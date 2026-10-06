@@ -59,20 +59,26 @@
                       DisplayMemberPath="DisplayLabel"
                       MinHeight="28"/>
             <Button Content="{loc:Loc Main_LoadMonitors}" Command="{Binding LoadMonitorsCommand}"
+                    ToolTip="{loc:Loc Tip_LoadMonitors}" ToolTipService.ShowOnDisabled="True"
                     Margin="0,6,0,0" Padding="8,4" HorizontalAlignment="Left"/>
         </StackPanel>
 
         <WrapPanel Grid.Row="3" Margin="0,4,0,12">
             <Button Content="{loc:Loc Main_LearnScreen}"
                     Command="{Binding LearnSelectedMonitorCommand}"
+                    ToolTip="{loc:Loc Tip_LearnScreen}" ToolTipService.ShowOnDisabled="True"
                     Padding="10,6" FontWeight="SemiBold"/>
         </WrapPanel>
 
         <WrapPanel Grid.Row="4" Margin="0,0,0,12">
-            <Button Content="{loc:Loc Main_CreateBackup}" Command="{Binding CreateTouchBackupCommand}" Padding="10,6" Margin="0,0,10,0"/>
-            <Button Content="{loc:Loc Main_AdvancedRepair}" Command="{Binding AdvancedRepairCommand}" Padding="10,6" Margin="0,0,10,0"/>
-            <Button Content="{loc:Loc Main_CheckServiceStatus}" Command="{Binding CheckServiceStatusCommand}" Padding="10,6" Margin="0,0,10,0"/>
-            <Button Content="{loc:Loc Main_ShowDiagnosticsLog}" Click="ShowLogWindow_OnClick" Padding="10,6"/>
+            <Button Content="{loc:Loc Main_ApplyNow}" Command="{Binding ApplyMappingsNowCommand}"
+                    ToolTip="{loc:Loc Tip_ApplyNow}" ToolTipService.ShowOnDisabled="True"
+                    Padding="10,6" Margin="0,0,10,0"/>
+            <Button Content="{loc:Loc Main_CheckServiceStatus}" Command="{Binding CheckServiceStatusCommand}"
+                    ToolTip="{loc:Loc Tip_CheckStatus}" ToolTipService.ShowOnDisabled="True"
+                    Padding="10,6" Margin="0,0,10,0"/>
+            <Button Content="{loc:Loc Main_ShowDiagnosticsLog}" Click="ShowLogWindow_OnClick"
+                    ToolTip="{loc:Loc Tip_ShowLog}" Padding="10,6"/>
         </WrapPanel>
 
         <TextBlock Grid.Row="5" Text="{Binding InstructionMessage}" TextWrapping="Wrap" FontWeight="SemiBold"

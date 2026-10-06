@@ -731,12 +731,13 @@ public partial class SetupWizardViewModel : ObservableObject
     partial void OnTabcalStepCompletedChanged(bool value) => RaiseNavigationChanged();
 
     /// <summary>
-    /// Command: run tabcal for every assignment, then ask the operator whether the pointer
-    /// actually follows their finger.
+    /// Command: have the service apply every learned assignment, then ask the operator whether
+    /// the pointer actually follows their finger.
     ///
-    /// Elevation IS required here and cannot be delegated: tabcal writes to
-    /// HKLM\SOFTWARE\Microsoft\Wisp\Touch, where Users hold read access only, and it needs the
-    /// interactive session, which the SYSTEM service does not have.
+    /// No tabcal.exe and no elevation: the service (SYSTEM) writes Windows' touch routing table
+    /// and restarts the digitizers when it answers the poll below. tabcal refused to run at all
+    /// with two touch screens attached ("Only one touch input device can be calibrated at a
+    /// time"). The poll carries this session's monitor list, which the service cannot see.
     /// </summary>
     [RelayCommand]
     public async Task RunTabcalTestAsync()
@@ -746,68 +747,25 @@ public partial class SetupWizardViewModel : ObservableObject
             IsBusy = true;
             TabcalStepCompleted = false;
 
-            if (!_elevation.IsElevated)
-            {
-                TabcalResult = _localizer[LocalizationKeys.Wizard_Step5_ElevationRequired];
-                StatusMessage = TabcalResult;
-
-                if (await _interaction.ConfirmAsync(
-                        TabcalResult + _localizer[LocalizationKeys.Wizard_Step5_ElevationConfirmSuffix],
-                        _localizer[LocalizationKeys.Wizard_Step5_ElevationConfirmTitle]))
-                {
-                    ElevationRequested = _elevation.RelaunchElevated(WizardSwitch);
-                }
-
-                return;
-            }
-
-            var pending = await _pipeClient.SendAsync<GetPendingReapplyResponse>(
+            await _pipeClient.SendAsync<GetPendingReapplyResponse>(
                 new GetPendingReapplyRequest(Monitors.ToList()));
 
-            if (pending.Pending == null || pending.Pending.Count == 0)
-            {
-                TabcalResult = _localizer[LocalizationKeys.Wizard_Step5_NothingPending];
-                StatusMessage = TabcalResult;
-                RecordStep(5, _localizer[LocalizationKeys.Wizard_Step5_RecordTitle], false, TabcalResult);
-                return;
-            }
+            // The digitizers restart when their routing changes; give them a moment to come
+            // back before the operator starts touching.
+            await Task.Delay(TimeSpan.FromSeconds(3));
 
-            int succeeded = 0;
-            foreach (var item in pending.Pending)
-            {
-                StatusMessage = string.Format(
-                    _localizer[LocalizationKeys.Wizard_Step5_CalibratingItem],
-                    item.MonitorFriendlyName, item.MonitorConnectorLabel);
-
-                var (ok, exitCode, error) =
-                    await _tabcal.RunAsync(item.LocalExecutablePath, item.LocalArguments);
-
-                try
-                {
-                    await _pipeClient.SendAsync<ReportReapplyResultResponse>(
-                        new ReportReapplyResultRequest(item.TouchHardwareKey, ok, exitCode, error));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Could not report the calibration result");
-                }
-
-                if (ok)
-                    succeeded++;
-
-                MarkAssignmentCalibrated(item.TouchHardwareKey, ok);
-            }
-
-            TabcalResult = string.Format(
-                _localizer[LocalizationKeys.Wizard_Step5_ResultCount], succeeded, pending.Pending.Count);
+            TabcalResult = _localizer[LocalizationKeys.Wizard_Step5_Applied];
             StatusMessage = TabcalResult;
 
-            // The decisive check is not tabcal's exit code — it is whether the pointer actually
-            // lands under the finger. Only a human can answer that.
+            // The decisive check is whether the pointer actually lands under the finger. Only a
+            // human can answer that, so the report records the operator's answer, not ours.
             PointerFollowsFinger = await _interaction.ConfirmAsync(
                 _localizer[LocalizationKeys.Wizard_Step5_VisualCheckIntro] + "\n\n" +
                 _localizer[LocalizationKeys.Wizard_Step5_VisualCheckQuestion],
                 _localizer[LocalizationKeys.Wizard_Step5_VisualCheckTitle]);
+
+            foreach (var assignment in _assignments.ToList())
+                MarkAssignmentCalibrated(assignment.TouchHardwareKey, PointerFollowsFinger == true);
 
             TabcalStepCompleted = true;
             TabcalResult += PointerFollowsFinger == true

@@ -88,38 +88,29 @@ public class TrayIconManager : IDisposable
     /// </summary>
     private ContextMenuStrip CreateContextMenu()
     {
-        _contextMenu = new ContextMenuStrip();
+        _contextMenu = new ContextMenuStrip { ShowItemToolTips = true };
 
-        var openConfig = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_OpenConfig]);
+        var openConfig = MenuItem(LocalizationKeys.Tray_OpenConfig, LocalizationKeys.Tip_OpenConfig);
         openConfig.Click += (s, e) => ShowMainWindow();
         _contextMenu.Items.Add(openConfig);
 
-        _contextMenu.Items.Add(new ToolStripSeparator());
-
-        var checkStatus = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_CheckStatus]);
-        checkStatus.Click += async (s, e) =>
-        {
-            await CheckServiceStatusAsync();
-        };
-        _contextMenu.Items.Add(checkStatus);
+        var applyNow = MenuItem(LocalizationKeys.Tray_ApplyNow, LocalizationKeys.Tip_ApplyNow);
+        applyNow.Click += async (s, e) => await ApplyMappingsNowAsync();
+        _contextMenu.Items.Add(applyNow);
 
         _contextMenu.Items.Add(new ToolStripSeparator());
 
-        var wizard = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_Wizard]);
+        var wizard = MenuItem(LocalizationKeys.Tray_Wizard, LocalizationKeys.Tip_Wizard);
         wizard.Click += (s, e) => ShowSetupWizard();
         _contextMenu.Items.Add(wizard);
 
-        var edidManager = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_EdidManager]);
+        var edidManager = MenuItem(LocalizationKeys.Tray_EdidManager, LocalizationKeys.Tip_EdidManager);
         edidManager.Click += (s, e) => ShowEdidManager();
         _contextMenu.Items.Add(edidManager);
 
-        var help = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_Help]);
+        var help = MenuItem(LocalizationKeys.Tray_Help, LocalizationKeys.Tip_Help);
         help.Click += (s, e) => ShowHelp();
         _contextMenu.Items.Add(help);
-
-        var exportLog = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_ExportLog]);
-        exportLog.Click += async (s, e) => await ExportDiagnosticsAsync();
-        _contextMenu.Items.Add(exportLog);
 
         _contextMenu.Items.Add(BuildDiagnoseMenu());
 
@@ -134,63 +125,65 @@ public class TrayIconManager : IDisposable
 
         _contextMenu.Items.Add(new ToolStripSeparator());
 
-        var exit = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_Exit]);
+        var exit = MenuItem(LocalizationKeys.Tray_Exit, LocalizationKeys.Tip_Exit);
         exit.Click += (s, e) => ExitApplication();
         _contextMenu.Items.Add(exit);
 
         return _contextMenu;
     }
 
+    private ToolStripMenuItem MenuItem(string textKey, string tipKey) =>
+        new(_localizer[textKey]) { ToolTipText = _localizer[tipKey] };
+
     /// <summary>
-    /// Builds the "Diagnose" submenu: manual overrides for automatic recovery mechanisms that
-    /// an operator may need to trigger by hand in the field. Currently holds just the console
-    /// session watchdog's manual reset.
+    /// Builds the "Diagnose" submenu: things a service technician needs, not the operator.
     ///
-    /// NOT routed through <see cref="ILocalizer"/> like the rest of this menu: this is an
-    /// operator/service-technician diagnostic entry, not part of the core localized UX, and
-    /// wiring one more string through all shipped languages' .resx files was judged not worth
-    /// it for a single admin-only menu entry. Revisit if this submenu grows.
+    /// The former "reset console session" entry is gone on purpose: it logged the operator's own
+    /// session off — which the Start menu does just as well — and after the watchdog had forced
+    /// unwanted sign-outs in the field, a one-click logoff in the tray was a risk without a use.
     /// </summary>
     private ToolStripMenuItem BuildDiagnoseMenu()
     {
-        var menu = new ToolStripMenuItem("Diagnose");
+        var menu = new ToolStripMenuItem(_localizer[LocalizationKeys.Tray_DiagnoseMenu]);
+        menu.DropDown.ShowItemToolTips = true;
 
-        var resetConsoleSession = new ToolStripMenuItem("Konsolen-Sitzung zurücksetzen");
-        resetConsoleSession.Click += async (s, e) => await ForceConsoleSessionResetAsync();
-        menu.DropDownItems.Add(resetConsoleSession);
+        var exportLog = MenuItem(LocalizationKeys.Tray_ExportLog, LocalizationKeys.Tip_ExportLog);
+        exportLog.Click += async (s, e) => await ExportDiagnosticsAsync();
+        menu.DropDownItems.Add(exportLog);
+
+        var checkStatus = MenuItem(LocalizationKeys.Tray_CheckStatus, LocalizationKeys.Tip_CheckStatus);
+        checkStatus.Click += async (s, e) => await CheckServiceStatusAsync(showResult: true);
+        menu.DropDownItems.Add(checkStatus);
 
         return menu;
     }
 
     /// <summary>
-    /// Confirms with the operator, then invokes the manual console-session reset override.
-    /// The confirmation lives here rather than in the ViewModel command because it is a tray-UI
-    /// concern (this is the only entry point for it) and because WTSLogoffSession is a
-    /// destructive, unconfirmable-once-fired action — an accidental menu click must not log the
-    /// operator's own console off without a chance to back out first.
+    /// "Apply mapping now": the service rewrites Windows' touch routing and restarts the
+    /// digitizers. The result is shown as a balloon, because with a silent start there is no
+    /// window in which a status line could appear.
     /// </summary>
-    private async Task ForceConsoleSessionResetAsync()
+    private async Task ApplyMappingsNowAsync()
     {
-        var confirmed = MessageBox.Show(
-            "Dies meldet die aktuelle Konsolen-Sitzung sofort ab, um einen hängenden Bildschirm " +
-            "(z. B. nach einem Stromausfall oder Grafiktreiber-Reset) zu beheben. Alle nicht " +
-            "gespeicherten Daten in anderen offenen Programmen dieser Sitzung gehen verloren. " +
-            "Fortfahren?",
-            "Konsolen-Sitzung zurücksetzen",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning) == MessageBoxResult.Yes;
-
-        if (!confirmed)
-            return;
-
         try
         {
-            await _viewModel.ForceConsoleSessionResetCommand.ExecuteAsync(null);
+            await _viewModel.ApplyMappingsNowCommand.ExecuteAsync(null);
+            ShowBalloon(_viewModel.StatusMessage ?? string.Empty);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Manual console session reset failed");
+            _logger.LogWarning(ex, "Apply-now from the tray failed");
         }
+    }
+
+    private void ShowBalloon(string text)
+    {
+        if (_notifyIcon == null || string.IsNullOrWhiteSpace(text))
+            return;
+
+        _notifyIcon.BalloonTipTitle = TrayIconText;
+        _notifyIcon.BalloonTipText = text;
+        _notifyIcon.ShowBalloonTip(5000);
     }
 
     /// <summary>
@@ -203,7 +196,10 @@ public class TrayIconManager : IDisposable
     /// </summary>
     private ToolStripMenuItem BuildLanguageMenu()
     {
-        var menu = new ToolStripMenuItem(_localizer[LocalizationKeys.LanguageMenuHeader]);
+        var menu = new ToolStripMenuItem(_localizer[LocalizationKeys.LanguageMenuHeader])
+        {
+            ToolTipText = _localizer[LocalizationKeys.Tip_Language]
+        };
 
         foreach (var culture in _localizer.AvailableCultures)
         {
@@ -270,8 +266,9 @@ public class TrayIconManager : IDisposable
     /// Updates tray icon color/tooltip based on status.
     /// (IEC 62443: Asynchronous to prevent UI freezing, DoS protection)
     /// </summary>
-    private async Task CheckServiceStatusAsync()
+    private async Task CheckServiceStatusAsync(bool showResult = false)
     {
+        string status;
         try
         {
             if (_notifyIcon == null) return;
@@ -287,23 +284,31 @@ public class TrayIconManager : IDisposable
 
             if (statusCheckTask.IsCompleted && _viewModel.IsServiceReachable)
             {
-                _notifyIcon.Text = $"{TrayIconText} - Dienst aktiv ✓";
+                status = _localizer[LocalizationKeys.Tray_StatusReachable];
                 _notifyIcon.Icon = GetActiveIcon();
             }
             else
             {
-                _notifyIcon.Text = $"{TrayIconText} - Dienst gestoppt ⚠";
+                // "Not reachable", not "stopped": a missing answer does not tell which it is.
+                status = _localizer[LocalizationKeys.Tray_StatusUnreachable];
                 _notifyIcon.Icon = GetInactiveIcon();
             }
         }
         catch (Exception ex)
         {
-            if (_notifyIcon != null)
-            {
-                _notifyIcon.Text = $"{TrayIconText} - Status unbekannt";
-            }
+            status = _localizer[LocalizationKeys.Tray_StatusUnknown];
             _logger.LogWarning(ex, "Tray service status check failed");
         }
+
+        if (_notifyIcon == null)
+            return;
+
+        // NotifyIcon.Text is limited to 127 characters.
+        var tooltip = $"{TrayIconText} - {status}";
+        _notifyIcon.Text = tooltip.Length > 127 ? tooltip[..127] : tooltip;
+
+        if (showResult)
+            ShowBalloon(status);
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ Unicode true
 
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
+!include "FileFunc.nsh"
 
 Name "TouchMappingAgent"
 OutFile "TouchMappingAgent-Setup.exe"
@@ -96,7 +97,32 @@ Function LaunchAgentNow
     Exec '"$INSTDIR\TouchMappingAgent.WPF.exe"'
 FunctionEnd
 
+; Waits (up to 10 s) until no process with the given image name is left. taskkill returns as
+; soon as termination is REQUESTED; the image stays mapped — and its .exe locked — until the
+; process has actually gone. Without this wait, version 1.0.1's silent install skipped
+; TouchMappingAgent.WPF.exe without any message and left the old client binary in place.
+!macro WaitForProcessExit IMAGE
+    StrCpy $R9 0
+    ${Do}
+        nsExec::ExecToStack 'cmd.exe /c tasklist /FI "IMAGENAME eq ${IMAGE}" /NH | find /I "${IMAGE}"'
+        Pop $R8
+        ${If} $R8 != 0
+            ${Break}
+        ${EndIf}
+        IntOp $R9 $R9 + 1
+        ${If} $R9 >= 20
+            ${Break}
+        ${EndIf}
+        Sleep 500
+    ${Loop}
+!macroend
+
 Section "Install"
+    ; 64-bit registry view throughout. NSIS is a 32-bit program; without this every HKLM\SOFTWARE
+    ; access is redirected to WOW6432Node — which is where 1.0.1 put its uninstall entry and Run
+    ; value, and why its uninstaller never reached the Mappings key the 64-bit service uses.
+    SetRegView 64
+
     ; Upgrade path: if a previous installation is registered, run ITS uninstaller silently
     ; before touching anything. This is what actually removes stale DLLs, the "en\" satellite
     ; folder and old registry entries from a version whose file set no longer matches this
@@ -107,10 +133,31 @@ Section "Install"
     ; place: without it, uninstall.exe copies itself to a temp file and returns immediately so
     ; it can delete itself, and this installer would then race it and start copying new files
     ; into a directory the old uninstaller is still cleaning up.
+    ;
+    ; "/UPGRADE" tells the uninstaller to KEEP the learned assignments: they describe this
+    ; machine's cabling, and an update must not force the operator to teach the screens again.
+    ; (1.0.1's uninstaller ignores the switch, but it only ever reached the WOW6432Node copy of
+    ; the Mappings key, so it never deleted the real one either.)
+    ;
+    ; The previous version may have registered itself in either view: 1.0.1 and earlier in
+    ; WOW6432Node, 1.0.2 and later in the 64-bit view.
     ReadRegStr $R0 HKLM "${UNINSTALL_REG_KEY}" "UninstallString"
-    ${If} $R0 != ""
-        ExecWait '"$R0" /S _?=$INSTDIR'
+    ${If} $R0 == ""
+        SetRegView 32
+        ReadRegStr $R0 HKLM "${UNINSTALL_REG_KEY}" "UninstallString"
+        SetRegView 64
     ${EndIf}
+    ${If} $R0 != ""
+        ExecWait '"$R0" /S /UPGRADE _?=$INSTDIR'
+    ${EndIf}
+
+    ; Leftovers of the 32-bit registration (1.0.1 and earlier). Removed explicitly because an
+    ; older uninstaller may not have run, and a stale Run value would start the client twice.
+    SetRegView 32
+    DeleteRegKey HKLM "${UNINSTALL_REG_KEY}"
+    DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "TouchMappingAgent"
+    DeleteRegKey HKLM "SYSTEM\CurrentControlSet\Services\EventLog\Application\TouchMappingAgent"
+    SetRegView 64
 
     ; Stop and remove any previous installation first. Without this, re-running the
     ; installer over an already-running service leaves its .exe/.dll files locked, so the
@@ -127,6 +174,7 @@ Section "Install"
     ; which surfaced as "Error opening file for writing: ...TouchMappingAgent.Service.exe"
     ; during install. Force-kill it so the File instruction below can actually overwrite it.
     nsExec::ExecToLog 'taskkill /IM TouchMappingAgent.Service.exe /F'
+    !insertmacro WaitForProcessExit "TouchMappingAgent.Service.exe"
 
     ; The WPF tray client is normally still running (minimized to tray) from a previous
     ; install — its .exe is just as locked as the service's while it's running, and
@@ -134,6 +182,7 @@ Section "Install"
     ; update the service but leave the OLD client binary in place and running, which looks
     ; exactly like "nothing changed" even though the service-side fix did apply.
     nsExec::ExecToLog 'taskkill /IM TouchMappingAgent.WPF.exe /F'
+    !insertmacro WaitForProcessExit "TouchMappingAgent.WPF.exe"
 
     SetOutPath "$INSTDIR"
     File "publish\*.exe"
@@ -206,8 +255,16 @@ Section "Install"
 SectionEnd
 
 Section "Uninstall"
+    ; See the Install section: without this, HKLM\SOFTWARE is the WOW6432Node copy.
+    SetRegView 64
+
     nsExec::ExecToLog 'net stop TouchMappingAgent'
     nsExec::ExecToLog 'sc.exe delete TouchMappingAgent'
+
+    ; Stop the client too: a running client keeps its .exe locked, and the Delete below would
+    ; leave it behind.
+    nsExec::ExecToLog 'taskkill /IM TouchMappingAgent.WPF.exe /F'
+    !insertmacro WaitForProcessExit "TouchMappingAgent.WPF.exe"
 
     ; Remove shortcuts
     Delete "$DESKTOP\TouchMappingAgent.lnk"
@@ -236,7 +293,13 @@ Section "Uninstall"
     DeleteRegKey HKLM "${UNINSTALL_REG_KEY}"
     DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "TouchMappingAgent"
 
-    ; Learned touch-to-monitor assignments. Removed on uninstall because they describe THIS
-    ; machine's cabling and are meaningless without the agent that applies them.
-    DeleteRegKey HKLM "SOFTWARE\PadaLuma\TouchMappingAgent\Mappings"
+    ; Learned touch-to-monitor assignments. Removed on a real uninstall because they describe
+    ; THIS machine's cabling and are meaningless without the agent that applies them — but kept
+    ; when the installer of a newer version runs this uninstaller as part of an upgrade.
+    ${GetParameters} $R0
+    ClearErrors
+    ${GetOptions} $R0 "/UPGRADE" $R1
+    ${If} ${Errors}
+        DeleteRegKey HKLM "SOFTWARE\PadaLuma\TouchMappingAgent\Mappings"
+    ${EndIf}
 SectionEnd

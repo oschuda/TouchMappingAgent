@@ -232,7 +232,7 @@
     <value>Note: </value>
   </data>
   <data name="Main_NoticeText" xml:space="preserve">
-    <value>With identical touch monitors, Windows prompts you during calibration to physically touch the target screen — exactly as in the native Tablet PC Setup wizard. Please touch the correct monitor the moment calibration starts.</value>
+    <value>While teaching, a full-screen window appears on the selected screen. Touch exactly that screen — this is how the agent learns which touch device belongs to it.</value>
   </data>
   <data name="Main_MonitorLabel" xml:space="preserve">
     <value>Monitor</value>
@@ -289,7 +289,7 @@
     <value>Mapping for {0} [{1}] saved and activated.</value>
   </data>
   <data name="Main_CalibrationFailed" xml:space="preserve">
-    <value>Calibration failed. Please run TouchMappingAgent as Administrator and try again.</value>
+    <value>The mapping could not be applied. See the diagnostics log for details.</value>
   </data>
   <data name="Main_Ready" xml:space="preserve">
     <value>Ready</value>
@@ -388,7 +388,7 @@
     <value>Touch Alignment (Digitizer Assignment)</value>
   </data>
   <data name="Wizard_StepTitle_TabcalTest" xml:space="preserve">
-    <value>Function Test &amp; Visual Alignment</value>
+    <value>Apply Mapping &amp; Visual Check</value>
   </data>
   <data name="Wizard_StepTitle_Summary" xml:space="preserve">
     <value>Commissioning Report</value>
@@ -593,16 +593,16 @@
 
   <!-- ===== Setup wizard: step 5 ===== -->
   <data name="Wizard_Step5_IntroBeforeBold" xml:space="preserve">
-    <value>The mapping is now activated in the Windows touch stack via tabcal.exe.</value>
+    <value>The background service now writes the mapping into the Windows touch table and briefly restarts the touch devices.</value>
   </data>
   <data name="Wizard_Step5_BoldPhrase" xml:space="preserve">
-    <value>This requires administrative rights.</value>
+    <value>No administrative rights are required.</value>
   </data>
   <data name="Wizard_Step5_IntroAfterBold" xml:space="preserve">
-    <value>tabcal writes to HKLM\SOFTWARE\Microsoft\Wisp\Touch, where normal users hold read access only. The background service cannot take this over: calibration needs the interactive session, which Session 0 is not.</value>
+    <value>The service runs as SYSTEM and writes HKLM\SOFTWARE\Microsoft\Wisp\Pen\Digimon itself. tabcal.exe is no longer used: it refuses to work as soon as two touch devices are attached.</value>
   </data>
   <data name="Wizard_Step5_Run" xml:space="preserve">
-    <value>Run Calibration and Start Visual Check</value>
+    <value>Apply Mapping and Start Visual Check</value>
   </data>
   <data name="Wizard_Step5_NotYetRun" xml:space="preserve">
     <value>Not yet run.</value>
@@ -620,6 +620,9 @@ Restart the wizard now with elevated rights?</value>
   </data>
   <data name="Wizard_Step5_NothingPending" xml:space="preserve">
     <value>The service reports no mapping to apply.</value>
+  </data>
+  <data name="Wizard_Step5_Applied" xml:space="preserve">
+    <value>The service has applied the mapping.</value>
   </data>
   <data name="Wizard_Step5_CalibratingItem" xml:space="preserve">
     <value>Calibrating {0} [{1}] …</value>
@@ -643,10 +646,10 @@ Restart the wizard now with elevated rights?</value>
     <value> Visual check NOT confirmed — check the mapping.</value>
   </data>
   <data name="Wizard_Step5_RecordTitle" xml:space="preserve">
-    <value>Calibration</value>
+    <value>Apply mapping</value>
   </data>
   <data name="Wizard_Step5_Failed" xml:space="preserve">
-    <value>The calibration test failed. See the diagnostics log for details.</value>
+    <value>Applying the mapping failed. See the diagnostics log for details.</value>
   </data>
 
   <!-- ===== Setup wizard: step 6 ===== -->
@@ -893,10 +896,10 @@ The agent supplies the missing criterion: a mapping learned once, anchored to th
     <value> Touch that screen. The agent identifies which digitizer sent the touch from the raw input signal and permanently links it to that monitor's port.</value>
   </data>
   <data name="Help_S2_Closing" xml:space="preserve">
-    <value>One pass per screen is then enough. The agent restores the mapping by itself after every restart and every DisplayPort event.</value>
+    <value>Alternatively, the setup wizard (tray menu) walks through all screens in turn and finishes with a visual check. One pass per screen is enough: from then on the background service writes the mapping into Windows by itself after every restart, every logon and every extender restart.</value>
   </data>
   <data name="Help_S3_Heading" xml:space="preserve">
-    <value>3. EDID Collisions</value>
+    <value>5. EDID Collisions</value>
   </data>
   <data name="Help_S3_Body1" xml:space="preserve">
     <value>The touch mapping itself does not need this — it uses the PnP device path, which is unique regardless. An EDID collision does, however, disrupt every</value>
@@ -917,7 +920,7 @@ The agent supplies the missing criterion: a mapping learned once, anchored to th
     <value> When two monitors share only the numeric serial number but differ in their text descriptor, the agent deliberately does not intervene — they are distinguishable. The value 0x01010101 is a common placeholder for "serial number not programmed"; rewriting such panels would achieve nothing and would alter firmware data without need.</value>
   </data>
   <data name="Help_S4_Heading" xml:space="preserve">
-    <value>4. Range Extenders (KVM / HDBaseT)</value>
+    <value>6. Range Extenders (KVM / HDBaseT)</value>
   </data>
   <data name="Help_S4_Body1" xml:space="preserve">
     <value>Extenders frequently do not pass DDC through. Two symptoms:</value>
@@ -954,25 +957,91 @@ The agent supplies the missing criterion: a mapping learned once, anchored to th
     <value> If the screens stay black ("no signal") after a restart and only work after a power cycle at the extender, the hot-plug-detect chain is interrupted during boot. An EDID override only helps to a limited extent here — active DP-to-HDMI adapters, an EDID emulator right at the graphics output, or a power supply where the extenders come up before the server can remedy this.</value>
   </data>
   <data name="Help_S5_Heading" xml:space="preserve">
-    <value>5. Important: The Agent Must Keep Running</value>
+    <value>7. Important: The Agent Must Keep Running</value>
   </data>
   <data name="Help_S5_Body1" xml:space="preserve">
-    <value>The service decides which mapping needs to be restored, but cannot carry that out itself: it runs in Session 0 and can neither see the desktop nor start tabcal.exe. Only the tray agent in the user session can do that.</value>
+    <value>The background service writes the mappings into Windows itself. It cannot see the desktop, though: it learns which screens are attached only from the tray agent in the user session. Without a running tray agent, no mapping is applied.</value>
   </data>
   <data name="Help_S5_Body2" xml:space="preserve">
     <value>If the agent is closed via "Exit", the mapping will not be restored after the next restart. Closing via the "X" does not exit it — it keeps running in the notification area.</value>
   </data>
   <data name="Help_S6_Heading" xml:space="preserve">
-    <value>6. If You Run Into Trouble</value>
+    <value>8. Logs for Support</value>
   </data>
   <data name="Help_S6_Body1" xml:space="preserve">
-    <value>"Export Diagnostics Log" in the tray menu writes the service's and client's logs, plus a snapshot of the detected hardware, to a file.</value>
+    <value>"Diagnostics → Export Diagnostics Log" in the tray menu writes the service's and client's logs, plus a snapshot of the detected hardware, to a file. Please attach this file to every support request.</value>
   </data>
   <data name="Help_S6_LogsLabel" xml:space="preserve">
     <value>Logs live under:</value>
   </data>
   <data name="Help_S6_TemplatesLabel" xml:space="preserve">
     <value>EDID templates live under:</value>
+  </data>
+  <data name="Help_S7_Heading" xml:space="preserve">
+    <value>3. Controls</value>
+  </data>
+  <data name="Help_S7_TrayLabel" xml:space="preserve">
+    <value>Tray menu (right-click the icon in the notification area):</value>
+  </data>
+  <data name="Help_S7_TrayText" xml:space="preserve">
+    <value>• Open Configuration – opens the main window (also by double-clicking the icon).
+• Apply mapping now – writes every stored mapping into Windows immediately and briefly restarts the touch devices. The first thing to try when touch lands on the wrong screen.
+• Setup Wizard – guided commissioning: prerequisites, EDID, teaching, applying with visual check, report.
+• EDID &amp; Display Manager – EDID status, collisions and templates (for technicians).
+• Help &amp; Manual – this window.
+• Diagnostics – export diagnostics log; check service status.
+• Language – switch the UI language.
+• Exit – ends the agent. Mappings are then no longer applied automatically.
+The dot on the icon shows the background service: green = reachable, amber = not reachable. Hovering over a menu entry shows a hint.</value>
+  </data>
+  <data name="Help_S7_MainLabel" xml:space="preserve">
+    <value>Main window:</value>
+  </data>
+  <data name="Help_S7_MainText" xml:space="preserve">
+    <value>• Load Monitors – re-reads the attached screens.
+• Learn Screen (Touch) – links the selected screen to the touch device that is touched next (see section 2).
+• Apply Mapping Now – as in the tray menu.
+• Check Service Status – checks whether the background service answers.
+• View Diagnostics Log – shows this session's log entries.</value>
+  </data>
+  <data name="Help_S8_Heading" xml:space="preserve">
+    <value>4. Symptoms and Remedies</value>
+  </data>
+  <data name="Help_S8_WrongScreenLabel" xml:space="preserve">
+    <value>Touch lands on the wrong screen</value>
+  </data>
+  <data name="Help_S8_WrongScreenText" xml:space="preserve">
+    <value>→ Tray menu "Apply mapping now". If that does not help, teach the screens again in the setup wizard.</value>
+  </data>
+  <data name="Help_S8_BriefOutageLabel" xml:space="preserve">
+    <value>Touch does not respond for a few seconds after an extender restart</value>
+  </data>
+  <data name="Help_S8_BriefOutageText" xml:space="preserve">
+    <value>→ Expected. The service writes the mapping again and briefly restarts the touch devices to do so.</value>
+  </data>
+  <data name="Help_S8_UnresolvableLabel" xml:space="preserve">
+    <value>Message "Unresolvable: 1" (or more)</value>
+  </data>
+  <data name="Help_S8_UnresolvableText" xml:space="preserve">
+    <value>→ A stored mapping matches no attached device: a touch device or monitor is missing, a USB cable was moved, or the mapping predates version 1.0.1. Teach the affected screen again.</value>
+  </data>
+  <data name="Help_S8_ServiceLabel" xml:space="preserve">
+    <value>Amber dot on the icon / "Service not reachable"</value>
+  </data>
+  <data name="Help_S8_ServiceText" xml:space="preserve">
+    <value>→ Check the "TouchMappingAgent" service in the Windows Services console and start it if needed. Without the service, no mapping is applied.</value>
+  </data>
+  <data name="Help_S8_ReplugLabel" xml:space="preserve">
+    <value>A touch device's USB cable was moved</value>
+  </data>
+  <data name="Help_S8_ReplugText" xml:space="preserve">
+    <value>→ The mapping is tied to the USB port. After moving the cable, teach the affected screen again.</value>
+  </data>
+  <data name="Help_S8_BlackLabel" xml:space="preserve">
+    <value>Screens black after a restart</value>
+  </data>
+  <data name="Help_S8_BlackText" xml:space="preserve">
+    <value>→ Not a touch-mapping fault. See section 6, "On the handshake".</value>
   </data>
   <data name="Help_Close" xml:space="preserve">
     <value>Close</value>
@@ -1027,6 +1096,72 @@ Do you really want to exit the agent?</value>
   </data>
   <data name="Tray_CheckingStatus" xml:space="preserve">
     <value>Checking status...</value>
+  </data>
+  <data name="Tray_ApplyNow" xml:space="preserve">
+    <value>Apply mapping now</value>
+  </data>
+  <data name="Tray_DiagnoseMenu" xml:space="preserve">
+    <value>Diagnostics</value>
+  </data>
+  <data name="Tray_StatusReachable" xml:space="preserve">
+    <value>Service reachable</value>
+  </data>
+  <data name="Tray_StatusUnreachable" xml:space="preserve">
+    <value>Service not reachable</value>
+  </data>
+  <data name="Tray_StatusUnknown" xml:space="preserve">
+    <value>Service status unknown</value>
+  </data>
+  <data name="Tip_LoadMonitors" xml:space="preserve">
+    <value>Re-reads the attached screens, e.g. after an extender has been switched back on.</value>
+  </data>
+  <data name="Tip_LearnScreen" xml:space="preserve">
+    <value>Shows a full-screen window on the selected screen. Touch that screen to link it to its touch device.</value>
+  </data>
+  <data name="Tip_ApplyNow" xml:space="preserve">
+    <value>Writes every stored mapping into Windows immediately and briefly restarts the touch devices. The first thing to try when touch lands on the wrong screen.</value>
+  </data>
+  <data name="Tip_CheckStatus" xml:space="preserve">
+    <value>Checks whether the background service answers. Without the service, no mapping is applied.</value>
+  </data>
+  <data name="Tip_ShowLog" xml:space="preserve">
+    <value>Shows this session's log entries.</value>
+  </data>
+  <data name="Tip_OpenConfig" xml:space="preserve">
+    <value>Opens the main window with the screen list and teaching.</value>
+  </data>
+  <data name="Tip_Wizard" xml:space="preserve">
+    <value>Guided commissioning: prerequisites, EDID, teaching, applying with visual check, report.</value>
+  </data>
+  <data name="Tip_EdidManager" xml:space="preserve">
+    <value>EDID status, collisions and templates of the screens. For technicians.</value>
+  </data>
+  <data name="Tip_Help" xml:space="preserve">
+    <value>Manual with controls and symptoms.</value>
+  </data>
+  <data name="Tip_ExportLog" xml:space="preserve">
+    <value>Saves logs and a hardware snapshot to a file – for support requests.</value>
+  </data>
+  <data name="Tip_Language" xml:space="preserve">
+    <value>Switch the UI language.</value>
+  </data>
+  <data name="Tip_Exit" xml:space="preserve">
+    <value>Ends the agent. Mappings are then no longer applied automatically.</value>
+  </data>
+  <data name="Main_ApplyNow" xml:space="preserve">
+    <value>Apply Mapping Now</value>
+  </data>
+  <data name="Main_ApplyingNow" xml:space="preserve">
+    <value>Applying the mapping; the touch devices restart briefly …</value>
+  </data>
+  <data name="Main_ApplyNowResult" xml:space="preserve">
+    <value>{0} of {1} mapping(s) applied. Unresolvable: {2}, failed: {3}.</value>
+  </data>
+  <data name="Main_ApplyNowNothingStored" xml:space="preserve">
+    <value>No mapping stored. Please teach the screens first.</value>
+  </data>
+  <data name="Main_ApplyNowFailed" xml:space="preserve">
+    <value>The mapping could not be applied: background service not reachable.</value>
   </data>
   <data name="Tray_EdidManagerOpenFailed" xml:space="preserve">
     <value>The EDID manager could not be opened. See the diagnostics log for details.</value>

@@ -139,6 +139,7 @@ public sealed class DiagnosticsExporter
                 sb.AppendLine($"    DevicePath      : {d.DevicePath}");
                 sb.AppendLine($"    InstanceId      : {d.InstanceId}");
                 sb.AppendLine($"    ParentInstanceId: {d.ParentInstanceId}");
+                sb.AppendLine($"    ParentLocation  : {d.ParentLocationPath}");
                 sb.AppendLine($"    HardwareKey     : {d.HardwareKey}");
                 sb.AppendLine();
             }

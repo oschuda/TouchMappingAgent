@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
 using TouchMappingAgent.Service.Services;
+using TouchMappingAgent.Shared.Contracts;
 using TouchMappingAgent.Shared.Localization;
 using TouchMappingAgent.Shared.Models;
 using Xunit;
@@ -11,9 +12,9 @@ namespace TouchMappingAgent.Tests.ServiceTests;
 /// Tests for the automatic re-application decision.
 ///
 /// The behaviour that matters operationally: after a hardware change (reboot, extender
-/// power-cycle, cable reseat) every stored assignment must be queued again, and once applied
-/// it must NOT be queued again until the hardware changes once more — otherwise the client
-/// would re-run tabcal.exe on every poll, several times a minute, forever.
+/// power-cycle, cable reseat) every stored assignment must be applied again, and once applied
+/// it must NOT be applied again until the hardware changes once more — otherwise every poll
+/// would rewrite the routing and restart the digitizers, several times a minute, forever.
 /// </summary>
 public class ReapplyCoordinatorTests : IDisposable
 {
@@ -23,6 +24,7 @@ public class ReapplyCoordinatorTests : IDisposable
     private readonly RegistryKey _testRoot;
     private readonly string _testRootName;
     private readonly MappingStore _store;
+    private readonly RecordingApplier _applier = new();
     private readonly ReapplyCoordinator _coordinator;
 
     public ReapplyCoordinatorTests()
@@ -30,7 +32,7 @@ public class ReapplyCoordinatorTests : IDisposable
         _testRootName = $@"Software\PadaLumaTests\{Guid.NewGuid():N}";
         _testRoot = Registry.CurrentUser.CreateSubKey(_testRootName, writable: true)!;
         _store = new MappingStore(NullLogger<MappingStore>.Instance, _testRoot);
-        _coordinator = new ReapplyCoordinator(NullLogger<ReapplyCoordinator>.Instance, _store);
+        _coordinator = new ReapplyCoordinator(NullLogger<ReapplyCoordinator>.Instance, _store, _applier);
     }
 
     public void Dispose()
@@ -69,56 +71,58 @@ public class ReapplyCoordinatorTests : IDisposable
         MonitorFriendlyName: "DM7000"));
 
     [Fact]
-    public void GetPending_QueuesStoredAssignment_WithRuntimeIdentifiers()
+    public void GetPending_AppliesStoredAssignment_AndHandsNothingToTheClient()
     {
         SeedMapping();
 
         var pending = _coordinator.GetPending(new[] { TouchA() }, new[] { Dp3() });
 
-        var item = Assert.Single(pending);
-        Assert.Equal("DP-3", item.MonitorConnectorLabel);
-        Assert.Equal(@"\\.\DISPLAY3", item.MonitorDeviceId);
-        Assert.Equal(TouchA().DevicePath, item.TouchDevicePath);
-        Assert.Equal(MappingMatchQuality.Exact, item.MatchQuality);
-        Assert.Contains(@"DisplayID=\\.\DISPLAY3", item.LocalArguments);
+        Assert.Empty(pending); // no tabcal work for the client any more
+        var (touch, monitor) = Assert.Single(_applier.Calls);
+        Assert.Equal(TouchA().DevicePath, touch.DevicePath);
+        Assert.Equal("DP-3", monitor.ConnectorLabel);
+        Assert.Equal(Dp3().DevicePath, monitor.DevicePath);
     }
 
     [Fact]
-    public void GetPending_ReturnsEmpty_WhenNothingStored()
+    public void GetPending_DoesNothing_WhenNothingStored()
     {
         Assert.Empty(_coordinator.GetPending(new[] { TouchA() }, new[] { Dp3() }));
+        Assert.Empty(_applier.Calls);
     }
 
     [Fact]
-    public void GetPending_StopsQueueing_AfterSuccessfulApplication()
-    {
-        SeedMapping();
-        var digitizers = new[] { TouchA() };
-        var monitors = new[] { Dp3() };
-
-        Assert.Single(_coordinator.GetPending(digitizers, monitors));
-
-        _coordinator.ReportResult(HidDeviceInfo.NormalizeInstanceId(TouchParentA), true, 0, null);
-
-        Assert.Empty(_coordinator.GetPending(digitizers, monitors));
-    }
-
-    /// <summary>
-    /// A failed run must stay queued: tabcal.exe failing because the client was not elevated
-    /// is a transient condition, and silently dropping the work would leave the operator with
-    /// touches on the wrong screen and nothing retrying.
-    /// </summary>
-    [Fact]
-    public void GetPending_KeepsQueueing_AfterFailedApplication()
+    public void GetPending_DoesNotReapply_AfterSuccessfulApplication()
     {
         SeedMapping();
         var digitizers = new[] { TouchA() };
         var monitors = new[] { Dp3() };
 
         _coordinator.GetPending(digitizers, monitors);
-        _coordinator.ReportResult(HidDeviceInfo.NormalizeInstanceId(TouchParentA), false, 1, "tabcal failed");
+        _coordinator.GetPending(digitizers, monitors);
+        _coordinator.GetPending(digitizers, monitors);
 
-        Assert.Single(_coordinator.GetPending(digitizers, monitors));
+        Assert.Single(_applier.Calls);
+    }
+
+    /// <summary>
+    /// A failed application must be retried on the next poll: silently dropping the work would
+    /// leave the operator with touches on the wrong screen and nothing retrying.
+    /// </summary>
+    [Fact]
+    public void GetPending_RetriesOnTheNextPoll_AfterFailedApplication()
+    {
+        SeedMapping();
+        var digitizers = new[] { TouchA() };
+        var monitors = new[] { Dp3() };
+
+        _applier.NextOutcome = TouchMapApplyOutcome.Failed;
+        _coordinator.GetPending(digitizers, monitors);
+        _applier.NextOutcome = TouchMapApplyOutcome.Updated;
+        _coordinator.GetPending(digitizers, monitors);
+        _coordinator.GetPending(digitizers, monitors);
+
+        Assert.Equal(2, _applier.Calls.Count);
     }
 
     /// <summary>
@@ -127,35 +131,33 @@ public class ReapplyCoordinatorTests : IDisposable
     /// already applied in the previous configuration.
     /// </summary>
     [Fact]
-    public void GetPending_RequeuesEverything_WhenHardwareGenerationChanges()
+    public void GetPending_ReappliesEverything_WhenHardwareGenerationChanges()
     {
         SeedMapping();
         var digitizers = new[] { TouchA() };
 
         _coordinator.GetPending(digitizers, new[] { Dp3() });
-        _coordinator.ReportResult(HidDeviceInfo.NormalizeInstanceId(TouchParentA), true, 0, null);
-        Assert.Empty(_coordinator.GetPending(digitizers, new[] { Dp3() }));
+        _coordinator.GetPending(digitizers, new[] { Dp3() });
+        Assert.Single(_applier.Calls);
 
         // Same panel, moved in the desktop arrangement.
-        var moved = Dp3() with { X = 0, Y = 0 };
+        _coordinator.GetPending(digitizers, new[] { Dp3() with { X = 0, Y = 0 } });
 
-        Assert.Single(_coordinator.GetPending(digitizers, new[] { moved }));
+        Assert.Equal(2, _applier.Calls.Count);
     }
 
     [Fact]
-    public void InvalidateAppliedState_RequeuesWithoutAHardwareChange()
+    public void InvalidateAppliedState_ReappliesWithoutAHardwareChange()
     {
         SeedMapping();
         var digitizers = new[] { TouchA() };
         var monitors = new[] { Dp3() };
 
         _coordinator.GetPending(digitizers, monitors);
-        _coordinator.ReportResult(HidDeviceInfo.NormalizeInstanceId(TouchParentA), true, 0, null);
-        Assert.Empty(_coordinator.GetPending(digitizers, monitors));
-
         _coordinator.InvalidateAppliedState("test");
+        _coordinator.GetPending(digitizers, monitors);
 
-        Assert.Single(_coordinator.GetPending(digitizers, monitors));
+        Assert.Equal(2, _applier.Calls.Count);
     }
 
     [Fact]
@@ -163,7 +165,9 @@ public class ReapplyCoordinatorTests : IDisposable
     {
         SeedMapping();
 
-        Assert.Empty(_coordinator.GetPending(Array.Empty<HidDeviceInfo>(), new[] { Dp3() }));
+        _coordinator.GetPending(Array.Empty<HidDeviceInfo>(), new[] { Dp3() });
+
+        Assert.Empty(_applier.Calls);
     }
 
     [Fact]
@@ -171,7 +175,60 @@ public class ReapplyCoordinatorTests : IDisposable
     {
         SeedMapping();
 
-        Assert.Empty(_coordinator.GetPending(new[] { TouchA() }, Array.Empty<MonitorInfo>()));
+        _coordinator.GetPending(new[] { TouchA() }, Array.Empty<MonitorInfo>());
+
+        Assert.Empty(_applier.Calls);
+    }
+
+    [Fact]
+    public void ApplyNow_ForcesTheRestart_AndCountsTheOutcome()
+    {
+        SeedMapping();
+
+        var result = _coordinator.ApplyNow(new[] { TouchA() }, new[] { Dp3() });
+
+        Assert.Equal(new ApplyMappingsNowResponse(MappingCount: 1, Applied: 1, Unresolvable: 0, Failed: 0), result);
+        Assert.True(Assert.Single(_applier.ForcedFlags));
+    }
+
+    [Fact]
+    public void ApplyNow_ReappliesEvenWhenAlreadyAppliedInThisGeneration()
+    {
+        // The operator presses this because touch is wrong NOW; "already applied" is exactly the
+        // belief that has to be overridden.
+        SeedMapping();
+        _coordinator.GetPending(new[] { TouchA() }, new[] { Dp3() });
+
+        _coordinator.ApplyNow(new[] { TouchA() }, new[] { Dp3() });
+
+        Assert.Equal(2, _applier.Calls.Count);
+    }
+
+    [Fact]
+    public void ApplyNow_ReportsUnresolvableAndFailedAssignments()
+    {
+        SeedMapping();
+
+        var absent = _coordinator.ApplyNow(Array.Empty<HidDeviceInfo>(), new[] { Dp3() });
+        Assert.Equal(new ApplyMappingsNowResponse(1, 0, 1, 0), absent);
+
+        _applier.NextOutcome = TouchMapApplyOutcome.Failed;
+        var failed = _coordinator.ApplyNow(new[] { TouchA() }, new[] { Dp3() });
+        Assert.Equal(new ApplyMappingsNowResponse(1, 0, 0, 1), failed);
+    }
+
+    private sealed class RecordingApplier : IWindowsTouchMapApplier
+    {
+        public List<(HidDeviceInfo Touch, MonitorInfo Monitor)> Calls { get; } = new();
+        public List<bool> ForcedFlags { get; } = new();
+        public TouchMapApplyOutcome NextOutcome { get; set; } = TouchMapApplyOutcome.Updated;
+
+        public TouchMapApplyOutcome Apply(HidDeviceInfo touch, MonitorInfo monitor, bool forceRestart = false)
+        {
+            Calls.Add((touch, monitor));
+            ForcedFlags.Add(forceRestart);
+            return NextOutcome;
+        }
     }
 
     [Fact]

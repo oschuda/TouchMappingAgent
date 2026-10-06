@@ -29,6 +29,13 @@ namespace TouchMappingAgent.WPF.Services;
 public sealed class ReapplyAgent : IDisposable
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// Heartbeat cadence, on its own loop. It must not share the poll loop: a poll can block for
+    /// 60s per pending item inside tabcal.exe, and a heartbeat that stalls with it reads as a
+    /// hung session to the service's watchdog.
+    /// </summary>
+    internal static readonly TimeSpan HeartbeatInterval = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan DisplayChangeSettleDelay = TimeSpan.FromSeconds(3);
     private static readonly TimeSpan TabcalTimeout = TimeSpan.FromSeconds(60);
 
@@ -41,6 +48,7 @@ public sealed class ReapplyAgent : IDisposable
     private readonly SemaphoreSlim _pollGate = new(1, 1);
 
     private Task? _loop;
+    private Task? _heartbeatLoop;
     private bool _disposed;
 
     /// <summary>Raised when an assignment was re-applied, for status display.</summary>
@@ -88,6 +96,7 @@ public sealed class ReapplyAgent : IDisposable
             return;
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+        _heartbeatLoop = Task.Run(() => RunHeartbeatAsync(_cts.Token));
         _loop = Task.Run(() => RunAsync(_cts.Token));
 
         _logger.LogInformation(
@@ -128,6 +137,44 @@ public sealed class ReapplyAgent : IDisposable
         _logger.LogInformation("Re-application agent stopped");
     }
 
+    private async Task RunHeartbeatAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await SendHeartbeatAsync(DisplayEnumerator.EnumerateMonitors().Count);
+
+            try
+            {
+                await Task.Delay(HeartbeatInterval, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Console session watchdog heartbeat: the service runs in Session 0 and cannot see the
+    /// desktop at all, so it relies on THIS client's own (correct) monitor count to tell a hung
+    /// DWM apart from a Session-0 blind spot. Sent even when the count is 0, since "0" is exactly
+    /// the signal the watchdog needs — see ConsoleDisplayHeartbeatState's remarks. Best-effort.
+    /// </summary>
+    internal async Task SendHeartbeatAsync(int monitorCount)
+    {
+        try
+        {
+            await _pipeClient.SendAsync<ConsoleDisplayHeartbeatResponse>(
+                new ConsoleDisplayHeartbeatRequest(
+                    monitorCount,
+                    System.Diagnostics.Process.GetCurrentProcess().SessionId));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Console display heartbeat failed; will retry");
+        }
+    }
+
     /// <summary>
     /// One poll: ask the service what is pending for the monitors currently attached, then
     /// apply each item and report the outcome back.
@@ -143,24 +190,7 @@ public sealed class ReapplyAgent : IDisposable
         {
             var monitors = DisplayEnumerator.EnumerateMonitors();
 
-            // Console session watchdog heartbeat: the service runs in Session 0 and cannot see
-            // the desktop at all, so it relies on THIS client's own (correct) monitor count to
-            // tell a hung DWM apart from a Session-0 blind spot. Sent unconditionally, even
-            // when monitors.Count is 0 below, since "0" is exactly the signal the watchdog
-            // needs — see ConsoleDisplayHeartbeatState's remarks. Best-effort: a failed
-            // heartbeat must never block re-application, which is why it is not awaited inside
-            // the same try/catch as the rest of this method.
-            try
-            {
-                await _pipeClient.SendAsync<ConsoleDisplayHeartbeatResponse>(
-                    new ConsoleDisplayHeartbeatRequest(
-                        monitors.Count,
-                        System.Diagnostics.Process.GetCurrentProcess().SessionId));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug(ex, "Console display heartbeat failed; will retry next poll");
-            }
+            // The heartbeat is sent from its own loop (RunHeartbeatAsync), not from here.
 
             if (monitors.Count == 0)
             {

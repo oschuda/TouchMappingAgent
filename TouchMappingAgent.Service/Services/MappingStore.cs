@@ -121,6 +121,9 @@ public class MappingStore
                 RemoveLegacyFlatValues(key);
 
                 var subKeyName = EscapeKeyName(mapping.TouchHardwareKey);
+
+                if (HidDeviceInfo.IsPortKey(mapping.TouchHardwareKey))
+                    RemoveSupersededInstanceAnchoredEntries(key, subKeyName, mapping.MonitorHardwareKey);
                 using var entry = key.CreateSubKey(subKeyName, writable: true);
                 if (entry == null)
                 {
@@ -284,6 +287,47 @@ public class MappingStore
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Could not remove legacy mapping value {LegacyValue}", valueName);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Re-learning a screen with a port anchor replaces the entry that the former USB-instance
+    /// anchor left for the same monitor. Without this the old entry would linger forever:
+    /// it no longer resolves (see ReapplyCoordinator) but would still count as an unresolvable
+    /// assignment in every status report.
+    /// </summary>
+    private void RemoveSupersededInstanceAnchoredEntries(
+        RegistryKey key, string newSubKeyName, string monitorHardwareKey)
+    {
+        if (string.IsNullOrWhiteSpace(monitorHardwareKey))
+            return;
+
+        foreach (var subKeyName in key.GetSubKeyNames())
+        {
+            if (string.Equals(subKeyName, newSubKeyName, StringComparison.OrdinalIgnoreCase) ||
+                HidDeviceInfo.IsPortKey(UnescapeKeyName(subKeyName)))
+            {
+                continue;
+            }
+
+            try
+            {
+                string storedMonitor;
+                using (var entry = key.OpenSubKey(subKeyName))
+                    storedMonitor = entry == null ? string.Empty : ReadString(entry, TouchMapping.ValueNames.MonitorHardwareKey);
+
+                if (!string.Equals(storedMonitor, monitorHardwareKey, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                key.DeleteSubKeyTree(subKeyName, throwOnMissingSubKey: false);
+                _logger.LogInformation(
+                    "Replaced instance-anchored mapping {LegacyKey} for monitor {MonitorKey} with a port-anchored one",
+                    UnescapeKeyName(subKeyName), monitorHardwareKey);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not remove superseded mapping {LegacyKey}", subKeyName);
             }
         }
     }

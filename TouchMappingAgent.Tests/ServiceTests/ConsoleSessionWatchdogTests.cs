@@ -211,7 +211,7 @@ public class ConsoleSessionWatchdogTests
     }
 
     [Fact]
-    public void StaleHeartbeat_IsTreatedAsSuspectEvenWithAPreviouslyHealthyCount()
+    public void StaleHeartbeat_NeverLogsOffTheConsole()
     {
         var watchdog = CreateWatchdog();
         _wts.Setup(w => w.EnumerateSessions()).Returns(new[] { HealthyConsole });
@@ -220,24 +220,72 @@ public class ConsoleSessionWatchdogTests
         _heartbeat.Report(ConsoleSessionId, 2, _clock.GetUtcNow());
         watchdog.EvaluateOnce();
 
-        _clock.Advance(ConsoleSessionWatchdog.HeartbeatStaleness + TimeSpan.FromSeconds(1));
-        watchdog.EvaluateOnce();
+        for (int i = 0; i < 10; i++)
+        {
+            _clock.Advance(TimeSpan.FromSeconds(20));
+            watchdog.EvaluateOnce();
+        }
 
-        _clock.Advance(ConsoleSessionWatchdog.DebounceWindow + TimeSpan.FromSeconds(1));
-        watchdog.EvaluateOnce();
-
-        _wts.Verify(w => w.LogoffSession(ConsoleSessionId, false), Times.Once);
+        _wts.Verify(w => w.LogoffSession(It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
     }
 
     [Fact]
-    public void NoHeartbeatEverReceived_IsTreatedAsSuspect()
+    public void NoHeartbeatEverReceived_NeverLogsOffTheConsole()
     {
         var watchdog = CreateWatchdog();
         _wts.Setup(w => w.EnumerateSessions()).Returns(new[] { HealthyConsole });
 
         _clock.Advance(ConsoleSessionWatchdog.BootHysteresis + TimeSpan.FromSeconds(1));
+
+        for (int i = 0; i < 10; i++)
+        {
+            _clock.Advance(TimeSpan.FromSeconds(20));
+            watchdog.EvaluateOnce();
+        }
+
+        _wts.Verify(w => w.LogoffSession(It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Fact]
+    public void HeartbeatGapWhileTabcalRunsAfterLogin_DoesNotLogOffTheConsole()
+    {
+        // Field incident: healthy heartbeat right after login, then a 60s tabcal.exe run plus
+        // the 15s poll interval without any report — the old logic logged the console off at
+        // ~63s of staleness, mid-re-application.
+        var watchdog = CreateWatchdog();
+        _wts.Setup(w => w.EnumerateSessions()).Returns(new[] { HealthyConsole });
+
+        _clock.Advance(ConsoleSessionWatchdog.BootHysteresis + TimeSpan.FromSeconds(1));
+        _heartbeat.Report(ConsoleSessionId, 2, _clock.GetUtcNow());
+
+        for (int cycle = 0; cycle < 4; cycle++)
+        {
+            for (int i = 0; i < 15; i++)
+            {
+                _clock.Advance(ConsoleSessionWatchdog.PollInterval);
+                watchdog.EvaluateOnce();
+            }
+
+            _heartbeat.Report(ConsoleSessionId, 2, _clock.GetUtcNow());
+        }
+
+        _wts.Verify(w => w.LogoffSession(It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Fact]
+    public void ZeroDisplaysAfterAStaleHeartbeat_StillLogsOffTheConsole()
+    {
+        // The black-screen detection itself must survive the change: once the client is
+        // reporting again and says 0 displays, the normal debounce applies.
+        var watchdog = CreateWatchdog();
+        _wts.Setup(w => w.EnumerateSessions()).Returns(new[] { HealthyConsole });
+
+        _clock.Advance(ConsoleSessionWatchdog.BootHysteresis + TimeSpan.FromSeconds(1));
+        watchdog.EvaluateOnce(); // no heartbeat yet — diagnostic only
+
+        _heartbeat.Report(ConsoleSessionId, 0, _clock.GetUtcNow());
         watchdog.EvaluateOnce();
-        _clock.Advance(ConsoleSessionWatchdog.DebounceWindow + TimeSpan.FromSeconds(1));
+        AdvanceAndRefreshHeartbeat(ConsoleSessionWatchdog.DebounceWindow + TimeSpan.FromSeconds(1), ConsoleSessionId, monitorCount: 0);
         watchdog.EvaluateOnce();
 
         _wts.Verify(w => w.LogoffSession(ConsoleSessionId, false), Times.Once);

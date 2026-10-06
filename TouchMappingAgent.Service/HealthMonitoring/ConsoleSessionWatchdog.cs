@@ -26,9 +26,10 @@ public enum SessionHealthVerdict
     /// <see cref="ConsoleSessionResetService.ResetUnresponsiveSession"/>.</summary>
     SessionUnresponsive,
 
-    /// <summary>The physical console is Active/Disconnected and reports 0 displays (or its
-    /// heartbeat is missing/stale) — the original, unchanged detection this watchdog started
-    /// with. Routes to <see cref="ConsoleSessionResetService.ResetConsoleSession"/>.</summary>
+    /// <summary>The physical console is Active/Disconnected and its live client reports 0
+    /// displays. A missing/stale heartbeat alone no longer qualifies (see
+    /// <see cref="ConsoleSessionWatchdog"/>'s remarks). Routes to
+    /// <see cref="ConsoleSessionResetService.ResetConsoleSession"/>.</summary>
     ConsoleBlackScreen,
 
     /// <summary>A WTS call did not respond within its time budget
@@ -43,9 +44,12 @@ public enum SessionHealthVerdict
 /// Detects and heals two independent classes of hung interactive session:
 ///
 ///  1. A hung PHYSICAL CONSOLE (black screen / headless DWM after a power event, extender
-///     power-cycle, or graphics driver reset) — the watchdog's original purpose, entirely
-///     unchanged: console Active/Disconnected + 0 displays (or a missing/stale heartbeat)
-///     forces a logoff via <see cref="ConsoleSessionResetService.ResetConsoleSession"/>.
+///     power-cycle, or graphics driver reset) — the watchdog's original purpose: console
+///     Active/Disconnected + a live client reporting 0 displays forces a logoff via
+///     <see cref="ConsoleSessionResetService.ResetConsoleSession"/>. A missing/stale heartbeat
+///     used to qualify as well; it no longer does, because the client goes quiet for up to 60s
+///     while tabcal.exe runs after every login, and the console was being logged off in the
+///     middle of exactly that re-application.
 ///
 ///  2. A hung RDP (or any other non-console) SESSION whose own client process has stopped
 ///     answering — added after a real incident where such a session's own logoff/reset
@@ -137,6 +141,7 @@ public sealed class ConsoleSessionWatchdog : BackgroundService, IDisposable, IAs
     // state exists alongside it.
     private DateTimeOffset? _consoleSuspectSinceUtc;
     private DateTimeOffset? _consoleLastResetAttemptUtc;
+    private bool _consoleHeartbeatMissingLogged;
 
     // Global "cannot even enumerate sessions" tracking — no specific session is known in this
     // case, so there is nothing to key a per-session dictionary entry on.
@@ -335,7 +340,7 @@ public sealed class ConsoleSessionWatchdog : BackgroundService, IDisposable, IAs
 
         _logger.LogWarning(
             "[SessionWatchdog] Suspected hanging console session ({Detail} for {SuspectSeconds:F0}s). " +
-            "Executing WTSLogoffSession on Session 1...",
+            "Requesting a console session reset...",
             detail, suspectDuration.TotalSeconds);
 
         _consoleLastResetAttemptUtc = now;
@@ -354,11 +359,8 @@ public sealed class ConsoleSessionWatchdog : BackgroundService, IDisposable, IAs
 
     /// <summary>
     /// Evaluates the console's black-screen condition: an Active/Disconnected console session
-    /// AND a client heartbeat that is missing, stale, or reports 0 displays. Unchanged from
-    /// the watchdog's original design — no process-presence plausibilisation here, since a
-    /// live-but-blind client (the case this exists for) cannot be told apart from a crashed
-    /// one by process presence alone, and the console's own debounce/cooldown already guard
-    /// against acting on a momentary blip.
+    /// AND a fresh client heartbeat reporting 0 displays. A missing or stale heartbeat is
+    /// logged as a diagnostic and never qualifies.
     /// </summary>
     private bool TryDetectConsoleBlackScreen(IReadOnlyList<WtsSessionInfo> sessions, DateTimeOffset now, out string detail)
     {
@@ -379,26 +381,37 @@ public sealed class ConsoleSessionWatchdog : BackgroundService, IDisposable, IAs
             return false;
 
         var heartbeat = _heartbeat.TryGetLast(console.SessionId, now);
-        string heartbeatDetail;
 
-        if (heartbeat is null)
+        // A missing or stale heartbeat is NOT evidence of a black screen and never triggers a
+        // logoff. Field incident (2026-09-23 .. 2026-10-06, nine forced sign-outs): the client
+        // legitimately stops reporting while it waits up to 60s for tabcal.exe after every
+        // login, and the console was logged off right in the middle of that re-application —
+        // which then restarted on the next login. The same absence is equally consistent with
+        // "client not started yet", "client closed" or "client crashed". Only the positive
+        // signal — a live client reporting 0 displays — proves the headless-DWM condition.
+        if (heartbeat is null || heartbeat.Value.Age > HeartbeatStaleness)
         {
-            heartbeatDetail = "no client heartbeat received yet";
+            if (!_consoleHeartbeatMissingLogged)
+            {
+                _consoleHeartbeatMissingLogged = true;
+                _logger.LogInformation(
+                    "[SessionWatchdog] Console session {SessionId}: {HeartbeatDetail}. Diagnostic only — a missing " +
+                    "heartbeat never triggers a console logoff.",
+                    console.SessionId,
+                    heartbeat is null
+                        ? "no client heartbeat received yet"
+                        : $"client heartbeat stale ({heartbeat.Value.Age.TotalSeconds:F0}s old)");
+            }
+
+            return false;
         }
-        else if (heartbeat.Value.Age > HeartbeatStaleness)
-        {
-            heartbeatDetail = $"client heartbeat stale ({heartbeat.Value.Age.TotalSeconds:F0}s old)";
-        }
-        else if (heartbeat.Value.MonitorCount == 0)
-        {
-            heartbeatDetail = "client reports 0 displays";
-        }
-        else
-        {
+
+        _consoleHeartbeatMissingLogged = false;
+
+        if (heartbeat.Value.MonitorCount != 0)
             return false; // client is alive and reporting a healthy display count
-        }
 
-        detail = $"Session {console.SessionId} state={console.State}, {heartbeatDetail}";
+        detail = $"Session {console.SessionId} state={console.State}, client reports 0 displays";
         return true;
     }
 

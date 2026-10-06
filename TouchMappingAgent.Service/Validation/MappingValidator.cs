@@ -219,7 +219,9 @@ public static class MappingValidator
     }
 
     /// <summary>
-    /// Validates a PnP device instance id — the touch-side anchor, e.g.
+    /// Validates the touch-side anchor: a port key
+    /// ("PORT\VID_14E1&amp;PID_3508\PCIROOT(0)/PCI(1400)/USBROOT(0)/USB(1)/USB(4)/USB(6)") or, for
+    /// hardware without a location path, a PnP device instance id, e.g.
     /// "USB\VID_14E1&amp;PID_3508\7&amp;1b9afb93&amp;0&amp;6". Unlike a device interface path
     /// this has no "\\?\" prefix and no interface GUID: it is an enumerator-qualified
     /// instance path with exactly the shape "ENUMERATOR\DEVICE-ID\INSTANCE-ID".
@@ -324,8 +326,10 @@ public static class MappingValidator
     private static bool IsValidDevicePathChar(char c) =>
         char.IsLetterOrDigit(c) || c is '#' or '&' or '_' or '-' or '.' or ',' or '{' or '}' or '\\';
 
+    // '(' ')' '/' occur in port keys ("PORT\VID_14E1&PID_3508\PCIROOT(0)/PCI(1400)/...").
+    // ".." is still rejected above, so '/' cannot form a traversal sequence.
     private static bool IsValidInstanceIdChar(char c) =>
-        char.IsLetterOrDigit(c) || c is '&' or '_' or '-' or '.' or '\\' or '{' or '}';
+        char.IsLetterOrDigit(c) || c is '&' or '_' or '-' or '.' or '\\' or '{' or '}' or '(' or ')' or '/';
 
     /// <summary>
     /// Adds a new vendor ID to the whitelist (admin operation, logged).

@@ -441,6 +441,9 @@ internal static class LocalizationKeys
     /// <summary>The service reports nothing pending to re-apply.</summary>
     public const string Wizard_Step5_NothingPending = "Wizard_Step5_NothingPending";
 
+    /// <summary>The service has applied the learned assignments; the visual check follows.</summary>
+    public const string Wizard_Step5_Applied = "Wizard_Step5_Applied";
+
     /// <summary>{0} = monitor name, {1} = connector. Progress while calibrating one assignment.</summary>
     public const string Wizard_Step5_CalibratingItem = "Wizard_Step5_CalibratingItem";
 
@@ -791,6 +794,44 @@ internal static class LocalizationKeys
     /// <summary>Section 6, "EDID templates live under:" label.</summary>
     public const string Help_S6_TemplatesLabel = "Help_S6_TemplatesLabel";
 
+    /// <summary>Help section "controls": heading, tray and main-window reference.</summary>
+    public const string Help_S7_Heading = "Help_S7_Heading";
+    /// <summary>Help section "controls": tray menu label.</summary>
+    public const string Help_S7_TrayLabel = "Help_S7_TrayLabel";
+    /// <summary>Help section "controls": tray menu entries.</summary>
+    public const string Help_S7_TrayText = "Help_S7_TrayText";
+    /// <summary>Help section "controls": main window label.</summary>
+    public const string Help_S7_MainLabel = "Help_S7_MainLabel";
+    /// <summary>Help section "controls": main window buttons.</summary>
+    public const string Help_S7_MainText = "Help_S7_MainText";
+
+    /// <summary>Help section "symptoms and remedies": heading.</summary>
+    public const string Help_S8_Heading = "Help_S8_Heading";
+    /// <summary>Symptom: touch lands on the wrong screen.</summary>
+    public const string Help_S8_WrongScreenLabel = "Help_S8_WrongScreenLabel";
+    /// <summary>Remedy: touch lands on the wrong screen.</summary>
+    public const string Help_S8_WrongScreenText = "Help_S8_WrongScreenText";
+    /// <summary>Symptom: touch briefly unresponsive.</summary>
+    public const string Help_S8_BriefOutageLabel = "Help_S8_BriefOutageLabel";
+    /// <summary>Explanation: touch briefly unresponsive.</summary>
+    public const string Help_S8_BriefOutageText = "Help_S8_BriefOutageText";
+    /// <summary>Symptom: unresolvable mappings reported.</summary>
+    public const string Help_S8_UnresolvableLabel = "Help_S8_UnresolvableLabel";
+    /// <summary>Remedy: unresolvable mappings reported.</summary>
+    public const string Help_S8_UnresolvableText = "Help_S8_UnresolvableText";
+    /// <summary>Symptom: service not reachable.</summary>
+    public const string Help_S8_ServiceLabel = "Help_S8_ServiceLabel";
+    /// <summary>Remedy: service not reachable.</summary>
+    public const string Help_S8_ServiceText = "Help_S8_ServiceText";
+    /// <summary>Symptom: a touch USB cable was moved.</summary>
+    public const string Help_S8_ReplugLabel = "Help_S8_ReplugLabel";
+    /// <summary>Remedy: a touch USB cable was moved.</summary>
+    public const string Help_S8_ReplugText = "Help_S8_ReplugText";
+    /// <summary>Symptom: screens black after restart.</summary>
+    public const string Help_S8_BlackLabel = "Help_S8_BlackLabel";
+    /// <summary>Remedy: screens black after restart.</summary>
+    public const string Help_S8_BlackText = "Help_S8_BlackText";
+
     /// <summary>Close button.</summary>
     public const string Help_Close = "Help_Close";
 
@@ -839,6 +880,61 @@ internal static class LocalizationKeys
 
     /// <summary>Balloon/tooltip text while the service status is being checked.</summary>
     public const string Tray_CheckingStatus = "Tray_CheckingStatus";
+
+    /// <summary>Tray menu: apply every stored assignment now.</summary>
+    public const string Tray_ApplyNow = "Tray_ApplyNow";
+
+    /// <summary>Tray menu: header of the technician submenu.</summary>
+    public const string Tray_DiagnoseMenu = "Tray_DiagnoseMenu";
+
+    /// <summary>Tooltip/balloon: the service answered.</summary>
+    public const string Tray_StatusReachable = "Tray_StatusReachable";
+
+    /// <summary>Tooltip/balloon: the service did not answer.</summary>
+    public const string Tray_StatusUnreachable = "Tray_StatusUnreachable";
+
+    /// <summary>Tooltip/balloon: the status check itself failed.</summary>
+    public const string Tray_StatusUnknown = "Tray_StatusUnknown";
+
+    /// <summary>Tooltip: reload monitors.</summary>
+    public const string Tip_LoadMonitors = "Tip_LoadMonitors";
+    /// <summary>Tooltip: learn the selected screen by touch.</summary>
+    public const string Tip_LearnScreen = "Tip_LearnScreen";
+    /// <summary>Tooltip: apply every stored assignment now (main window and tray).</summary>
+    public const string Tip_ApplyNow = "Tip_ApplyNow";
+    /// <summary>Tooltip: check the background service (main window and tray).</summary>
+    public const string Tip_CheckStatus = "Tip_CheckStatus";
+    /// <summary>Tooltip: show this session's log.</summary>
+    public const string Tip_ShowLog = "Tip_ShowLog";
+    /// <summary>Tooltip (tray): open the main window.</summary>
+    public const string Tip_OpenConfig = "Tip_OpenConfig";
+    /// <summary>Tooltip (tray): setup wizard.</summary>
+    public const string Tip_Wizard = "Tip_Wizard";
+    /// <summary>Tooltip (tray): EDID manager.</summary>
+    public const string Tip_EdidManager = "Tip_EdidManager";
+    /// <summary>Tooltip (tray): help window.</summary>
+    public const string Tip_Help = "Tip_Help";
+    /// <summary>Tooltip (tray): export the diagnostics report.</summary>
+    public const string Tip_ExportLog = "Tip_ExportLog";
+    /// <summary>Tooltip (tray): language submenu.</summary>
+    public const string Tip_Language = "Tip_Language";
+    /// <summary>Tooltip (tray): exit the agent.</summary>
+    public const string Tip_Exit = "Tip_Exit";
+
+    /// <summary>Main window button: apply every stored assignment now.</summary>
+    public const string Main_ApplyNow = "Main_ApplyNow";
+
+    /// <summary>Status line while the service applies the assignments.</summary>
+    public const string Main_ApplyingNow = "Main_ApplyingNow";
+
+    /// <summary>{0} = applied, {1} = stored, {2} = unresolvable, {3} = failed.</summary>
+    public const string Main_ApplyNowResult = "Main_ApplyNowResult";
+
+    /// <summary>Apply-now with no stored assignment at all.</summary>
+    public const string Main_ApplyNowNothingStored = "Main_ApplyNowNothingStored";
+
+    /// <summary>Apply-now could not reach the service.</summary>
+    public const string Main_ApplyNowFailed = "Main_ApplyNowFailed";
 
     /// <summary>The EDID manager window could not be opened.</summary>
     public const string Tray_EdidManagerOpenFailed = "Tray_EdidManagerOpenFailed";

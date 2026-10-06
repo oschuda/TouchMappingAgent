@@ -163,6 +163,7 @@ public class NamedPipeClientImpl : INamedPipeClient
             nameof(GetMappingsRequest) => "GetMappings",
             nameof(DeleteMappingRequest) => "DeleteMapping",
             nameof(GetPendingReapplyRequest) => "GetPendingReapply",
+            nameof(ApplyMappingsNowRequest) => "ApplyMappingsNow",
             nameof(ReportReapplyResultRequest) => "ReportReapplyResult",
             nameof(GetHardwareStatusRequest) => "GetHardwareStatus",
             nameof(GetEdidStatusRequest) => "GetEdidStatus",

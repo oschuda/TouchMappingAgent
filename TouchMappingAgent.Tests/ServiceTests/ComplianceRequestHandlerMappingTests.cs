@@ -25,7 +25,13 @@ public class ComplianceRequestHandlerMappingTests
         // does not have. The layout exercised is identical.
         var mappingStore = new MappingStore(
             NullLogger<MappingStore>.Instance, Microsoft.Win32.Registry.CurrentUser);
-        var coordinator = new ReapplyCoordinator(NullLogger<ReapplyCoordinator>.Instance, mappingStore);
+        // The routing writer is pointed at a throw-away HKCU subtree with a no-op restart, so no
+        // test can touch the machine's real touch routing or restart a real digitizer.
+        var applier = new WindowsTouchMapApplier(
+            NullLogger<WindowsTouchMapApplier>.Instance,
+            Microsoft.Win32.Registry.CurrentUser.CreateSubKey($@"Software\PadaLumaTests\{Guid.NewGuid():N}", writable: true)!,
+            _ => true);
+        var coordinator = new ReapplyCoordinator(NullLogger<ReapplyCoordinator>.Instance, mappingStore, applier);
 
         // Pointed at HKCU for the same reason as the mapping store: the EDID module's
         // production root needs elevation.
@@ -67,7 +73,7 @@ public class ComplianceRequestHandlerMappingTests
     }
 
     [Fact]
-    public async Task HandleMapTouchRequestAsync_WhenSuccessful_DelegatesLocalExecutionWithTabcalArguments()
+    public async Task HandleMapTouchRequestAsync_WhenSuccessful_NeverAsksTheClientToRunTabcal()
     {
         var handler = CreateHandler();
         var request = new MapTouchRequest(@"\\.\DISPLAY2", @"\\?\HID#VID_0461&PID_0001#instance#{guid}");
@@ -75,17 +81,11 @@ public class ComplianceRequestHandlerMappingTests
 
         var response = await handler.HandleMapTouchRequestAsync(json, CancellationToken.None);
 
-        // On a machine without HKLM write access (e.g. a non-elevated CI runner) the
-        // registry-backed audit write can legitimately fail; only assert the delegation
-        // contract when the service actually reports success.
-        if (!response.Success)
-            return;
-
-        Assert.True(response.RequiresLocalExecution);
-        Assert.False(string.IsNullOrEmpty(response.LocalExecutablePath));
-        Assert.Contains("tabcal.exe", response.LocalExecutablePath, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(@"DisplayID=\\.\DISPLAY2", response.LocalArguments);
-        Assert.Contains("DeviceKind=touch", response.LocalArguments);
+        // tabcal.exe refuses to run with two touch screens attached; the service applies the
+        // routing itself on the client's next poll.
+        Assert.False(response.RequiresLocalExecution);
+        Assert.Null(response.LocalExecutablePath);
+        Assert.Null(response.LocalArguments);
     }
 
     [Fact]

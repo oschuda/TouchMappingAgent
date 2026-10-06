@@ -56,6 +56,7 @@ public class ServiceCompositionRootTests
         services.AddSingleton<BackupService>();
         services.AddSingleton<AdvancedRepairService>();
         services.AddSingleton<MappingStore>();
+        services.AddSingleton<IWindowsTouchMapApplier, WindowsTouchMapApplier>();
         services.AddSingleton<ReapplyCoordinator>();
         services.AddSingleton<ResilientHardwareWatcher>();
         services.AddHostedService(sp => sp.GetRequiredService<ResilientHardwareWatcher>());

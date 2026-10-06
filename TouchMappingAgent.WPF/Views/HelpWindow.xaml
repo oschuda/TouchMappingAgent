@@ -67,6 +67,54 @@
 
                 <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
                     <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S7_Heading}"
+                                   Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S7_TrayLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S7_TrayText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S7_MainLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S7_MainText}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S8_Heading}"
+                                   Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S8_WrongScreenLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S8_WrongScreenText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S8_BriefOutageLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S8_BriefOutageText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S8_UnresolvableLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S8_UnresolvableText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S8_ServiceLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S8_ServiceText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S8_ReplugLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S8_ReplugText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S8_BlackLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S8_BlackText}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
                         <TextBlock Text="{loc:Loc Help_S3_Heading}" Style="{StaticResource Evolved.Text.Heading}"/>
                         <TextBlock Style="{StaticResource Evolved.Text}">
                             <Run Text="{loc:Loc Help_S3_Body1}"/>

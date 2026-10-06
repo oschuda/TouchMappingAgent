@@ -238,7 +238,7 @@
     <value>Hinweis: </value>
   </data>
   <data name="Main_NoticeText" xml:space="preserve">
-    <value>Bei baugleichen Touch-Monitoren fordert Windows während der Kalibrierung dazu auf, den Ziel-Bildschirm physisch zu berühren – genau wie im nativen Tablet-PC-Einrichtungsassistenten. Bitte berühren Sie in diesem Moment den korrekten Monitor, sobald die Kalibrierung startet.</value>
+    <value>Beim Anlernen erscheint auf dem gewählten Bildschirm ein Vollbildfenster. Berühren Sie genau diesen Bildschirm – der Agent erkennt daran, welches Touch-Gerät zu ihm gehört.</value>
   </data>
   <data name="Main_MonitorLabel" xml:space="preserve">
     <value>Monitor</value>
@@ -295,7 +295,7 @@
     <value>Zuordnung für {0} [{1}] gespeichert und aktiviert.</value>
   </data>
   <data name="Main_CalibrationFailed" xml:space="preserve">
-    <value>Kalibrierung fehlgeschlagen. Bitte TouchMappingAgent als Administrator ausführen und erneut versuchen.</value>
+    <value>Die Zuordnung konnte nicht angewendet werden. Details im Diagnose-Log.</value>
   </data>
   <data name="Main_Ready" xml:space="preserve">
     <value>Bereit</value>
@@ -394,7 +394,7 @@
     <value>Touch-Zuordnung</value>
   </data>
   <data name="Wizard_StepTitle_TabcalTest" xml:space="preserve">
-    <value>Kalibrierung und Sichtprüfung</value>
+    <value>Zuordnung anwenden und Sichtprüfung</value>
   </data>
   <data name="Wizard_StepTitle_Summary" xml:space="preserve">
     <value>Abschluss</value>
@@ -599,16 +599,16 @@
 
   <!-- ===== Setup wizard: step 5 ===== -->
   <data name="Wizard_Step5_IntroBeforeBold" xml:space="preserve">
-    <value>Die Zuordnung wird jetzt über tabcal.exe im Windows-Touch-Stack aktiviert.</value>
+    <value>Der Hintergrunddienst trägt die Zuordnung jetzt in die Windows-Touch-Tabelle ein und startet die Touch-Geräte kurz neu.</value>
   </data>
   <data name="Wizard_Step5_BoldPhrase" xml:space="preserve">
-    <value>Hierfür sind Administratorrechte erforderlich.</value>
+    <value>Administratorrechte sind dafür nicht erforderlich.</value>
   </data>
   <data name="Wizard_Step5_IntroAfterBold" xml:space="preserve">
-    <value>tabcal schreibt nach HKLM\SOFTWARE\Microsoft\Wisp\Touch, wofür normale Benutzer nur Lesezugriff haben. Der Hintergrunddienst kann es nicht übernehmen: die Kalibrierung braucht die interaktive Sitzung, die Session 0 nicht ist.</value>
+    <value>Der Dienst läuft als SYSTEM und schreibt HKLM\SOFTWARE\Microsoft\Wisp\Pen\Digimon selbst. tabcal.exe wird nicht mehr verwendet: Es verweigert die Arbeit, sobald zwei Touch-Geräte angeschlossen sind.</value>
   </data>
   <data name="Wizard_Step5_Run" xml:space="preserve">
-    <value>Kalibrierung ausführen und Sichtprüfung starten</value>
+    <value>Zuordnung anwenden und Sichtprüfung starten</value>
   </data>
   <data name="Wizard_Step5_NotYetRun" xml:space="preserve">
     <value>Noch nicht ausgeführt.</value>
@@ -626,6 +626,9 @@ Assistenten jetzt mit erhöhten Rechten neu starten?</value>
   </data>
   <data name="Wizard_Step5_NothingPending" xml:space="preserve">
     <value>Der Dienst meldet keine anzuwendende Zuordnung.</value>
+  </data>
+  <data name="Wizard_Step5_Applied" xml:space="preserve">
+    <value>Die Zuordnung wurde vom Dienst angewendet.</value>
   </data>
   <data name="Wizard_Step5_CalibratingItem" xml:space="preserve">
     <value>Kalibriere {0} [{1}] …</value>
@@ -649,10 +652,10 @@ Assistenten jetzt mit erhöhten Rechten neu starten?</value>
     <value> Sichtprüfung NICHT bestätigt — Zuordnung prüfen.</value>
   </data>
   <data name="Wizard_Step5_RecordTitle" xml:space="preserve">
-    <value>Kalibrierung</value>
+    <value>Zuordnung anwenden</value>
   </data>
   <data name="Wizard_Step5_Failed" xml:space="preserve">
-    <value>Der Kalibrierungstest ist fehlgeschlagen. Details im Diagnose-Log.</value>
+    <value>Das Anwenden der Zuordnung ist fehlgeschlagen. Details im Diagnose-Log.</value>
   </data>
 
   <!-- ===== Setup wizard: step 6 ===== -->
@@ -899,10 +902,10 @@ Der Agent liefert das fehlende Kriterium: eine einmal angelernte Zuordnung, vera
     <value> Diesen Bildschirm berühren. Der Agent erkennt anhand des Roh-Eingabesignals, welcher Digitizer die Berührung gesendet hat, und verknüpft ihn dauerhaft mit dem Anschluss dieses Monitors.</value>
   </data>
   <data name="Help_S2_Closing" xml:space="preserve">
-    <value>Danach genügt ein Durchgang pro Bildschirm. Der Agent stellt die Zuordnung nach jedem Neustart und jedem DisplayPort-Ereignis selbsttätig wieder her.</value>
+    <value>Alternativ führt der Einrichtungs-Assistent (Tray-Menü) nacheinander durch alle Bildschirme und schließt mit einer Sichtprüfung ab. Ein Durchgang pro Bildschirm genügt: Danach trägt der Hintergrunddienst die Zuordnung nach jedem Neustart, jeder Anmeldung und jedem Extender-Neustart selbsttätig in Windows ein.</value>
   </data>
   <data name="Help_S3_Heading" xml:space="preserve">
-    <value>3. EDID-Kollisionen</value>
+    <value>5. EDID-Kollisionen</value>
   </data>
   <data name="Help_S3_Body1" xml:space="preserve">
     <value>Die Touch-Zuordnung selbst braucht das nicht — sie verwendet den PnP-Gerätepfad, der ohnehin eindeutig ist. Eine EDID-Kollision stört aber jede</value>
@@ -923,7 +926,7 @@ Der Agent liefert das fehlende Kriterium: eine einmal angelernte Zuordnung, vera
     <value> Teilen sich zwei Monitore nur die numerische Seriennummer, unterscheiden sich aber im Text-Descriptor, greift der Agent bewusst nicht ein — sie sind unterscheidbar. Der Wert 0x01010101 ist ein verbreiteter Platzhalter für „Seriennummer nicht programmiert"; solche Panels umzuschreiben brächte nichts und veränderte Firmware-Daten ohne Not.</value>
   </data>
   <data name="Help_S4_Heading" xml:space="preserve">
-    <value>4. Range-Extender (KVM / HDBaseT)</value>
+    <value>6. Range-Extender (KVM / HDBaseT)</value>
   </data>
   <data name="Help_S4_Body1" xml:space="preserve">
     <value>Extender reichen DDC häufig nicht durch. Zwei Symptome:</value>
@@ -960,25 +963,91 @@ Der Agent liefert das fehlende Kriterium: eine einmal angelernte Zuordnung, vera
     <value> Bleiben die Bildschirme nach einem Neustart schwarz („kein Signal") und funktionieren erst nach einem Strom-Aus/Ein am Extender, ist die Hot-Plug-Detect-Kette beim Booten unterbrochen. Ein EDID-Override hilft hier nur bedingt — abhelfen können aktive DP-auf-HDMI-Adapter, ein EDID-Emulator direkt am Grafikausgang oder eine Stromversorgung, bei der die Extender vor dem Server hochlaufen.</value>
   </data>
   <data name="Help_S5_Heading" xml:space="preserve">
-    <value>5. Wichtig: Agent muss laufen</value>
+    <value>7. Wichtig: Agent muss laufen</value>
   </data>
   <data name="Help_S5_Body1" xml:space="preserve">
-    <value>Der Dienst entscheidet, welche Zuordnung wiederhergestellt werden muss, kann das aber nicht selbst ausführen: er läuft in Session 0 und sieht weder den Desktop noch kann er tabcal.exe starten. Nur der Tray-Agent in der Benutzersitzung kann das.</value>
+    <value>Der Hintergrunddienst trägt die Zuordnungen selbst in Windows ein. Den Desktop sieht er aber nicht: Welche Bildschirme angeschlossen sind, erfährt er nur vom Tray-Agenten in der Benutzersitzung. Ohne laufenden Tray-Agenten wird deshalb keine Zuordnung angewendet.</value>
   </data>
   <data name="Help_S5_Body2" xml:space="preserve">
     <value>Wird der Agent über „Beenden" geschlossen, bleibt die Zuordnung nach dem nächsten Neustart aus. Das Schließen über das „X" beendet ihn nicht — er läuft im Infobereich weiter.</value>
   </data>
   <data name="Help_S6_Heading" xml:space="preserve">
-    <value>6. Bei Problemen</value>
+    <value>8. Protokolle für den Support</value>
   </data>
   <data name="Help_S6_Body1" xml:space="preserve">
-    <value>„Diagnose-Log exportieren" im Tray-Menü schreibt die Protokolle von Dienst und Client sowie eine Momentaufnahme der erkannten Hardware in eine Datei.</value>
+    <value>„Diagnose → Diagnose-Log exportieren" im Tray-Menü schreibt die Protokolle von Dienst und Client sowie eine Momentaufnahme der erkannten Hardware in eine Datei. Diese Datei bitte bei jeder Support-Anfrage mitschicken.</value>
   </data>
   <data name="Help_S6_LogsLabel" xml:space="preserve">
     <value>Protokolle liegen unter:</value>
   </data>
   <data name="Help_S6_TemplatesLabel" xml:space="preserve">
     <value>EDID-Vorlagen liegen unter:</value>
+  </data>
+  <data name="Help_S7_Heading" xml:space="preserve">
+    <value>3. Bedienelemente</value>
+  </data>
+  <data name="Help_S7_TrayLabel" xml:space="preserve">
+    <value>Tray-Menü (Rechtsklick auf das Symbol im Infobereich):</value>
+  </data>
+  <data name="Help_S7_TrayText" xml:space="preserve">
+    <value>• Konfiguration öffnen – öffnet das Hauptfenster (auch per Doppelklick auf das Symbol).
+• Zuordnung jetzt anwenden – trägt alle gespeicherten Zuordnungen sofort in Windows ein und startet die Touch-Geräte kurz neu. Die erste Maßnahme, wenn der Touch auf dem falschen Bildschirm landet.
+• Einrichtungs-Assistent – geführte Inbetriebnahme: Voraussetzungen, EDID, Anlernen, Anwenden mit Sichtprüfung, Bericht.
+• EDID &amp; Display-Manager – EDID-Status, Kollisionen und Vorlagen (für Techniker).
+• Hilfe &amp; Handbuch – dieses Fenster.
+• Diagnose – Diagnose-Log exportieren; Dienst-Status prüfen.
+• Sprache – Sprache der Oberfläche umschalten.
+• Beenden – beendet den Agenten. Danach werden Zuordnungen nicht mehr automatisch angewendet.
+Der Punkt am Symbol zeigt den Hintergrunddienst: grün = erreichbar, bernsteinfarben = nicht erreichbar. Zu jedem Menüeintrag erscheint beim Darüberfahren ein Hinweis.</value>
+  </data>
+  <data name="Help_S7_MainLabel" xml:space="preserve">
+    <value>Hauptfenster:</value>
+  </data>
+  <data name="Help_S7_MainText" xml:space="preserve">
+    <value>• Monitore laden – liest die angeschlossenen Bildschirme neu ein.
+• Bildschirm anlernen (Berührung) – verknüpft den gewählten Bildschirm mit dem Touch-Gerät, das als Nächstes berührt wird (siehe Abschnitt 2).
+• Zuordnung jetzt anwenden – wie im Tray-Menü.
+• Dienst-Status prüfen – prüft, ob der Hintergrunddienst antwortet.
+• Diagnose-Log anzeigen – zeigt die Protokolleinträge dieser Sitzung.</value>
+  </data>
+  <data name="Help_S8_Heading" xml:space="preserve">
+    <value>4. Fehlerbilder und Abhilfe</value>
+  </data>
+  <data name="Help_S8_WrongScreenLabel" xml:space="preserve">
+    <value>Touch landet auf dem falschen Bildschirm</value>
+  </data>
+  <data name="Help_S8_WrongScreenText" xml:space="preserve">
+    <value>→ Tray-Menü „Zuordnung jetzt anwenden". Hilft das nicht, die Bildschirme im Einrichtungs-Assistenten neu anlernen.</value>
+  </data>
+  <data name="Help_S8_BriefOutageLabel" xml:space="preserve">
+    <value>Touch reagiert nach einem Extender-Neustart einige Sekunden nicht</value>
+  </data>
+  <data name="Help_S8_BriefOutageText" xml:space="preserve">
+    <value>→ Normal. Der Dienst trägt die Zuordnung neu ein und startet dafür die Touch-Geräte kurz neu.</value>
+  </data>
+  <data name="Help_S8_UnresolvableLabel" xml:space="preserve">
+    <value>Meldung „Nicht auflösbar: 1" (oder mehr)</value>
+  </data>
+  <data name="Help_S8_UnresolvableText" xml:space="preserve">
+    <value>→ Eine gespeicherte Zuordnung passt zu keinem angeschlossenen Gerät: Touch-Gerät oder Monitor fehlt, ein USB-Kabel wurde umgesteckt, oder die Zuordnung stammt aus einer Version vor 1.0.1. Den betroffenen Bildschirm neu anlernen.</value>
+  </data>
+  <data name="Help_S8_ServiceLabel" xml:space="preserve">
+    <value>Bernsteinfarbener Punkt am Symbol / „Dienst nicht erreichbar"</value>
+  </data>
+  <data name="Help_S8_ServiceText" xml:space="preserve">
+    <value>→ In der Windows-Dienstverwaltung den Dienst „TouchMappingAgent" prüfen und ggf. starten. Ohne Dienst wird keine Zuordnung angewendet.</value>
+  </data>
+  <data name="Help_S8_ReplugLabel" xml:space="preserve">
+    <value>USB-Kabel eines Touch-Geräts umgesteckt</value>
+  </data>
+  <data name="Help_S8_ReplugText" xml:space="preserve">
+    <value>→ Die Zuordnung hängt am USB-Port. Nach dem Umstecken den betroffenen Bildschirm neu anlernen.</value>
+  </data>
+  <data name="Help_S8_BlackLabel" xml:space="preserve">
+    <value>Bildschirme nach dem Neustart schwarz</value>
+  </data>
+  <data name="Help_S8_BlackText" xml:space="preserve">
+    <value>→ Kein Fehler der Touch-Zuordnung. Siehe Abschnitt 6, „Hinweis zum Handshake".</value>
   </data>
   <data name="Help_Close" xml:space="preserve">
     <value>Schließen</value>
@@ -1033,6 +1102,72 @@ Möchten Sie den Agenten wirklich beenden?</value>
   </data>
   <data name="Tray_CheckingStatus" xml:space="preserve">
     <value>Status wird geprüft...</value>
+  </data>
+  <data name="Tray_ApplyNow" xml:space="preserve">
+    <value>Zuordnung jetzt anwenden</value>
+  </data>
+  <data name="Tray_DiagnoseMenu" xml:space="preserve">
+    <value>Diagnose</value>
+  </data>
+  <data name="Tray_StatusReachable" xml:space="preserve">
+    <value>Dienst erreichbar</value>
+  </data>
+  <data name="Tray_StatusUnreachable" xml:space="preserve">
+    <value>Dienst nicht erreichbar</value>
+  </data>
+  <data name="Tray_StatusUnknown" xml:space="preserve">
+    <value>Dienst-Status unbekannt</value>
+  </data>
+  <data name="Tip_LoadMonitors" xml:space="preserve">
+    <value>Liest die angeschlossenen Bildschirme neu ein, z. B. nachdem ein Extender wieder eingeschaltet wurde.</value>
+  </data>
+  <data name="Tip_LearnScreen" xml:space="preserve">
+    <value>Zeigt auf dem gewählten Bildschirm ein Vollbildfenster. Berühren Sie diesen Bildschirm, um ihn mit seinem Touch-Gerät zu verknüpfen.</value>
+  </data>
+  <data name="Tip_ApplyNow" xml:space="preserve">
+    <value>Trägt alle gespeicherten Zuordnungen sofort in Windows ein und startet die Touch-Geräte kurz neu. Erste Maßnahme, wenn der Touch auf dem falschen Bildschirm landet.</value>
+  </data>
+  <data name="Tip_CheckStatus" xml:space="preserve">
+    <value>Prüft, ob der Hintergrunddienst antwortet. Ohne Dienst wird keine Zuordnung angewendet.</value>
+  </data>
+  <data name="Tip_ShowLog" xml:space="preserve">
+    <value>Zeigt die Protokolleinträge dieser Sitzung.</value>
+  </data>
+  <data name="Tip_OpenConfig" xml:space="preserve">
+    <value>Öffnet das Hauptfenster mit Bildschirmliste und Anlernen.</value>
+  </data>
+  <data name="Tip_Wizard" xml:space="preserve">
+    <value>Geführte Inbetriebnahme: Voraussetzungen, EDID, Anlernen, Anwenden mit Sichtprüfung, Bericht.</value>
+  </data>
+  <data name="Tip_EdidManager" xml:space="preserve">
+    <value>EDID-Status, Kollisionen und Vorlagen der Bildschirme. Für Techniker.</value>
+  </data>
+  <data name="Tip_Help" xml:space="preserve">
+    <value>Handbuch mit Bedienelementen und Fehlerbildern.</value>
+  </data>
+  <data name="Tip_ExportLog" xml:space="preserve">
+    <value>Speichert Protokolle und eine Hardware-Momentaufnahme in eine Datei – für Support-Anfragen.</value>
+  </data>
+  <data name="Tip_Language" xml:space="preserve">
+    <value>Sprache der Oberfläche umschalten.</value>
+  </data>
+  <data name="Tip_Exit" xml:space="preserve">
+    <value>Beendet den Agenten. Danach werden Zuordnungen nicht mehr automatisch angewendet.</value>
+  </data>
+  <data name="Main_ApplyNow" xml:space="preserve">
+    <value>Zuordnung jetzt anwenden</value>
+  </data>
+  <data name="Main_ApplyingNow" xml:space="preserve">
+    <value>Zuordnung wird angewendet, die Touch-Geräte werden kurz neu gestartet …</value>
+  </data>
+  <data name="Main_ApplyNowResult" xml:space="preserve">
+    <value>{0} von {1} Zuordnung(en) angewendet. Nicht auflösbar: {2}, fehlgeschlagen: {3}.</value>
+  </data>
+  <data name="Main_ApplyNowNothingStored" xml:space="preserve">
+    <value>Keine Zuordnung gespeichert. Bitte zuerst die Bildschirme anlernen.</value>
+  </data>
+  <data name="Main_ApplyNowFailed" xml:space="preserve">
+    <value>Die Zuordnung konnte nicht angewendet werden: Hintergrunddienst nicht erreichbar.</value>
   </data>
   <data name="Tray_EdidManagerOpenFailed" xml:space="preserve">
     <value>Der EDID-Manager konnte nicht geöffnet werden. Details im Diagnose-Log.</value>

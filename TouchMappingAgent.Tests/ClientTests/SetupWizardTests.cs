@@ -319,40 +319,33 @@ public class SetupWizardTests
     // ---------------------------------------------------------------- step 5
 
     /// <summary>
-    /// tabcal writes to a key normal users cannot write and needs the interactive session, so
-    /// the wizard must ask for elevation rather than attempting and failing.
+    /// The service (SYSTEM) writes the routing now; the wizard must neither ask for elevation
+    /// nor run tabcal.exe, which refuses to work with two touch screens attached.
     /// </summary>
     [Fact]
-    public async Task TabcalStep_RequestsElevationWhenNotElevated()
+    public async Task ApplyStep_NeedsNoElevation_AndLetsTheServiceApply()
     {
-        var (vm, _, elevation, interaction) = CreateWizard();
+        var (vm, pipe, elevation, interaction) = CreateWizard();
         elevation.IsElevated = false;
-        interaction.ConfirmResult = true;
+        interaction.ConfirmResult = true;   // "yes, the pointer follows"
+
+        pipe.Setup(p => p.SendAsync<GetPendingReapplyResponse>(It.IsAny<object>()))
+            .ReturnsAsync(new GetPendingReapplyResponse(Array.Empty<PendingReapply>()));
 
         await vm.RunTabcalTestAsync();
 
-        Assert.False(vm.TabcalStepCompleted);
-        Assert.Equal(LocalizationKeys.Wizard_Step5_ElevationRequired, vm.TabcalResult);
-        Assert.Contains(SetupWizardViewModel.WizardSwitch, elevation.RelaunchArguments);
-        Assert.True(vm.ElevationRequested);
-    }
-
-    [Fact]
-    public async Task TabcalStep_DoesNotRelaunchWhenTheOperatorDeclines()
-    {
-        var (vm, _, elevation, interaction) = CreateWizard();
-        elevation.IsElevated = false;
-        interaction.ConfirmResult = false;
-
-        await vm.RunTabcalTestAsync();
-
+        pipe.Verify(p => p.SendAsync<GetPendingReapplyResponse>(It.IsAny<GetPendingReapplyRequest>()), Times.Once);
         Assert.Empty(elevation.RelaunchArguments);
         Assert.False(vm.ElevationRequested);
+        Assert.True(vm.TabcalStepCompleted);
+        Assert.True(vm.PointerFollowsFinger);
+        Assert.StartsWith(LocalizationKeys.Wizard_Step5_Applied, vm.TabcalResult);
+        Assert.Contains(LocalizationKeys.Wizard_Step5_ConfirmedSuffix, vm.TabcalResult);
     }
 
     /// <summary>
-    /// tabcal's exit code says the tool ran, not that the pointer lands under the finger. The
-    /// step must therefore hinge on the operator's answer, not on the exit code.
+    /// Nothing reports whether the pointer actually lands under the finger except the operator.
+    /// The step must therefore hinge on the operator's answer.
     /// </summary>
     [Fact]
     public async Task TabcalStep_RecordsANegativeVisualCheckAsAFailure()
@@ -379,18 +372,17 @@ public class SetupWizardTests
     }
 
     [Fact]
-    public async Task TabcalStep_ReportsWhenTheServiceHasNothingToApply()
+    public async Task ApplyStep_ReportsAFailure_WhenTheServiceCannotBeReached()
     {
-        var (vm, pipe, elevation, _) = CreateWizard();
-        elevation.IsElevated = true;
+        var (vm, pipe, _, _) = CreateWizard();
 
         pipe.Setup(p => p.SendAsync<GetPendingReapplyResponse>(It.IsAny<object>()))
-            .ReturnsAsync(new GetPendingReapplyResponse(Array.Empty<PendingReapply>()));
+            .ThrowsAsync(new TimeoutException("service not reachable"));
 
         await vm.RunTabcalTestAsync();
 
         Assert.False(vm.TabcalStepCompleted);
-        Assert.Equal(LocalizationKeys.Wizard_Step5_NothingPending, vm.TabcalResult);
+        Assert.Equal(LocalizationKeys.Wizard_Step5_Failed, vm.TabcalResult);
     }
 
     // ---------------------------------------------------------------- step 6

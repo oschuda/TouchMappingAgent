@@ -201,4 +201,38 @@ public class MappingStoreTests : IDisposable
     {
         Assert.Empty(_store.GetAll());
     }
+
+    private const string PortKeyDp3Side =
+        @"PORT\VID_14E1&PID_3508\PCIROOT(0)/PCI(1400)/USBROOT(0)/USB(1)/USB(4)/USB(6)";
+
+    [Fact]
+    public void PortKey_SurvivesTheSubkeyEscapingRoundTrip()
+    {
+        // The location path's own '#' separators are stored as '/', because the store maps
+        // '\' to '#' and back — a raw '#' would come back as a backslash.
+        Assert.True(_store.Save(SampleMapping(PortKeyDp3Side)));
+
+        var loaded = Assert.Single(_store.GetAll());
+        Assert.Equal(PortKeyDp3Side, loaded.TouchHardwareKey);
+    }
+
+    [Fact]
+    public void SavingAPortAnchoredMapping_ReplacesTheInstanceAnchoredOneForTheSameMonitor()
+    {
+        Assert.True(_store.Save(SampleMapping(TouchParentA)));                       // DP-3, legacy
+        Assert.True(_store.Save(SampleMapping(TouchParentB) with                       // DP-2, legacy
+        {
+            MonitorHardwareKey = @"\\?\DISPLAY#CHR8910#5&2C72B841&0&UID250116",
+            MonitorConnectorLabel = "DP-2",
+            MonitorTargetId = 250116,
+            MonitorBoundsKey = "0,0,1920,1080"
+        }));
+
+        Assert.True(_store.Save(SampleMapping(PortKeyDp3Side)));                     // DP-3, re-learned
+
+        var keys = _store.GetAll().Select(m => m.TouchHardwareKey).ToList();
+        Assert.Contains(PortKeyDp3Side, keys);
+        Assert.DoesNotContain(HidDeviceInfo.NormalizeInstanceId(TouchParentA), keys);
+        Assert.Contains(HidDeviceInfo.NormalizeInstanceId(TouchParentB), keys);       // other monitor untouched
+    }
 }

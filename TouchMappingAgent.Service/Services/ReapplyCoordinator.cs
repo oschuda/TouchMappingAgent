@@ -19,9 +19,10 @@ namespace TouchMappingAgent.Service.Services;
 /// the wrong screen. The stored, hardware-anchored mapping is the missing criterion — but
 /// something has to notice the configuration changed and push the assignment back in.
 ///
-/// HOW THE WORK GETS DONE: not here. A Windows Service runs in the non-interactive Session 0
-/// and can neither run tabcal.exe's calibration nor see the desktop. This class only decides;
-/// the interactive client polls <see cref="GetPending"/> and executes.
+/// HOW THE WORK GETS DONE: here, through <see cref="IWindowsTouchMapApplier"/>, which writes
+/// Windows' touch routing table and restarts the digitizer. The service still depends on the
+/// interactive client for one thing: Session 0 cannot see the desktop, so the client's poll of
+/// <see cref="GetPending"/> supplies the monitor list — and is therefore also the trigger.
 ///
 /// GENERATION TRACKING: "already applied" is scoped to a hardware generation — a hash over the
 /// present digitizers and monitors. Any change (a reboot, an extender power-cycle, a monitor
@@ -32,18 +33,22 @@ public class ReapplyCoordinator
 {
     private readonly ILogger<ReapplyCoordinator> _logger;
     private readonly MappingStore _store;
+    private readonly IWindowsTouchMapApplier _applier;
 
     private readonly object _stateLock = new();
     private readonly HashSet<string> _appliedInCurrentGeneration = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _reportedUnresolvableInCurrentGeneration = new(StringComparer.Ordinal);
     private string _currentGeneration = string.Empty;
 
     /// <summary>Initializes a new instance of <see cref="ReapplyCoordinator"/>.</summary>
     /// <param name="logger">Logger for audit and diagnostic output.</param>
     /// <param name="store">Persistent mapping store.</param>
-    public ReapplyCoordinator(ILogger<ReapplyCoordinator> logger, MappingStore store)
+    /// <param name="applier">Writes Windows' touch routing for a resolved assignment.</param>
+    public ReapplyCoordinator(ILogger<ReapplyCoordinator> logger, MappingStore store, IWindowsTouchMapApplier applier)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _store = store ?? throw new ArgumentNullException(nameof(store));
+        _applier = applier ?? throw new ArgumentNullException(nameof(applier));
     }
 
     /// <summary>
@@ -62,10 +67,6 @@ public class ReapplyCoordinator
         RollGenerationIfChanged(generation);
 
         var mappings = _store.GetAll();
-        if (mappings.Count == 0)
-            return Array.Empty<PendingReapply>();
-
-        var pending = new List<PendingReapply>();
 
         foreach (var mapping in mappings)
         {
@@ -82,28 +83,100 @@ public class ReapplyCoordinator
                 continue;
             }
 
-            pending.Add(new PendingReapply(
-                TouchHardwareKey: mapping.TouchHardwareKey,
-                MonitorHardwareKey: mapping.MonitorHardwareKey,
-                MonitorConnectorLabel: resolved.Monitor.ConnectorLabel,
-                TouchDevicePath: resolved.TouchDevice.DevicePath,
-                MonitorDeviceId: resolved.Monitor.DeviceId,
-                MonitorFriendlyName: resolved.Monitor.DisplayName,
-                LocalExecutablePath: WindowsToolPaths.TabcalPath,
-                LocalArguments: MappingResolver.BuildTabcalArguments(
-                    resolved.Monitor.DeviceId, resolved.TouchDevice.DevicePath),
-                MatchQuality: resolved.MatchQuality,
-                Reason: DescribeReason(resolved)));
+            // Applied right here, by the service: it writes Windows' routing table and restarts
+            // the digitizer (see WindowsTouchMapApplier). Nothing is handed to the client to run
+            // with tabcal.exe any more — on a machine with two touch screens tabcal refuses to
+            // work at all and only ever produced a modal error dialog.
+            var outcome = _applier.Apply(resolved.TouchDevice, resolved.Monitor);
+            if (outcome == TouchMapApplyOutcome.Failed)
+            {
+                // Stays unapplied, so the next poll retries; logged once per generation.
+                lock (_stateLock)
+                {
+                    if (!_reportedUnresolvableInCurrentGeneration.Add(mapping.TouchHardwareKey))
+                        continue;
+                }
+
+                _logger.LogWarning(
+                    "Could not apply assignment {TouchKey} -> {MonitorConnector}; will retry on the next poll",
+                    mapping.TouchHardwareKey, resolved.Monitor.ConnectorLabel);
+                continue;
+            }
+
+            lock (_stateLock)
+            {
+                _appliedInCurrentGeneration.Add(mapping.TouchHardwareKey);
+            }
+
+            if (outcome == TouchMapApplyOutcome.Updated)
+            {
+                _store.MarkApplied(mapping.TouchHardwareKey, DateTime.UtcNow);
+                _logger.LogInformation(
+                    "Assignment {TouchKey} applied: {TouchPath} -> {MonitorConnector} (match {MatchQuality}, generation {Generation})",
+                    mapping.TouchHardwareKey, resolved.TouchDevice.DevicePath, resolved.Monitor.ConnectorLabel,
+                    resolved.MatchQuality, _currentGeneration);
+            }
         }
 
-        if (pending.Count > 0)
+        // Kept for the contract: clients still read this list, and an empty one means
+        // "nothing for you to do".
+        return Array.Empty<PendingReapply>();
+    }
+
+    /// <summary>
+    /// Operator-requested "apply now": applies EVERY stored assignment immediately and restarts
+    /// the digitizers even where Windows' table already reads correctly — the case this exists
+    /// for is "the table is right but touch still lands on the wrong screen".
+    /// </summary>
+    public ApplyMappingsNowResponse ApplyNow(
+        IReadOnlyList<HidDeviceInfo> presentDigitizers,
+        IReadOnlyList<MonitorInfo> presentMonitors)
+    {
+        ArgumentNullException.ThrowIfNull(presentDigitizers);
+        ArgumentNullException.ThrowIfNull(presentMonitors);
+
+        RollGenerationIfChanged(ComputeGeneration(presentDigitizers, presentMonitors));
+
+        var mappings = _store.GetAll();
+        int applied = 0, unresolvable = 0, failed = 0;
+
+        foreach (var mapping in mappings)
         {
-            _logger.LogInformation(
-                "{PendingCount} assignment(s) queued for re-application in hardware generation {Generation}",
-                pending.Count, _currentGeneration);
+            var resolved = MappingResolver.Resolve(mapping, presentDigitizers, presentMonitors);
+            if (resolved == null)
+            {
+                unresolvable++;
+                LogUnresolvable(mapping, presentDigitizers);
+                continue;
+            }
+
+            if (_applier.Apply(resolved.TouchDevice, resolved.Monitor, forceRestart: true) == TouchMapApplyOutcome.Failed)
+            {
+                failed++;
+                continue;
+            }
+
+            applied++;
+            lock (_stateLock)
+            {
+                _appliedInCurrentGeneration.Add(mapping.TouchHardwareKey);
+            }
+
+            _store.MarkApplied(mapping.TouchHardwareKey, DateTime.UtcNow);
         }
 
-        return pending;
+        _logger.LogInformation(
+            "Apply-now requested by the operator: {Applied} applied, {Unresolvable} unresolvable, {Failed} failed " +
+            "(of {Total} stored)",
+            applied, unresolvable, failed, mappings.Count);
+
+        ComplianceAuditLogger.LogCriticalAction(
+            AuditActions.SaveMapping,
+            "APPLY_NOW",
+            success: failed == 0 && unresolvable == 0,
+            errorMessage: failed == 0 && unresolvable == 0 ? null : $"{unresolvable} unresolvable, {failed} failed");
+
+        return new ApplyMappingsNowResponse(mappings.Count, applied, unresolvable, failed);
     }
 
     /// <summary>
@@ -231,6 +304,7 @@ public class ReapplyCoordinator
             _currentGeneration = generation;
             rolled = _appliedInCurrentGeneration.Count > 0 || previous.Length > 0;
             _appliedInCurrentGeneration.Clear();
+            _reportedUnresolvableInCurrentGeneration.Clear();
         }
 
         if (rolled)
@@ -244,6 +318,28 @@ public class ReapplyCoordinator
 
     private void LogUnresolvable(TouchMapping mapping, IReadOnlyList<HidDeviceInfo> presentDigitizers)
     {
+        // Once per mapping and hardware generation: the client polls every 15s, and the same
+        // warning used to be written thousands of times a day while nothing changed.
+        lock (_stateLock)
+        {
+            if (!_reportedUnresolvableInCurrentGeneration.Add(mapping.TouchHardwareKey))
+                return;
+        }
+
+        if (!HidDeviceInfo.IsPortKey(mapping.TouchHardwareKey) &&
+            presentDigitizers.Any(d => HidDeviceInfo.IsPortKey(d.HardwareKey)))
+        {
+            // Not resolved through the legacy id on purpose: behind the range extenders that id
+            // can name either physical touch screen, so there is no way to tell which one the
+            // operator meant when it was learned.
+            _logger.LogWarning(
+                "Stored assignment {TouchKey} uses the former USB instance anchor, which is not stable " +
+                "behind the range extenders. It is not applied; re-learn this screen once to replace it " +
+                "with a port anchor.",
+                mapping.TouchHardwareKey);
+            return;
+        }
+
         var touchDevice = MappingResolver.FindUniqueTouchDevice(mapping.TouchHardwareKey, presentDigitizers);
 
         if (touchDevice == null)
@@ -260,15 +356,6 @@ public class ReapplyCoordinator
             "{MonitorConnector} / {MonitorBounds}",
             mapping.TouchHardwareKey, mapping.MonitorConnectorLabel, mapping.MonitorBoundsKey);
     }
-
-    private static LocalizableText DescribeReason(ResolvedMapping resolved) =>
-        LocalizableText.Of(resolved.MatchQuality switch
-        {
-            MappingMatchQuality.Exact => MessageKeys.Reapply_ReasonExact,
-            MappingMatchQuality.Connector => MessageKeys.Reapply_ReasonConnector,
-            MappingMatchQuality.BoundsOnly => MessageKeys.Reapply_ReasonBoundsOnly,
-            _ => MessageKeys.Reapply_ReasonStored
-        });
 
     /// <summary>
     /// Builds a stable fingerprint of the present hardware. Deliberately includes the monitor

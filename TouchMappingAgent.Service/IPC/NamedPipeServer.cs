@@ -276,6 +276,9 @@ public class NamedPipeServer
                     "GetPendingReapply" => await WithHandlerAsync(
                         h => h.HandleGetPendingReapplyRequestAsync(payloadElement.GetRawText(), cancellationToken),
                         () => new GetPendingReapplyResponse(Array.Empty<PendingReapply>())),
+                    "ApplyMappingsNow" => await WithHandlerAsync(
+                        h => h.HandleApplyMappingsNowRequestAsync(payloadElement.GetRawText(), cancellationToken),
+                        () => new ApplyMappingsNowResponse(0, 0, 0, 0)),
                     "ReportReapplyResult" => await WithHandlerAsync(
                         h => h.HandleReportReapplyResultRequestAsync(payloadElement.GetRawText(), cancellationToken),
                         () => new ReportReapplyResultResponse(false, "Service unavailable.")),

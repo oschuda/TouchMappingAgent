@@ -305,103 +305,44 @@ public partial class MonitorMappingViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Command: Creates a secure backup of the current touch configurations (MVO 2023/1230 Resilience).
+    /// Command: "apply mapping now". The service writes Windows' touch routing for every stored
+    /// assignment and restarts the digitizers, even where the routing already reads correctly —
+    /// the operator presses this because touch lands on the wrong screen right now.
+    ///
+    /// Replaces the former "advanced repair", which closed every RDP client window on the
+    /// machine, cleared a registry value nothing ever wrote, and then reported "assignments
+    /// restored" without having touched the routing at all.
     /// </summary>
-    [RelayCommand(CanExecute = nameof(CanExecuteBackup))]
-    private async Task CreateTouchBackup()
+    [RelayCommand(CanExecute = nameof(CanExecuteApplyNow))]
+    public async Task ApplyMappingsNow()
     {
         try
         {
             IsLoading = true;
-            StatusMessage = _localizer[LocalizationKeys.Main_CreatingBackup];
+            StatusMessage = _localizer[LocalizationKeys.Main_ApplyingNow];
 
-            var request = new CreateBackupRequest();
-            var response = await _pipeClient.SendAsync<CreateBackupResponse>(request);
+            // Restarting a digitizer through pnputil takes a few seconds per device.
+            var response = await _pipeClient.SendAsync<ApplyMappingsNowResponse>(
+                new ApplyMappingsNowRequest(DisplayEnumerator.EnumerateMonitors()), TimeSpan.FromSeconds(60));
 
-            StatusMessage = response.Success
-                ? _localizer[LocalizationKeys.Main_BackupCreated]
-                : _localizer[LocalizationKeys.Main_BackupFailed];
+            StatusMessage = response.MappingCount == 0
+                ? _localizer[LocalizationKeys.Main_ApplyNowNothingStored]
+                : string.Format(
+                    _localizer[LocalizationKeys.Main_ApplyNowResult],
+                    response.Applied, response.MappingCount, response.Unresolvable, response.Failed);
+            AppendLog(
+                $"ApplyMappingsNow: {response.Applied}/{response.MappingCount} applied, " +
+                $"{response.Unresolvable} unresolvable, {response.Failed} failed");
         }
         catch (Exception ex)
         {
-            StatusMessage = _localizer[LocalizationKeys.Main_BackupError];
-            LogError(ex, "CreateTouchBackup failed");
+            StatusMessage = _localizer[LocalizationKeys.Main_ApplyNowFailed];
+            LogError(ex, "ApplyMappingsNow IPC command failed");
         }
         finally
         {
             IsLoading = false;
-            CreateTouchBackupCommand.NotifyCanExecuteChanged();
-        }
-    }
-
-    /// <summary>
-    /// Command: Executes the advanced repair sequence in the service (IEC 62443 / NIS2 compliance).
-    /// </summary>
-    [RelayCommand(CanExecute = nameof(CanExecuteRepair))]
-    private async Task AdvancedRepair()
-    {
-        try
-        {
-            IsLoading = true;
-            StatusMessage = _localizer[LocalizationKeys.Main_RunningAdvancedRepair];
-
-            var request = new AdvancedRepairRequest();
-            // The server-side sequence can run RDP-process shutdown (up to 5s) plus
-            // tabcal.exe ClearCal (up to 30s) before it replies, well past the default
-            // 10s pipe read timeout used for quick requests. 45s covers that worst case.
-            var response = await _pipeClient.SendAsync<AdvancedRepairResponse>(request, TimeSpan.FromSeconds(45));
-
-            StatusMessage = response.Success
-                ? _localizer[LocalizationKeys.Main_AdvancedRepairSucceeded]
-                : _localizer[LocalizationKeys.Main_AdvancedRepairIssues];
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = _localizer[LocalizationKeys.Main_AdvancedRepairIpcFailed];
-            LogError(ex, "AdvancedRepair IPC command failed");
-        }
-        finally
-        {
-            IsLoading = false;
-            AdvancedRepairCommand.NotifyCanExecuteChanged();
-        }
-    }
-
-    /// <summary>
-    /// Command: manual operator override for the service's console session watchdog
-    /// ("Diagnose &gt; Konsolen-Sitzung zurücksetzen" in the tray menu). Runs the exact same
-    /// guarded WTSLogoffSession the watchdog would run automatically after detecting a hung
-    /// console (black screen after a power event/extender cycle/driver reset), immediately —
-    /// bypassing the watchdog's boot hysteresis and debounce timers, but not its underlying
-    /// safety check, which still refuses to touch anything but the physical console session.
-    /// The confirmation dialog lives in TrayIconManager, right before this command is invoked —
-    /// this method itself performs no further confirmation.
-    /// </summary>
-    [RelayCommand(CanExecute = nameof(CanExecuteRepair))]
-    private async Task ForceConsoleSessionReset()
-    {
-        try
-        {
-            IsLoading = true;
-            StatusMessage = "Konsolen-Sitzung wird zurückgesetzt...";
-
-            var response = await _pipeClient.SendAsync<ForceConsoleSessionResetResponse>(
-                new ForceConsoleSessionResetRequest());
-
-            StatusMessage = response.Success
-                ? "Konsolen-Sitzung erfolgreich zurückgesetzt."
-                : $"Konsolen-Sitzung konnte nicht zurückgesetzt werden: {response.Detail}";
-            AppendLog($"ForceConsoleSessionReset: {(response.Success ? "success" : "failed")} ({response.Detail})");
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = "Zurücksetzen der Konsolen-Sitzung fehlgeschlagen (Dienst nicht erreichbar).";
-            LogError(ex, "ForceConsoleSessionReset IPC command failed");
-        }
-        finally
-        {
-            IsLoading = false;
-            ForceConsoleSessionResetCommand.NotifyCanExecuteChanged();
+            ApplyMappingsNowCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -467,8 +408,7 @@ public partial class MonitorMappingViewModel : ObservableObject
     private void ClearLog() => LogText = string.Empty;
 
     // --- Validation Rules for Buttons (CanExecute) ---
-    private bool CanExecuteBackup() => !IsLoading;
-    private bool CanExecuteRepair() => !IsLoading;
+    private bool CanExecuteApplyNow() => !IsLoading;
 
     /// <summary>
     /// Appends a timestamped line to the diagnostic log shown in the LogWindow.

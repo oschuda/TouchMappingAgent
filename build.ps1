@@ -62,7 +62,7 @@ $satelliteOk = Test-Path (Join-Path $publishDir "en\TouchMappingAgent.WPF.resour
 Write-Host ("Publish output: {0} .exe, {1} .dll, en\ satellite present: {2}" -f $exeCount, $dllCount, $satelliteOk) -ForegroundColor Green
 
 if ($SkipInstaller) {
-    Write-Host "SkipInstaller set — done." -ForegroundColor Yellow
+    Write-Host "SkipInstaller set - done." -ForegroundColor Yellow
     return
 }
 

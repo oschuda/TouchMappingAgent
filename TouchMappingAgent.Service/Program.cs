@@ -97,10 +97,15 @@ class Program
                     // Singleton because it serialises its writes internally.
                     services.AddSingleton<MappingStore>();
 
+                    // WindowsTouchMapApplier: writes Windows' touch routing table (Wisp\Pen\Digimon)
+                    // and restarts the digitizer. Singleton: it serialises writes and remembers
+                    // digitizers whose restart is still outstanding.
+                    services.AddSingleton<IWindowsTouchMapApplier, WindowsTouchMapApplier>();
+
                     // ReapplyCoordinator: decides which stored assignments need re-applying
-                    // for the hardware configuration currently present. Must be a singleton —
-                    // it holds the "already applied in this hardware generation" state that
-                    // stops the client re-running tabcal.exe on every poll.
+                    // for the hardware configuration currently present, and applies them. Must
+                    // be a singleton — it holds the "already applied in this hardware
+                    // generation" state that stops every poll from rewriting the routing.
                     services.AddSingleton<ReapplyCoordinator>();
 
                     // ResilientHardwareWatcher: polls for digitizer hotplug and invalidates

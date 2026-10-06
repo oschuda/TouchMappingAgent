@@ -12,11 +12,11 @@ namespace TouchMappingAgent.Shared.Hardware;
 /// mice, game controllers) are excluded.
 ///
 /// Beyond the interface path, each device carries its PnP instance id and — the part that
-/// matters for persistent mapping — its USB PARENT instance id. On the target installation
-/// two identical PM1715 digitizers hang off USB range extenders that report no location path
-/// at all, so vendor/product/name are useless for telling them apart. Their parent device
-/// instances ("USB\VID_14E1&amp;PID_3508\7&amp;1b9afb93&amp;0&amp;6" vs "...\7&amp;235bf858&amp;0&amp;6")
-/// derive from the physical controller port and are what survives a reboot.
+/// matters for persistent mapping — its USB PARENT's instance id and physical location path.
+/// On the target installation two identical PM1715 digitizers hang off USB range extenders, so
+/// vendor/product/name are useless for telling them apart. The HID node itself has no location
+/// path, but its USB parent does, and that path (one port number per hub level) is what
+/// identifies the physical side. See <see cref="HidDeviceInfo.HardwareKey"/>.
 ///
 /// LIVES IN Shared: the interactive WPF client needs it for the learn flow (turning a raw
 /// touch event's device path back into a hardware anchor), and the service needs it to answer
@@ -83,12 +83,13 @@ public static class TouchDigitizerEnumerator
 
                     // Only now (after the digitizer filter) pay for the PnP lookups.
                     var instanceId = TryGetDeviceInstanceId(deviceInfoSet, ref devInfoData) ?? string.Empty;
-                    var parentInstanceId = TryGetParentInstanceId(devInfoData.DevInst) ?? string.Empty;
+                    var (parentInstanceId, parentLocationPath) = TryGetParentIdentity(devInfoData.DevInst);
 
                     results.Add(device with
                     {
                         InstanceId = instanceId,
-                        ParentInstanceId = parentInstanceId
+                        ParentInstanceId = parentInstanceId ?? string.Empty,
+                        ParentLocationPath = parentLocationPath ?? string.Empty
                     });
                 }
                 catch
@@ -173,34 +174,62 @@ public static class TouchDigitizerEnumerator
     }
 
     /// <summary>
-    /// Walks one level up the device tree to the USB device instance
-    /// (e.g. "USB\VID_14E1&amp;PID_3508\7&amp;1b9afb93&amp;0&amp;6"). This is the port anchor the
-    /// whole persistence model rests on.
+    /// Walks one level up the device tree to the USB device and reads both its instance id
+    /// (e.g. "USB\VID_14E1&amp;PID_3508\7&amp;1b9afb93&amp;0&amp;6") and its physical location path
+    /// (e.g. "PCIROOT(0)#PCI(1400)#USBROOT(0)#USB(1)#USB(4)#USB(6)").
+    ///
+    /// The location path is the real port anchor. The instance id is NOT stable behind the
+    /// target installation's range extenders: both extender hubs report the same USB serial
+    /// number, so whichever enumerates first gets the serial-based id and the other a
+    /// port-derived one — and the digitizer ids below them follow suit. Measured 2026-10-06:
+    /// "7&amp;1b9afb93&amp;0&amp;6" belonged to one physical touch screen before an extender
+    /// power-cycle and to the other one after it.
     /// </summary>
-    private static string? TryGetParentInstanceId(uint devInst)
+    private static (string? InstanceId, string? LocationPath) TryGetParentIdentity(uint devInst)
     {
         try
         {
             if (CM_Get_Parent(out uint parentDevInst, devInst, 0) != CR_SUCCESS)
-                return null;
+                return (null, null);
 
             var buffer = new StringBuilder(MaxDeviceIdLength);
-            return CM_Get_Device_ID(parentDevInst, buffer, buffer.Capacity, 0) == CR_SUCCESS
+            var instanceId = CM_Get_Device_ID(parentDevInst, buffer, buffer.Capacity, 0) == CR_SUCCESS
                 ? buffer.ToString()
                 : null;
-        }
-        catch (EntryPointNotFoundException)
-        {
-            return null;
-        }
-        catch (DllNotFoundException)
-        {
-            return null;
+
+            return (instanceId, TryGetPciRootLocationPath(parentDevInst));
         }
         catch
         {
+            // Includes EntryPointNotFoundException / DllNotFoundException on stripped-down images.
+            return (null, null);
+        }
+    }
+
+    /// <summary>
+    /// Reads DEVPKEY_Device_LocationPaths and returns the "PCIROOT(...)" entry. The property is a
+    /// string list that typically also carries an ACPI-namespace variant of the same path; the
+    /// PCIROOT form is the one that encodes every hub port down to the device.
+    /// </summary>
+    private static string? TryGetPciRootLocationPath(uint devInst)
+    {
+        var key = DEVPKEY_Device_LocationPaths;
+        uint size = 0;
+
+        int result = CM_Get_DevNode_Property(devInst, ref key, out _, null, ref size, 0);
+        if (result != CR_BUFFER_SMALL || size == 0)
+            return null;
+
+        var buffer = new byte[size];
+        if (CM_Get_DevNode_Property(devInst, ref key, out uint type, buffer, ref size, 0) != CR_SUCCESS ||
+            type != DEVPROP_TYPE_STRING_LIST)
+        {
             return null;
         }
+
+        return Encoding.Unicode.GetString(buffer, 0, (int)size)
+            .Split('\0', StringSplitOptions.RemoveEmptyEntries)
+            .FirstOrDefault(p => p.StartsWith("PCIROOT(", StringComparison.OrdinalIgnoreCase));
     }
 
     private static HidDeviceInfo? TryReadDigitizerInfo(string devicePath)
@@ -329,6 +358,27 @@ public static class TouchDigitizerEnumerator
 
     [DllImport("cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     private static extern int CM_Get_Device_ID(uint dnDevInst, StringBuilder buffer, int bufferLen, uint ulFlags);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DEVPROPKEY
+    {
+        public Guid fmtid;
+        public uint pid;
+    }
+
+    private const int CR_BUFFER_SMALL = 0x1A;
+    private const uint DEVPROP_TYPE_STRING_LIST = 0x2012;
+
+    private static readonly DEVPROPKEY DEVPKEY_Device_LocationPaths = new()
+    {
+        fmtid = new Guid("A45C254E-DF1C-4EFD-8020-67D146A850E0"),
+        pid = 37
+    };
+
+    [DllImport("cfgmgr32.dll", EntryPoint = "CM_Get_DevNode_PropertyW", CharSet = CharSet.Unicode)]
+    private static extern int CM_Get_DevNode_Property(
+        uint dnDevInst, ref DEVPROPKEY propertyKey, out uint propertyType,
+        byte[]? propertyBuffer, ref uint propertyBufferSize, uint ulFlags);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     private static extern SafeFileHandle CreateFile(

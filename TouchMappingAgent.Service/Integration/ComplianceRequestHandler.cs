@@ -125,19 +125,10 @@ public class ComplianceRequestHandler
     }
 
     /// <summary>
-    /// Requests a touch-to-monitor mapping. The functional OS-level association is owned
-    /// exclusively by Windows' own touch stack (applied via tabcal.exe, which persists to
-    /// HKLM\SOFTWARE\Microsoft\Wisp\Touch\CalibrationData) — a service-owned registry key
-    /// has no effect on the real digitizer routing, which was the root cause of touches on
-    /// one monitor being (mis)delivered to another.
-    ///
-    /// Windows Services run in Session 0 (non-interactive), so this service CANNOT invoke
-    /// tabcal.exe itself: it can neither show the calibration UI nor receive the physical
-    /// touch confirmation on the target screen. Instead this method persists an audit/
-    /// bookkeeping record only, and returns the exact command the interactive WPF client
-    /// (which does run in the user's session) must execute locally to perform the real
-    /// mapping. See <see cref="HandleConfirmLocalMappingRequestAsync"/> for the follow-up
-    /// audit entry once the client reports the outcome.
+    /// Persists a learned touch-to-monitor assignment. The OS-level routing lives in Windows'
+    /// own table (HKLM\SOFTWARE\Microsoft\Wisp\Pen\Digimon); the service writes it through
+    /// <see cref="ReapplyCoordinator"/> / <see cref="WindowsTouchMapApplier"/> once the client's
+    /// next poll supplies the monitor list. No tabcal.exe command is returned any more.
     /// </summary>
     private async Task<MapTouchResponse> ProcessMappingAsync(
         MapTouchRequest request,
@@ -186,19 +177,21 @@ public class ComplianceRequestHandler
                 "without persisting it", request.DeviceId);
         }
 
-        var arguments = MappingResolver.BuildTabcalArguments(request.MonitorId, request.DeviceId);
-
         _logger.LogInformation(
-            "Touch mapping requested: device={DeviceId} -> monitor={MonitorId}. " +
-            "Delegating real calibration to interactive client (Session 0 cannot run tabcal.exe): {Arguments}",
-            request.DeviceId, request.MonitorId, arguments);
+            "Touch mapping requested: device={DeviceId} -> monitor={MonitorId}. The routing is written " +
+            "by the service on the client's next poll (no tabcal.exe)",
+            request.DeviceId, request.MonitorId);
 
+        // No local execution: the service applies the routing itself (WindowsTouchMapApplier)
+        // as soon as the client's next poll supplies the monitor list. tabcal.exe refuses to run
+        // with two touch screens attached, so handing the client a tabcal command only ever
+        // produced a modal error dialog on the target.
         return new MapTouchResponse(
             Success: true,
             ErrorMessage: null,
-            LocalExecutablePath: WindowsToolPaths.TabcalPath,
-            LocalArguments: arguments,
-            RequiresLocalExecution: true);
+            LocalExecutablePath: null,
+            LocalArguments: null,
+            RequiresLocalExecution: false);
     }
 
     /// <summary>
@@ -281,6 +274,33 @@ public class ComplianceRequestHandler
         {
             _logger.LogError(ex, "Error computing pending re-applications");
             return new GetPendingReapplyResponse(Array.Empty<PendingReapply>());
+        }
+    }
+
+    /// <summary>
+    /// Operator action "apply mapping now". See <see cref="ReapplyCoordinator.ApplyNow"/>.
+    /// </summary>
+    public async Task<ApplyMappingsNowResponse> HandleApplyMappingsNowRequestAsync(
+        string requestJson,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = SecureJsonDeserializer.DeserializeSecure<ApplyMappingsNowRequest>(requestJson);
+            var monitors = request.CurrentMonitors ?? (IReadOnlyList<MonitorInfo>)Array.Empty<MonitorInfo>();
+
+            return await Task.Run(
+                () => _reapplyCoordinator.ApplyNow(TouchDigitizerEnumerator.EnumerateDigitizers(), monitors),
+                cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error applying mappings on operator request");
+            return new ApplyMappingsNowResponse(0, 0, 0, 0);
         }
     }
 

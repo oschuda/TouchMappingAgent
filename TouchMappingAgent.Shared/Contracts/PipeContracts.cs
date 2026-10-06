@@ -209,6 +209,25 @@ public record ReportReapplyResultResponse(
     string? ErrorMessage);
 
 /// <summary>
+/// Operator action "apply mapping now": the service applies every stored assignment at once and
+/// restarts the digitizers so Windows picks the routing up immediately. Carries the client's
+/// monitor list for the same reason as <see cref="GetPendingReapplyRequest"/>.
+/// </summary>
+public record ApplyMappingsNowRequest(
+    IReadOnlyList<MonitorInfo> CurrentMonitors);
+
+/// <summary>
+/// Outcome of <see cref="ApplyMappingsNowRequest"/>. <see cref="Unresolvable"/> counts stored
+/// assignments whose digitizer or monitor is not present (or uses the former, unstable anchor
+/// and must be re-learned).
+/// </summary>
+public record ApplyMappingsNowResponse(
+    int MappingCount,
+    int Applied,
+    int Unresolvable,
+    int Failed);
+
+/// <summary>
 /// Request for the service's view of current hardware health: how many displays and
 /// digitizers are present, which mappings resolve, and which do not.
 /// </summary>

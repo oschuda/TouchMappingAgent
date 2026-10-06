@@ -307,14 +307,28 @@ sie nur über *ihren Anschluss*.
 | **PnP-Gerätepfad des Monitors** | ✅ enthält `…&UID250116` | **Ja** (primär) |
 | **Connector + Target-ID** | ✅ solange das Kabel steckt | **Ja** (sekundär) |
 | **Desktop-Bounds** | ⚠️ ändert sich beim Umsortieren | Ja (letzter Rückfall) |
-| **`ParentInstanceId` (USB)** | ✅ vom Controller-Port abgeleitet | **Ja** (Touch-Seite) |
+| `ParentInstanceId` (USB) | ❌ hinter den Extendern abhängig von der Einschaltreihenfolge (s. u.) | Nur Rückfall |
+| **`LocationPaths` des USB-Elternknotens** | ✅ eine Portnummer pro Hub-Ebene | **Ja** (Touch-Seite) |
 
 Gespeichert wird das Paar:
 
 ```
-USB\VID_14E1&PID_3508\7&1b9afb93&0&6   <->   \\?\DISPLAY#CHR8910#5&2c72b841&0&UID250116
-         ↑ physischer USB-Port                          ↑ physischer Grafik-Anschluss
+PORT\VID_14E1&PID_3508\PCIROOT(0)/PCI(1400)/USBROOT(0)/USB(1)/USB(4)/USB(6)   <->   \\?\DISPLAY#CHR8910#5&2c72b841&0&UID250118
+                         ↑ physischer USB-Port                                          ↑ physischer Grafik-Anschluss
 ```
+
+> **Feldbefund 2026-10-06 — warum nicht mehr `ParentInstanceId`.** Beide USB-Extender-Empfänger
+> melden sich als `USB\VID_0000&PID_0000` mit **derselben Seriennummer**. Windows vergibt die
+> serienbasierte Instanz-ID (`MSFT2000000000`) an den zuerst enumerierten, der andere erhält eine
+> portabgeleitete. Die Digitizer darunter erben das: `7&1b9afb93&0&6` gehört dem Touch an
+> `USB(1)` *oder* dem an `USB(2)`, je nachdem, welcher Extender nach einem Power-Cycle schneller
+> war. Eine darauf gespeicherte Zuordnung wurde so auf den falschen Schirm angewendet und als
+> Erfolg gemeldet. Der Portpfad ändert sich dabei nicht. Das `#` des Pfads wird im Schlüssel als
+> `/` gespeichert, weil `MappingStore` `\` in Subkey-Namen als `#` maskiert.
+>
+> Zuordnungen im alten Format werden **nicht** migriert (es ist nicht feststellbar, welcher
+> Schirm beim Anlernen gemeint war) und nicht mehr angewendet; einmaliges Neu-Anlernen ersetzt
+> sie.
 
 ### Connector-Ermittlung über die CCD-API
 
@@ -373,8 +387,8 @@ CM_Get_Device_ID(parentDevInst, ...);                    // USB\VID_14E1&PID_350
 > `USB\VID_0408&PID_3008\0000` — die letzte Komponente ist dort eine *Seriennummer*, kein
 > Portpfad. Bei zwei baugleichen Geräten dieser Machart kollidieren die Anker.
 > `MappingResolver.FindUniqueTouchDevice` erkennt das und liefert `null`, statt eines der
-> beiden zu wählen. Die PM1715 der Zielanlage sind port-abgeleitet
-> (`7&1b9afb93&0&6` vs. `7&235bf858&0&6`) und damit unkritisch.
+> beiden zu wählen. Die Annahme, die PM1715 der Zielanlage seien port-abgeleitet und damit
+> unkritisch, hat sich als falsch erwiesen (Feldbefund oben); deshalb der Portpfad als Anker.
 
 ### Auflösungs-Kaskade
 

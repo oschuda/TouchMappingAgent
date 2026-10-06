@@ -42,7 +42,7 @@ public sealed class DiagnosticsExporter
 
     /// <summary>Suggested file name, stamped so several exports do not overwrite each other.</summary>
     public static string SuggestedFileName =>
-        $"MultiTouchAgent-Diagnose_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+        $"TouchMappingAgent-Diagnose_{DateTime.Now:yyyyMMdd_HHmmss}.log";
 
     /// <summary>
     /// Writes the diagnostics report to <paramref name="targetPath"/>.
@@ -70,7 +70,7 @@ public sealed class DiagnosticsExporter
         var sb = new StringBuilder();
 
         sb.AppendLine("=======================================================================");
-        sb.AppendLine(" MultiTouch Agent — Diagnosebericht");
+        sb.AppendLine(" TouchMappingAgent — Diagnosebericht");
         sb.AppendLine($" Erstellt: {DateTime.Now:yyyy-MM-dd HH:mm:ss zzz}");
         sb.AppendLine($" Rechner : {Environment.MachineName}");
         sb.AppendLine($" Benutzer: {Environment.UserName}");

@@ -17,8 +17,6 @@ namespace TouchMappingAgent.Service.Integration;
 public class ComplianceRequestHandler
 {
     private readonly ILogger<ComplianceRequestHandler> _logger;
-    private readonly BackupService _backupService;
-    private readonly AdvancedRepairService _repairService;
     private readonly MappingStore _mappingStore;
     private readonly ReapplyCoordinator _reapplyCoordinator;
     private readonly Evolved.EdidManager.EdidManagerService _edidManager;
@@ -26,24 +24,18 @@ public class ComplianceRequestHandler
 
     /// <summary>Initializes a new instance of <see cref="ComplianceRequestHandler"/>.</summary>
     /// <param name="logger">Logger for audit and diagnostic output.</param>
-    /// <param name="backupService">Service for creating registry backups.</param>
-    /// <param name="repairService">Service for executing multi-phase repair.</param>
     /// <param name="mappingStore">Persistent, hardware-anchored mapping store.</param>
     /// <param name="reapplyCoordinator">Decides which assignments need re-applying.</param>
     /// <param name="edidManager">Resolves EDID serial collisions between identical monitors.</param>
     /// <param name="templateStore">Provides EDID templates for extender fallback.</param>
     public ComplianceRequestHandler(
         ILogger<ComplianceRequestHandler> logger,
-        BackupService backupService,
-        AdvancedRepairService repairService,
         MappingStore mappingStore,
         ReapplyCoordinator reapplyCoordinator,
         Evolved.EdidManager.EdidManagerService edidManager,
         Evolved.EdidManager.Templates.IEdidTemplateStore templateStore)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
-        _repairService = repairService ?? throw new ArgumentNullException(nameof(repairService));
         _mappingStore = mappingStore ?? throw new ArgumentNullException(nameof(mappingStore));
         _reapplyCoordinator = reapplyCoordinator ?? throw new ArgumentNullException(nameof(reapplyCoordinator));
         _edidManager = edidManager ?? throw new ArgumentNullException(nameof(edidManager));
@@ -644,115 +636,6 @@ public class ComplianceRequestHandler
         {
             _logger.LogError(ex, "Error in HandleConfirmLocalMappingRequestAsync");
             return new ConfirmLocalMappingResponse(false, "Failed to record mapping confirmation.");
-        }
-    }
-
-    /// <summary>
-    /// Handles a CreateBackupRequest for configuration resilience (MVO 2023/1230).
-    /// </summary>
-    public async Task<CreateBackupResponse> HandleCreateBackupRequestAsync(
-        string requestJson,
-        CancellationToken cancellationToken)
-    {
-        const string action = AuditActions.SaveMapping;
-        string backupId = "UNKNOWN";
-
-        try
-        {
-            // Step 1: SECURE DESERIALIZATION
-            var request = SecureJsonDeserializer.DeserializeSecure<CreateBackupRequest>(requestJson);
-
-            // Step 2: CREATE BACKUP (MVO 2023/1230 Resilience)
-            _logger.LogInformation("Creating backup with description: {Description}", request.BackupDescription);
-            var result = await Task.Run(() => _backupService.CreateBackup(request.BackupDescription), cancellationToken);
-
-            if (result == null)
-            {
-                ComplianceAuditLogger.LogCriticalAction(
-                    action,
-                    "BACKUP_FAILED",
-                    success: false,
-                    errorMessage: "Backup creation returned null");
-
-                return new CreateBackupResponse(false, null, "Backup creation failed.");
-            }
-
-            backupId = result;
-
-            // Step 3: LOG SUCCESS (ISO 27001 A.8.15)
-            ComplianceAuditLogger.LogCriticalAction(action, backupId, success: true);
-
-            return new CreateBackupResponse(true, backupId, null);
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("CreateBackupRequest cancelled");
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in HandleCreateBackupRequestAsync");
-
-            ComplianceAuditLogger.LogCriticalAction(
-                action,
-                backupId,
-                success: false,
-                errorMessage: "Backup operation failed");
-
-            // OWASP: Generic error message to client
-            return new CreateBackupResponse(false, null, "An error occurred during backup. Please try again.");
-        }
-    }
-
-    /// <summary>
-    /// Handles an AdvancedRepairRequest for system recovery (IEC 62443 / NIS2).
-    /// Executes multi-phase repair sequence for touch and display systems.
-    /// </summary>
-    public async Task<AdvancedRepairResponse> HandleAdvancedRepairRequestAsync(
-        string requestJson,
-        CancellationToken cancellationToken)
-    {
-        const string action = AuditActions.StartAdvancedRepair;
-        string repairId = "UNKNOWN";
-
-        try
-        {
-            // Step 1: SECURE DESERIALIZATION
-            var request = SecureJsonDeserializer.DeserializeSecure<AdvancedRepairRequest>(requestJson);
-
-            // Step 2: EXECUTE REPAIR (IEC 62443 / NIS2 Recovery)
-            _logger.LogInformation("Starting advanced repair sequence");
-            var (success, recoveryDetails) = await _repairService.ExecuteAdvancedRepairAsync(cancellationToken);
-
-            // Step 3: LOG RESULT (ISO 27001 A.8.15)
-            ComplianceAuditLogger.LogCriticalAction(
-                action,
-                "REPAIR_SEQUENCE",
-                success: success,
-                errorMessage: success ? null : recoveryDetails);
-
-            return new AdvancedRepairResponse(success, recoveryDetails, null);
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("AdvancedRepairRequest cancelled");
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in HandleAdvancedRepairRequestAsync");
-
-            ComplianceAuditLogger.LogCriticalAction(
-                action,
-                repairId,
-                success: false,
-                errorMessage: "Repair operation failed");
-
-            // OWASP: Generic error message to client
-            return new AdvancedRepairResponse(
-                false,
-                "Repair sequence encountered an error.",
-                "Please check Windows Event Log for details.");
         }
     }
 }

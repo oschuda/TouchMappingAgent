@@ -65,12 +65,6 @@ internal static class LocalizationKeys
     /// <summary>Button: starts the touch-identification flow for the selected monitor.</summary>
     public const string Main_LearnScreen = "Main_LearnScreen";
 
-    /// <summary>Button: creates a mapping backup.</summary>
-    public const string Main_CreateBackup = "Main_CreateBackup";
-
-    /// <summary>Button: runs the advanced repair sequence.</summary>
-    public const string Main_AdvancedRepair = "Main_AdvancedRepair";
-
     /// <summary>Button: asks the service for its current hardware status.</summary>
     public const string Main_CheckServiceStatus = "Main_CheckServiceStatus";
 
@@ -124,30 +118,6 @@ internal static class LocalizationKeys
 
     /// <summary>Reading the monitor list threw.</summary>
     public const string Main_LoadMonitorsFailed = "Main_LoadMonitorsFailed";
-
-    /// <summary>A mapping backup is being created.</summary>
-    public const string Main_CreatingBackup = "Main_CreatingBackup";
-
-    /// <summary>The backup command succeeded.</summary>
-    public const string Main_BackupCreated = "Main_BackupCreated";
-
-    /// <summary>The service reported that the backup failed.</summary>
-    public const string Main_BackupFailed = "Main_BackupFailed";
-
-    /// <summary>The backup command threw before it could finish.</summary>
-    public const string Main_BackupError = "Main_BackupError";
-
-    /// <summary>The advanced repair sequence is running.</summary>
-    public const string Main_RunningAdvancedRepair = "Main_RunningAdvancedRepair";
-
-    /// <summary>The advanced repair sequence succeeded.</summary>
-    public const string Main_AdvancedRepairSucceeded = "Main_AdvancedRepairSucceeded";
-
-    /// <summary>The advanced repair sequence reported partial success.</summary>
-    public const string Main_AdvancedRepairIssues = "Main_AdvancedRepairIssues";
-
-    /// <summary>The advanced repair sequence could not even be requested.</summary>
-    public const string Main_AdvancedRepairIpcFailed = "Main_AdvancedRepairIpcFailed";
 
     /// <summary>The service answered the status probe.</summary>
     public const string Main_ServiceActive = "Main_ServiceActive";

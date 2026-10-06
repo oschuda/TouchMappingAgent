@@ -204,10 +204,6 @@ Section "Install"
     File "publish\en\*.resources.dll"
     SetOutPath "$INSTDIR"
 
-    ; Create Backup Dir and Set ACLs
-    CreateDirectory "C:\TouchBackup"
-    nsExec::ExecToLog 'icacls "C:\TouchBackup" /inheritance:r /grant:r "SYSTEM:(OI)(CI)F" "Administrators:(OI)(CI)F"'
-
     ; Register EventLog
     WriteRegStr HKLM "SYSTEM\CurrentControlSet\Services\EventLog\Application\TouchMappingAgent" "EventMessageFile" "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll"
     WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Services\EventLog\Application\TouchMappingAgent" "TypesSupported" 7

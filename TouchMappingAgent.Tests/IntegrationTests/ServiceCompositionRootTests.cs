@@ -52,9 +52,6 @@ public class ServiceCompositionRootTests
             builder.AddProvider(NullLoggerProvider.Instance);
         });
 
-        services.AddTransient<DisplayRefreshService>();
-        services.AddSingleton<BackupService>();
-        services.AddSingleton<AdvancedRepairService>();
         services.AddSingleton<MappingStore>();
         services.AddSingleton<IWindowsTouchMapApplier, WindowsTouchMapApplier>();
         services.AddSingleton<ReapplyCoordinator>();
@@ -149,7 +146,7 @@ public class ServiceCompositionRootTests
     /// <summary>
     /// The specific regression: ComplianceRequestHandler is the type that silently failed to
     /// resolve, and it is the one every functional IPC command (MapTouch, ConfirmLocalMapping,
-    /// CreateBackup, AdvancedRepair) goes through.
+    /// GetPendingReapply, ApplyMappingsNow) goes through.
     /// </summary>
     [Fact]
     public void CompositionRoot_ResolvesComplianceRequestHandler()
@@ -216,9 +213,7 @@ public class ServiceCompositionRootTests
     {
         var typesUnderTest = new[]
         {
-            typeof(BackupService),
-            typeof(DisplayRefreshService),
-            typeof(AdvancedRepairService),
+            typeof(WindowsTouchMapApplier),
             typeof(MappingStore),
             typeof(ReapplyCoordinator),
             typeof(ResilientHardwareWatcher),

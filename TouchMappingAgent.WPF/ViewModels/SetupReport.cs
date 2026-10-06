@@ -14,7 +14,7 @@ public sealed record SetupReport
     public int SchemaVersion { get; init; } = 1;
 
     /// <summary>Product that produced the report.</summary>
-    public string Tool { get; init; } = "MultiTouch Agent Setup-Assistent";
+    public string Tool { get; init; } = "TouchMappingAgent Setup-Assistent";
 
     /// <summary>Agent version.</summary>
     public string ToolVersion { get; init; } = "1.0.0";

@@ -249,12 +249,6 @@
   <data name="Main_LearnScreen" xml:space="preserve">
     <value>Bildschirm anlernen (Berührung)</value>
   </data>
-  <data name="Main_CreateBackup" xml:space="preserve">
-    <value>Backup erstellen</value>
-  </data>
-  <data name="Main_AdvancedRepair" xml:space="preserve">
-    <value>Erweiterte Reparatur ausführen</value>
-  </data>
   <data name="Main_CheckServiceStatus" xml:space="preserve">
     <value>Dienst-Status prüfen</value>
   </data>
@@ -308,30 +302,6 @@
   </data>
   <data name="Main_LoadMonitorsFailed" xml:space="preserve">
     <value>Monitore konnten nicht geladen werden. Bitte erneut versuchen.</value>
-  </data>
-  <data name="Main_CreatingBackup" xml:space="preserve">
-    <value>Sicheres Backup wird erstellt...</value>
-  </data>
-  <data name="Main_BackupCreated" xml:space="preserve">
-    <value>Backup erfolgreich im sicheren Speicher erstellt!</value>
-  </data>
-  <data name="Main_BackupFailed" xml:space="preserve">
-    <value>Backup fehlgeschlagen. Bitte Dienst-Protokolle prüfen.</value>
-  </data>
-  <data name="Main_BackupError" xml:space="preserve">
-    <value>Beim Erstellen des Backups ist ein Fehler aufgetreten.</value>
-  </data>
-  <data name="Main_RunningAdvancedRepair" xml:space="preserve">
-    <value>Erweiterte Touch- und Display-Reparatur wird ausgeführt...</value>
-  </data>
-  <data name="Main_AdvancedRepairSucceeded" xml:space="preserve">
-    <value>Erweiterte Reparatur erfolgreich ausgeführt! Hardware-Zuordnungen wiederhergestellt.</value>
-  </data>
-  <data name="Main_AdvancedRepairIssues" xml:space="preserve">
-    <value>Bei der Reparatur sind Probleme aufgetreten. Windows-Ereignisanzeige prüfen.</value>
-  </data>
-  <data name="Main_AdvancedRepairIpcFailed" xml:space="preserve">
-    <value>Die Reparatursequenz konnte wegen eines IPC-Fehlers nicht ausgeführt werden.</value>
   </data>
   <data name="Main_ServiceActive" xml:space="preserve">
     <value>Dienst ist aktiv und antwortet.</value>
@@ -861,7 +831,7 @@ Assistenten jetzt mit erhöhten Rechten neu starten?</value>
     <value>Hilfe &amp; Handbuch</value>
   </data>
   <data name="Help_HeaderTitle" xml:space="preserve">
-    <value>MultiTouch Agent — Handbuch</value>
+    <value>TouchMappingAgent — Handbuch</value>
   </data>
   <data name="Help_HeaderSubtitle" xml:space="preserve">
     <value>Touch-Zuordnung, EDID-Kollisionen und Range-Extender</value>
@@ -1055,7 +1025,7 @@ Der Punkt am Symbol zeigt den Hintergrunddienst: grün = erreichbar, bernsteinfa
 
   <!-- ===== Diagnostics log window ===== -->
   <data name="Log_WindowTitle" xml:space="preserve">
-    <value>MultiTouch Agent - Diagnose-Log</value>
+    <value>TouchMappingAgent - Diagnose-Log</value>
   </data>
   <data name="Log_Clear" xml:space="preserve">
     <value>Leeren</value>
@@ -1189,10 +1159,10 @@ Möchten Sie den Agenten wirklich beenden?</value>
     <value>Der Diagnosebericht konnte nicht geschrieben werden. Details im Diagnose-Log.</value>
   </data>
   <data name="Tray_Caption" xml:space="preserve">
-    <value>MultiTouch Agent</value>
+    <value>TouchMappingAgent</value>
   </data>
   <data name="Tray_AboutBody" xml:space="preserve">
-    <value>MultiTouch Agent
+    <value>TouchMappingAgent
 Multimonitor · Local · Direct
 
 © 2026 PadaLuma Ink-Jet Solutions GmbH.

@@ -94,34 +94,6 @@ public record GetTouchDevicesRequest;
 public record GetTouchDevicesResponse(
     IReadOnlyList<HidDeviceInfo> Devices);
 
-/// <summary>
-/// Request to create a secure backup of current configurations (MVO 2023/1230 Resilience).
-/// </summary>
-public record CreateBackupRequest(
-    string? BackupDescription = null);
-
-/// <summary>
-/// Response indicating the result of a backup operation.
-/// </summary>
-public record CreateBackupResponse(
-    bool Success,
-    string? BackupId,
-    string? ErrorMessage);
-
-/// <summary>
-/// Request to execute advanced repair sequence (IEC 62443 / NIS2 Recovery).
-/// Handles driver conflicts, display reconfiguration, and HID remapping.
-/// </summary>
-public record AdvancedRepairRequest;
-
-/// <summary>
-/// Response indicating the result of the advanced repair sequence.
-/// </summary>
-public record AdvancedRepairResponse(
-    bool Success,
-    string? RecoveryDetails,
-    string? ErrorMessage);
-
 // =========================================================================================
 // PHASE 2: hardware-anchored persistence and automatic re-application
 // =========================================================================================

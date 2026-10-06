@@ -261,8 +261,6 @@ public class NamedPipeServer
                 // Route based on discriminator
                 return requestType switch
                 {
-                    "CreateBackup" => await HandleCreateBackupAsync(payloadElement.GetRawText(), cancellationToken),
-                    "AdvancedRepair" => await HandleAdvancedRepairAsync(payloadElement.GetRawText(), cancellationToken),
                     "GetTouchDevices" => await HandleGetTouchDevicesAsync(cancellationToken),
                     "GetMonitors" => await HandleGetMonitorsAsync(cancellationToken),
                     "MapTouch" => await HandleMapTouchAsync(payloadElement.GetRawText(), cancellationToken),
@@ -371,77 +369,6 @@ public class NamedPipeServer
         {
             LogError(ex, "Error invoking ComplianceRequestHandler");
             return unavailable();
-        }
-    }
-
-    private async Task<object> HandleCreateBackupAsync(string requestJson, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var handler = _serviceProvider.GetService(typeof(ComplianceRequestHandler)) as ComplianceRequestHandler;
-            if (handler == null)
-            {
-                LogError(
-                    new InvalidOperationException("ComplianceRequestHandler not registered"),
-                    "Handler resolution failed");
-                return new CreateBackupResponse(false, null, "Service unavailable.");
-            }
-
-            var response = await handler.HandleCreateBackupRequestAsync(requestJson, cancellationToken);
-            return response;
-        }
-        catch (OperationCanceledException)
-        {
-            LogError(new OperationCanceledException(), "CreateBackup request cancelled");
-            return new CreateBackupResponse(false, null, "Request cancelled.");
-        }
-        catch (Exception ex)
-        {
-            LogError(ex, "Error in HandleCreateBackupAsync");
-            ComplianceAuditLogger.LogCriticalAction(
-                AuditActions.SaveMapping,
-                "BACKUP_HANDLER_ERROR",
-                success: false,
-                errorMessage: "Handler execution failed");
-
-            return new CreateBackupResponse(false, null, "Backup operation failed. Please try again.");
-        }
-    }
-
-    private async Task<object> HandleAdvancedRepairAsync(string requestJson, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var handler = _serviceProvider.GetService(typeof(ComplianceRequestHandler)) as ComplianceRequestHandler;
-            if (handler == null)
-            {
-                LogError(
-                    new InvalidOperationException("ComplianceRequestHandler not registered"),
-                    "Handler resolution failed");
-                return new AdvancedRepairResponse(false, "Service unavailable.", null);
-            }
-
-            var response = await handler.HandleAdvancedRepairRequestAsync(requestJson, cancellationToken);
-            return response;
-        }
-        catch (OperationCanceledException)
-        {
-            LogError(new OperationCanceledException(), "AdvancedRepair request cancelled");
-            return new AdvancedRepairResponse(false, "Request cancelled.", null);
-        }
-        catch (Exception ex)
-        {
-            LogError(ex, "Error in HandleAdvancedRepairAsync");
-            ComplianceAuditLogger.LogCriticalAction(
-                AuditActions.StartAdvancedRepair,
-                "REPAIR_HANDLER_ERROR",
-                success: false,
-                errorMessage: "Handler execution failed");
-
-            return new AdvancedRepairResponse(
-                false,
-                "Repair sequence encountered an error.",
-                "Check Windows Event Log for details.");
         }
     }
 

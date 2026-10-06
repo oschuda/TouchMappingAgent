@@ -59,7 +59,7 @@ class Program
                 // service is only discovered when something first asks for it — and here that
                 // "something" was NamedPipeServer.GetService(...) inside a try/catch, which
                 // swallowed the InvalidOperationException and answered every MapTouch /
-                // CreateBackup / AdvancedRepair request with a generic failure while the
+                // mapping request with a generic failure while the
                 // health check (GetTouchDevices, no DI needed) still reported the service as
                 // healthy. Fail loudly at startup instead.
                 // ValidateScopes catches scoped-into-singleton captive dependencies.
@@ -82,17 +82,6 @@ class Program
                     // =========================================================================
                     // SERVICE LAYER (Business Logic)
                     // =========================================================================
-                    // DisplayRefreshService: Stateless, can be Transient
-                    services.AddTransient<DisplayRefreshService>();
-
-                    // BackupService: Handles registry I/O and file storage (CRA / ISO 27001)
-                    // Singleton ensures ACL-protected C:\TouchBackup directory is initialized once
-                    services.AddSingleton<BackupService>();
-
-                    // AdvancedRepairService: Multi-phase recovery logic (IEC 62443 / NIS2)
-                    // Singleton for consistent error handling and audit trail
-                    services.AddSingleton<AdvancedRepairService>();
-
                     // MappingStore: hardware-anchored persistence of learned assignments.
                     // Singleton because it serialises its writes internally.
                     services.AddSingleton<MappingStore>();
@@ -163,7 +152,7 @@ class Program
                     // INTEGRATION LAYER (Request Handling & Compliance)
                     // =========================================================================
                     // ComplianceRequestHandler: Central dispatcher for all IPC requests
-                    // Depends on BackupService, AdvancedRepairService for handler methods
+                    // Depends on MappingStore, ReapplyCoordinator and the EDID module
                     services.AddSingleton<ComplianceRequestHandler>();
 
                     // =========================================================================

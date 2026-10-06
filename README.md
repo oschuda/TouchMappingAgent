@@ -1,4 +1,4 @@
-# MultiTouch Agent
+# TouchMappingAgent
 
 Ein .NET 9 Windows-Dienst plus WPF-Tray-Agent, der Touch-Digitizer dauerhaft an bestimmte
 physische Monitore bindet — auch dann, wenn Windows das von sich aus nicht kann.
@@ -17,8 +17,9 @@ PM1715-Digitizer über USB-Extender. Die Hardware-Messung zeigt:
 | Grafik-Anschluss | DP-2 | DP-3 |
 
 Die Extender emulieren eine generische EDID, deshalb sind beide Panels für Windows
-**identisch**. Die Digitizer melden keinen `locationPath` (die USB-Extender reichen die
-Mainboard-Topologie nicht durch), sind also ebenfalls nicht unterscheidbar. Windows hat damit
+**identisch**. Die Digitizer sind ebenfalls baugleich, und beide USB-Extender melden dieselbe
+Seriennummer — Windows vergibt ihre Instanz-IDs deshalb abhängig von der Einschaltreihenfolge
+(Feldbefund 2026-10-06, siehe unten). Windows hat damit
 nach einem Neustart oder einem DisplayPort-Event **kein Kriterium**, um links von rechts zu
 trennen — Touch-Eingaben landen auf dem falschen Bildschirm.
 
@@ -34,10 +35,16 @@ vergibt beide bei jedem Boot neu, und ihre Reihenfolge hängt davon ab, welcher 
 Hot-Plug-Detect-Handshake zuerst abschließt. Gespeichert wird stattdessen:
 
 ```
-ParentInstanceId (Touch)              <->  PnP-Gerätepfad (Monitor)
-USB\VID_14E1&PID_3508\7&1b9afb93&0&6  <->  \\?\DISPLAY#CHR8910#5&2c72b841&0&UID250116
-        ↑ USB-Controller-Port                        ↑ enthält Connector-UID
+Port-Anker (Touch)                                                          <->  PnP-Gerätepfad (Monitor)
+PORT\VID_14E1&PID_3508\PCIROOT(0)/PCI(1400)/USBROOT(0)/USB(2)/USB(4)/USB(6)  <->  \\?\DISPLAY#CHR8910#5&2c72b841&0&UID250116
+                  ↑ Portpfad des USB-Elternknotens                                      ↑ enthält Connector-UID
 ```
+
+Der Touch-Anker ist der **Portpfad** (`DEVPKEY_Device_LocationPaths`) des USB-Elternknotens,
+nicht dessen Instanz-ID. Hinter den Range-Extendern ist die Instanz-ID nicht stabil: beide
+Extender-Hubs melden dieselbe Seriennummer, Windows vergibt die serienbasierte ID an den zuerst
+enumerierten — `7&1b9afb93&0&6` gehörte vor einem Extender-Power-Cycle zum einen, danach zum
+anderen Touchscreen.
 
 Beim Auflösen wird eine Kaskade durchlaufen — Gerätepfad (`Exact`) → Connector + Target-ID
 (`Connector`) → Desktop-Bounds (`BoundsOnly`). Jede Stufe muss **genau einen** Treffer liefern;
@@ -57,16 +64,22 @@ zwei APIs:
 
 | API | liefert |
 |---|---|
-| `EnumDisplayDevices` / `EnumDisplaySettings` | GDI-Name für `tabcal`, aktueller Modus, Desktop-Position |
+| `EnumDisplayDevices` / `EnumDisplaySettings` | GDI-Name, aktueller Modus, Desktop-Position |
 | `QueryDisplayConfig` + `DisplayConfigGetDeviceInfo` (CCD) | Connector (`DP-2`), Target-ID, PnP-Gerätepfad, echter Monitorname |
 
 ### 3. Session-0-Isolation bestimmt die Aufgabenteilung
 
-Ein Windows-Dienst läuft in Session 0 und kann dort zwei Dinge **nicht**:
+Ein Windows-Dienst läuft in Session 0 und kann dort **den Desktop nicht sehen**:
+`EnumDisplayDevices` liefert aus dem SYSTEM-Dienstprozess eine leere Monitorliste, selbst wenn
+Monitore angeschlossen sind (empirisch bestätigt).
 
-* **Den Desktop sehen.** `EnumDisplayDevices` liefert aus dem SYSTEM-Dienstprozess eine leere
-  Monitorliste, selbst wenn Monitore angeschlossen sind (empirisch bestätigt).
-* **`tabcal.exe` ausführen.** Dessen Kalibrierung braucht UI und eine physische Berührung.
+Die Zuordnung selbst schreibt der Dienst aber direkt: Windows hält sie in
+`HKLM\SOFTWARE\Microsoft\Wisp\Pen\Digimon` (`"20-<HID-Pfad>"` → `"<Monitor-Pfad>"`). Windows
+liest einen geänderten Eintrag erst bei der nächsten Anmeldung — oder sofort, wenn das
+Touch-Gerät per `pnputil /restart-device` neu gestartet wird (auf der Zielanlage verifiziert).
+Beides erledigt [`WindowsTouchMapApplier`](TouchMappingAgent.Service/Services/WindowsTouchMapApplier.cs).
+`tabcal.exe` wird nicht verwendet: es verweigert bei zwei angeschlossenen Touch-Geräten die
+Arbeit („Only one touch input device can be calibrated at a time").
 
 Daraus folgt die Rollenverteilung:
 
@@ -76,11 +89,12 @@ Daraus folgt die Rollenverteilung:
 │                                                                    │
 │  • MappingStore        — Persistenz der Hardware-Anker (HKLM)     │
 │  • ReapplyCoordinator  — entscheidet, was neu angewendet werden    │
-│                          muss (Hardware-Generation)                │
+│                          muss (Hardware-Generation), und wendet an │
+│  • WindowsTouchMapApplier — schreibt Digimon, startet Touch neu    │
 │  • ResilientHardwareWatcher — pollt USB-Hotplug                    │
 │  • NamedPipeServer     — beantwortet Anfragen (ACL-geschützt)      │
 │                                                                    │
-│  Sieht KEINE Monitore. Führt KEIN tabcal aus.                     │
+│  Sieht KEINE Monitore — bekommt die Liste vom Client.             │
 └────────────────────────────┬───────────────────────────────────────┘
                              │ Named Pipe — Client ruft an,
                              │ nicht umgekehrt
@@ -88,7 +102,7 @@ Daraus folgt die Rollenverteilung:
 │  TouchMappingAgent.WPF (Benutzer, Tray)                            │
 │                                                                    │
 │  • DisplayEnumerator   — sieht die Monitore (CCD-API)             │
-│  • ReapplyAgent        — pollt den Dienst, führt tabcal aus       │
+│  • ReapplyAgent        — pollt den Dienst, liefert die Monitore   │
 │  • IdentifyWindow      — Vollbild-Anlernen mit RawInput           │
 │  • TrayIconManager     — resident, Beenden nur mit Warnung        │
 └────────────────────────────────────────────────────────────────────┘
@@ -113,12 +127,13 @@ Windows kann die Zuordnung nicht erraten, also muss ein Mensch sie einmal zeigen
    ab. **Warum RawInput und nicht WPFs `TouchDown`:** letzteres sagt *dass* und *wo* berührt
    wurde, aber nicht *von welchem Gerät* — und genau das ist bei zwei identischen Digitizern
    die ganze Frage. RawInput liefert auf jeder Nachricht ein Gerätehandle, das über
-   `GetRawInputDeviceInfo(RIDI_DEVICENAME)` zum HID-Pfad und damit zur `ParentInstanceId` wird.
+   `GetRawInputDeviceInfo(RIDI_DEVICENAME)` zum HID-Pfad und damit zum Port-Anker wird.
 4. Die Paarung wird an den Dienst geschickt, dort validiert und persistiert.
-5. `tabcal.exe` läuft im Client-Kontext und aktiviert die Zuordnung.
+5. Beim nächsten Poll des Clients schreibt der Dienst die Zuordnung in die Windows-Tabelle und
+   startet das Touch-Gerät neu.
 
-Ab da stellt der `ReapplyAgent` sie nach jedem Neustart und jedem DisplayPort-Event
-automatisch wieder her.
+Ab da trägt der Dienst sie nach jedem Neustart, jeder Anmeldung und jedem Extender-Neustart
+automatisch wieder ein. „Zuordnung jetzt anwenden" (Tray und Hauptfenster) erzwingt das sofort.
 
 ## Einrichtungs-Assistent
 
@@ -131,7 +146,7 @@ Für die Inbetriebnahme vor Ort: Tray-Menü, Eintrag "Einrichtungs-Assistent..."
 | 2 EDID-Strategie | Automatisch, Vorlage oder bewusst übersprungen — Schreibvorgang erfolgreich |
 | 3 PnP-Verifizierung | **0 doppelte Display-Identitäten**, jeder Monitor mit eigenem PnP-Pfad |
 | 4 Touch-Zuordnung | jeder Monitor angelernt, kein Digitizer doppelt vergeben |
-| 5 Kalibrierung | `tabcal` gelaufen **und** Sichtprüfung durch den Techniker bestätigt |
+| 5 Anwenden und Sichtprüfung | Dienst hat angewendet **und** Sichtprüfung durch den Techniker bestätigt |
 | 6 Abschluss | `setup-report.json` exportiert |
 
 **Der Assistent lässt sich nicht durchklicken.** Jeder Schritt schaltet die Weiter-Schaltfläche
@@ -140,8 +155,8 @@ abgeschlossen" druckt, obwohl die Sichtprüfung fehlschlug, wäre schlechter als
 läge als unterschriebenes Protokoll zu einer Anlage vor, deren Touch weiterhin auf dem falschen
 Bildschirm landet.
 
-Schritt 5 hängt bewusst **nicht** am Exit-Code von `tabcal`. Der sagt nur, dass das Werkzeug
-lief — ob der Zeiger unter dem Finger landet, kann nur ein Mensch beantworten.
+Schritt 5 hängt bewusst an der Antwort des Technikers: ob der Zeiger unter dem Finger landet,
+kann nur ein Mensch beantworten.
 
 ### Rechte-Architektur
 
@@ -150,25 +165,25 @@ Empirisch auf dem Zielsystem geprüft:
 | Schreibziel | Rechte für `Benutzer` | Weg |
 |---|---|---|
 | `HKLM\SYSTEM\CurrentControlSet\Enum` (EDID_OVERRIDE) | ReadKey | **Delegation an den Dienst** (läuft als SYSTEM, FullControl) — kein UAC-Prompt |
-| `HKLM\SOFTWARE\Microsoft\Wisp\Touch` (tabcal) | ReadKey, Schreiben verweigert | **`runas`** — der Dienst kann es nicht, `tabcal` braucht die interaktive Sitzung |
+| `HKLM\SOFTWARE\Microsoft\Wisp\Pen\Digimon` (Touch-Zuordnung) | ReadKey | **Delegation an den Dienst** — kein UAC-Prompt |
 
 Der Tray-Client bleibt deshalb im Autostart auf `asInvoker` — ein `requireAdmin`-Manifest
-setzte bei jedem Windows-Start eine UAC-Abfrage vor den Agenten. Elevation wird nur dort
-angefordert, wo sie unvermeidbar ist: in Schritt 5, per Neustart mit `--wizard`.
+setzte bei jedem Windows-Start eine UAC-Abfrage vor den Agenten.
 
 ### Eine Instanz pro Sitzung
 
 Der Agent lässt sich nur einmal pro Sitzung starten. Ein zweiter Aufruf — Installer-Option,
 Desktop-Verknüpfung neben dem Autostart — reicht seine Absicht per benanntem Event an die
-laufende Instanz weiter und beendet sich. Ohne das liefen zwei Poller und zwei Prozesse, die
-gleichzeitig `tabcal` auf dieselbe Zuordnung ansetzen.
+laufende Instanz weiter und beendet sich. Ohne das liefen zwei Poller nebeneinander.
 ## Tray-Verhalten
 
 | Aktion | Verhalten |
 |---|---|
 | „X" am Fenster | `Hide()` — der Agent bleibt resident |
 | Tray-Doppelklick / „Konfiguration öffnen" | Fenster wieder anzeigen |
+| Tray → „Zuordnung jetzt anwenden" | Dienst schreibt alle Zuordnungen neu und startet die Touch-Geräte neu; Ergebnis als Sprechblase |
 | Tray → „Einrichtungs-Assistent…" | Geführte Inbetriebnahme in sechs Schritten |
+| Tray → „Diagnose" | Diagnose-Log exportieren, Dienst-Status prüfen |
 | Tray → „Beenden" | Warnung, dann Abbruch oder `LogWarning` + Shutdown |
 | Start mit `--silent` | kein Fenster, nur Tray-Icon + Re-Application |
 
@@ -186,8 +201,8 @@ TouchMappingAgent.Shared/          Modelle, Contracts, Hardware-Enumeration
   Contracts/                       IPC-DTOs + Pipe-Client
 
 TouchMappingAgent.Service/         Windows-Dienst (SYSTEM, Session 0)
-  Services/                        MappingStore, ReapplyCoordinator, BackupService,
-                                   AdvancedRepairService, DisplayRefreshService
+  Services/                        MappingStore, ReapplyCoordinator, WindowsTouchMapApplier,
+                                   ConsoleSessionResetService, SessionProcessService
   Hardware/                        ResilientHardwareWatcher (BackgroundService)
   IPC/                             NamedPipeServer + ACL-Factory
   Integration/                     ComplianceRequestHandler (zentraler Dispatcher)
@@ -376,20 +391,20 @@ zusätzlich als Audit-Einträge ins Windows-Event-Log (ISO 27001 A.8.15).
 
 ## Bekannte offene Punkte
 
-* **`tabcal.exe`-Argumentsyntax nicht verifiziert.** Die Form
-  `LinCal DisplayID=… DeviceKind=touch DevicePath="…" NoValidate` ist übernommen, aber nicht
-  gegen `tabcal.exe /?` auf der Zielmaschine geprüft. Sie steht zentral in
-  `MappingResolver.BuildTabcalArguments` — genau eine Stelle zum Korrigieren.
 * **`ValidateHidDevice` (VID-Whitelist) ist nicht verdrahtet.** Die Methode existiert, wird aber
   auf keinem Produktivpfad aufgerufen. Die VID der Zielhardware (`0x14E1`) ist eingetragen,
   damit eine spätere Aktivierung die Anlage nicht aussperrt.
-* **„Erweiterte Reparatur" ruft `tabcal ClearCal`** und löscht damit die Kalibrierung. Der
-  `ReapplyCoordinator` stellt sie beim nächsten Poll wieder her, aber der Ablauf ist nicht als
-  Absicht dokumentiert.
-* **Kollidierende USB-Anker.** Meldet ein Digitizer als Parent eine Seriennummer statt eines
-  Portpfads (real beobachtet: `USB\VID_0408&PID_3008\0000`), kollidieren zwei baugleiche
-  Geräte. Der Resolver erkennt das und verweigert — die PM1715 der Zielanlage sind
-  port-abgeleitet und damit unkritisch.
+* **Pipe offen für alle angemeldeten Benutzer.** Die ACL erlaubt „Authenticated Users", nicht
+  nur Administratoren (siehe `SecureNamedPipeFactory`). Damit kann jeder angemeldete Benutzer
+  u. a. `ForceConsoleSessionReset` (meldet die Konsole ab) auslösen. Auf einer Anlage mit
+  mehreren Benutzerkonten auf eine eigene Gruppe einschränken.
+* **Hardware ohne Portpfad.** Liefert ein USB-Elternknoten keinen `LocationPaths`-Eintrag, fällt
+  der Anker auf die Instanz-ID zurück. Endet diese auf eine Seriennummer (real beobachtet:
+  `USB\VID_0408&PID_3008\0000`), kollidieren zwei baugleiche Geräte; der Resolver erkennt das
+  und verweigert.
+* **`tabcal`-Reste im Client.** `ReapplyAgent`/`TabcalRunner` würden einen vom Dienst gelieferten
+  `tabcal`-Auftrag noch ausführen; der Dienst liefert seit 1.0.2 keinen mehr. Kann entfernt
+  werden.
 
 ## Voraussetzungen
 

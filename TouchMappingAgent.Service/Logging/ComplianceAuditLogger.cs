@@ -178,9 +178,6 @@ public static class ComplianceAuditLogger
 /// </summary>
 public static class AuditActions
 {
-    /// <summary>Advanced repair process initiated.</summary>
-    public const string StartAdvancedRepair = "START_ADVANCED_REPAIR";
-
     /// <summary>Touch device mapping saved to configuration.</summary>
     public const string SaveMapping = "SAVE_MAPPING";
 

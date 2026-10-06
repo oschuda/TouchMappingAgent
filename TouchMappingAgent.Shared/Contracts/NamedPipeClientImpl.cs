@@ -154,8 +154,6 @@ public class NamedPipeClientImpl : INamedPipeClient
         // Map request type to discriminator value
         var discriminator = typeName switch
         {
-            nameof(CreateBackupRequest) => "CreateBackup",
-            nameof(AdvancedRepairRequest) => "AdvancedRepair",
             nameof(GetTouchDevicesRequest) => "GetTouchDevices",
             nameof(GetMonitorsRequest) => "GetMonitors",
             nameof(MapTouchRequest) => "MapTouch",

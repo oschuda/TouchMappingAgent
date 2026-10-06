@@ -36,8 +36,8 @@ public static class SecureNamedPipeFactory
     /// needed.
     ///
     /// TRADE-OFF FOR FOLLOW-UP: this now lets ANY authenticated logged-on user (not just
-    /// admins) invoke every IPC command, including AdvancedRepair (kills RDP processes,
-    /// resets HID registry) and CreateBackup — acceptable to make the tool functional at
+    /// admins) invoke every IPC command, including ForceConsoleSessionReset (logs the console
+    /// off) and ApplyMappingsNow (restarts the digitizers) — acceptable to make the tool functional at
     /// all, but on a shared/multi-user Windows Server 2022 box you may want to replace the
     /// Authenticated Users SID below with a dedicated local/AD group instead of "every
     /// authenticated user".

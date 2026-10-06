@@ -17,19 +17,18 @@ public class ComplianceRequestHandlerMappingTests
 {
     private static ComplianceRequestHandler CreateHandler()
     {
-        var backupService = new BackupService(NullLogger<BackupService>.Instance);
-        var displayRefreshService = new DisplayRefreshService(NullLogger<DisplayRefreshService>.Instance);
-        var repairService = new AdvancedRepairService(NullLogger<AdvancedRepairService>.Instance, displayRefreshService);
-
         // HKCU, not HKLM: the store's production root needs elevation, which a test runner
         // does not have. The layout exercised is identical.
         var mappingStore = new MappingStore(
             NullLogger<MappingStore>.Instance, Microsoft.Win32.Registry.CurrentUser);
-        // The routing writer is pointed at a throw-away HKCU subtree with a no-op restart, so no
-        // test can touch the machine's real touch routing or restart a real digitizer.
+        // The routing writer is pointed at an HKCU test key with a no-op restart, so no test can
+        // touch the machine's real touch routing or restart a real digitizer. One fixed key,
+        // reused across runs: these tests never reach the writer, and a fresh key per handler
+        // only piled up empty keys in the test runner's profile.
         var applier = new WindowsTouchMapApplier(
             NullLogger<WindowsTouchMapApplier>.Instance,
-            Microsoft.Win32.Registry.CurrentUser.CreateSubKey($@"Software\PadaLumaTests\{Guid.NewGuid():N}", writable: true)!,
+            Microsoft.Win32.Registry.CurrentUser.CreateSubKey(
+                @"Software\PadaLumaTests\ComplianceRequestHandlerMappingTests", writable: true)!,
             _ => true);
         var coordinator = new ReapplyCoordinator(NullLogger<ReapplyCoordinator>.Instance, mappingStore, applier);
 
@@ -52,8 +51,6 @@ public class ComplianceRequestHandlerMappingTests
 
         return new ComplianceRequestHandler(
             NullLogger<ComplianceRequestHandler>.Instance,
-            backupService,
-            repairService,
             mappingStore,
             coordinator,
             edidManager,

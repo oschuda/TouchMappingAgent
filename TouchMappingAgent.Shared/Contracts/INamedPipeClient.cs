@@ -16,7 +16,7 @@ public interface INamedPipeClient
     /// <summary>
     /// Sends a request to the service and waits for a response, overriding the default read
     /// timeout. Use for requests whose server-side handling can legitimately run longer than the
-    /// default (e.g. AdvancedRepair, which may invoke tabcal.exe with its own 30-second wait).
+    /// default (e.g. ApplyMappingsNow, which restarts each digitizer through pnputil).
     /// </summary>
     /// <typeparam name="TResponse">The expected response type.</typeparam>
     /// <param name="request">The request object.</param>

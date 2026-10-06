@@ -50,7 +50,7 @@ public class PipelineRoutingTests
     [Fact]
     public void ResponseSerialization_NoStackTracesExposed()
     {
-        var response = new CreateBackupResponse(false, null, "Operation failed.");
+        var response = new MapTouchResponse(false, "Operation failed.");
         var json = JsonSerializer.Serialize(response);
 
         Assert.DoesNotContain("Exception", json);
@@ -65,23 +65,13 @@ public class PipelineRoutingTests
     }
 
     [Fact]
-    public void CreateBackupResponse_SerializedCorrectly()
+    public void ApplyMappingsNowResponse_SerializedCorrectly()
     {
-        var response = new CreateBackupResponse(true, "BKP_ID_001", null);
+        var response = new ApplyMappingsNowResponse(MappingCount: 2, Applied: 1, Unresolvable: 1, Failed: 0);
         var json = JsonSerializer.Serialize(response);
 
-        Assert.Contains("BKP_ID_001", json);
-        Assert.Contains("true", json);
-    }
-
-    [Fact]
-    public void AdvancedRepairResponse_SerializedCorrectly()
-    {
-        var response = new AdvancedRepairResponse(true, "Phase info", null);
-        var json = JsonSerializer.Serialize(response);
-
-        Assert.Contains("Phase info", json);
-        Assert.Contains("true", json);
+        Assert.Contains("\"Applied\":1", json);
+        Assert.Contains("\"Unresolvable\":1", json);
     }
 
     [Fact]

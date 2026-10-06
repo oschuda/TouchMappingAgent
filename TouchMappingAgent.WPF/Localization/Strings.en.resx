@@ -243,12 +243,6 @@
   <data name="Main_LearnScreen" xml:space="preserve">
     <value>Learn Screen (Touch)</value>
   </data>
-  <data name="Main_CreateBackup" xml:space="preserve">
-    <value>Create Backup</value>
-  </data>
-  <data name="Main_AdvancedRepair" xml:space="preserve">
-    <value>Run Advanced Repair</value>
-  </data>
   <data name="Main_CheckServiceStatus" xml:space="preserve">
     <value>Check Service Status</value>
   </data>
@@ -302,30 +296,6 @@
   </data>
   <data name="Main_LoadMonitorsFailed" xml:space="preserve">
     <value>Failed to load monitors. Please try again.</value>
-  </data>
-  <data name="Main_CreatingBackup" xml:space="preserve">
-    <value>Creating secure backup...</value>
-  </data>
-  <data name="Main_BackupCreated" xml:space="preserve">
-    <value>Backup created successfully in secure storage!</value>
-  </data>
-  <data name="Main_BackupFailed" xml:space="preserve">
-    <value>Backup failed. Please check service logs.</value>
-  </data>
-  <data name="Main_BackupError" xml:space="preserve">
-    <value>An error occurred while creating the backup.</value>
-  </data>
-  <data name="Main_RunningAdvancedRepair" xml:space="preserve">
-    <value>Executing advanced touch and display repair...</value>
-  </data>
-  <data name="Main_AdvancedRepairSucceeded" xml:space="preserve">
-    <value>Advanced repair executed successfully! Hardware mappings restored.</value>
-  </data>
-  <data name="Main_AdvancedRepairIssues" xml:space="preserve">
-    <value>Repair sequence encountered issues. Check Windows Event Log.</value>
-  </data>
-  <data name="Main_AdvancedRepairIpcFailed" xml:space="preserve">
-    <value>Failed to execute repair sequence due to an IPC failure.</value>
   </data>
   <data name="Main_ServiceActive" xml:space="preserve">
     <value>Service is active and responding.</value>
@@ -855,7 +825,7 @@ Restart the wizard now with elevated rights?</value>
     <value>Help &amp; Manual</value>
   </data>
   <data name="Help_HeaderTitle" xml:space="preserve">
-    <value>MultiTouch Agent — Manual</value>
+    <value>TouchMappingAgent — Manual</value>
   </data>
   <data name="Help_HeaderSubtitle" xml:space="preserve">
     <value>Touch Mapping, EDID Collisions and Range Extenders</value>
@@ -1049,7 +1019,7 @@ The dot on the icon shows the background service: green = reachable, amber = not
 
   <!-- ===== Diagnostics log window ===== -->
   <data name="Log_WindowTitle" xml:space="preserve">
-    <value>MultiTouch Agent - Diagnostics Log</value>
+    <value>TouchMappingAgent - Diagnostics Log</value>
   </data>
   <data name="Log_Clear" xml:space="preserve">
     <value>Clear</value>
@@ -1183,10 +1153,10 @@ Do you really want to exit the agent?</value>
     <value>The diagnostics report could not be written. See the diagnostics log for details.</value>
   </data>
   <data name="Tray_Caption" xml:space="preserve">
-    <value>MultiTouch Agent</value>
+    <value>TouchMappingAgent</value>
   </data>
   <data name="Tray_AboutBody" xml:space="preserve">
-    <value>MultiTouch Agent
+    <value>TouchMappingAgent
 Multimonitor · Local · Direct
 
 © 2026 PadaLuma Ink-Jet Solutions GmbH.

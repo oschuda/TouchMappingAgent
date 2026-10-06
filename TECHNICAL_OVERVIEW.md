@@ -22,6 +22,13 @@
 11. [Deployment und Installation](#deployment-und-installation)
 12. [Entwicklung und Testing](#entwicklung-und-testing)
 
+> **Stand 1.0.2 — entfernte Komponenten.** `AdvancedRepairService`, `BackupService`,
+> `DisplayRefreshService`, die IPC-Befehle `CreateBackup`/`AdvancedRepair`, das Verzeichnis
+> `C:\TouchBackup` und jeder Aufruf von `tabcal.exe` existieren nicht mehr. Wo die älteren
+> Kapitel sie beschreiben, ist das Historie. Gründe: die „Reparatur" beendete alle
+> `mstsc`-Prozesse und meldete Erfolg ohne Wirkung, das Backup sicherte stets 0 Einträge und
+> hatte keine Wiederherstellung, `tabcal` funktioniert mit zwei Touch-Geräten nicht.
+>
 > **Hinweis zum Dokumentstand.** Kapitel 5 beschreibt den aktuellen Stand von Zuordnung,
 > Persistenz und Client-Verhalten und ist maßgeblich. Einzelne Code-Auszüge in den älteren
 > Kapiteln (insbesondere die `INamedPipeClient`-Signatur in Kapitel 6.3 und das
@@ -408,7 +415,7 @@ Touch-Eingabe auf den falschen Schirm legt und dabei aussieht, als hätte es fun
 
 ### Persistenz
 
-`HKLM\SOFTWARE\PadaLuma\TouchMappingAgent\Mappings\<escaped ParentInstanceId>`
+`HKLM\SOFTWARE\PadaLuma\TouchMappingAgent\Mappings\<escaped Touch-Anker>`
 
 Ein Subkey pro Zuordnung. Der Anker enthält Backslashes, die in der Registry
 Subkey-Trenner sind — ohne Escaping (`\` → `#`) würde aus einer Zuordnung stillschweigend ein
@@ -434,11 +441,20 @@ anwesenden Digitizer (Anker + Interface-Pfad) und Monitore (Anker + Connector + 
 GDI-Name), sortiert und damit reihenfolgeunabhängig.
 
 * Ändert sich die Generation, wird der „bereits angewendet"-Zustand verworfen und **jede**
-  auflösbare Zuordnung neu eingereiht.
-* Ein gemeldeter Erfolg markiert die Zuordnung für diese Generation als erledigt — sonst würde
-  der Client `tabcal.exe` bei jedem Poll erneut starten.
-* Ein gemeldeter Fehlschlag lässt sie in der Warteschlange; der nächste Poll versucht es
-  wieder.
+  auflösbare Zuordnung neu angewendet.
+* Angewendet wird im Dienst selbst durch `WindowsTouchMapApplier`: Eintrag
+  `"20-<HID-Pfad>"` → `"<Monitor-Pfad>"` in `HKLM\SOFTWARE\Microsoft\Wisp\Pen\Digimon`
+  schreiben, danach das Touch-Gerät per `pnputil /restart-device` neu starten. Erst der Neustart
+  lässt Windows den Eintrag sofort übernehmen (sonst erst bei der nächsten Anmeldung; auf der
+  Zielanlage verifiziert). Neu gestartet wird nur, wenn sich der Eintrag tatsächlich ändert.
+* Ein Erfolg markiert die Zuordnung für diese Generation als erledigt — sonst würde jeder Poll
+  die Tabelle neu schreiben. Ein Fehlschlag bleibt offen; der nächste Poll versucht es wieder.
+* `ApplyNow` („Zuordnung jetzt anwenden") wendet alle Zuordnungen sofort an und startet die
+  Touch-Geräte auch dann neu, wenn die Tabelle bereits stimmt.
+
+Die HID-Pfade wandern hinter den Range-Extendern mit der Einschaltreihenfolge mit. Genau deshalb
+muss die Tabelle nach jedem Extender-Power-Cycle aus dem Port-Anker neu geschrieben werden — die
+von Windows selbst gepflegte Zuordnung zeigt danach auf den falschen Schirm.
 
 Auslöser für eine neue Generation sind Neustart, Extender-Power-Cycle, Kabelwechsel,
 Treiber-Reload und Änderungen der Monitoranordnung.
@@ -450,24 +466,25 @@ und liefert für die Display-Seite aus Session 0 ohnehin nichts.
 
 ### Session-0-Isolation als Architekturtreiber
 
-Zwei empirisch bestätigte Einschränkungen bestimmen die Aufgabenteilung:
+Eine empirisch bestätigte Einschränkung bestimmt die Aufgabenteilung: **Der Dienst sieht den
+Desktop nicht.** `EnumDisplayDevices` liefert aus dem SYSTEM-Dienstprozess eine leere
+Monitorliste, auch wenn Monitore angeschlossen sind.
 
-1. **Der Dienst sieht den Desktop nicht.** `EnumDisplayDevices` liefert aus dem
-   SYSTEM-Dienstprozess eine leere Monitorliste, auch wenn Monitore angeschlossen sind.
-2. **Der Dienst kann `tabcal.exe` nicht ausführen.** Dessen Kalibrierung braucht UI und eine
-   physische Berührung; beides ist in Session 0 unmöglich.
+`tabcal.exe` spielt seit 1.0.2 keine Rolle mehr: es verweigert bei zwei angeschlossenen
+Touch-Geräten die Arbeit („Only one touch input device can be calibrated at a time"), und
+sein Exit-Code 0 nach Wegklicken dieses Dialogs wurde früher als Erfolg gewertet.
 
 Daraus folgt:
 
 ```
-Dienst (Session 0)                        Client (Session 1, interaktiv)
-─────────────────────                     ─────────────────────────────
+Dienst (Session 0, SYSTEM)                Client (Session 1, interaktiv)
+──────────────────────────                ─────────────────────────────
 besitzt gespeicherte Zuordnungen          sieht die Monitore (CCD)
-entscheidet, was anzuwenden ist           führt tabcal.exe aus
-auditiert                                 zeigt das Anlern-Fenster
-                    ◄──── GetPendingReapply(CurrentMonitors) ────
-                    ───── PendingReapply[] ─────►
-                    ◄──── ReportReapplyResult ────
+entscheidet UND wendet an (Digimon,       zeigt das Anlern-Fenster
+  pnputil /restart-device)                sendet Heartbeat (eigene Schleife)
+auditiert
+                    ◄──── GetPendingReapply(CurrentMonitors) ────   (Poll = Auslöser)
+                    ◄──── ApplyMappingsNow(CurrentMonitors) ─────   (Bediener)
 ```
 
 Der Client **pollt**, weil der Dienst der Pipe-*Server* ist und nicht in den Client hineinrufen
@@ -491,7 +508,7 @@ GetRawInputDeviceInfo(header.hDevice, RIDI_DEVICENAME, ...);   // -> HID-Interfa
 
 `RIDEV_INPUTSINK`, damit die Nachrichten auch ohne Tastaturfokus ankommen. Der Pfad wird über
 `TouchDigitizerEnumerator.FindByDevicePath` (Vergleich normalisiert — RawInput meldet
-kleingeschrieben, SetupAPI gemischt) zurück auf das Gerät und damit auf die `ParentInstanceId`
+kleingeschrieben, SetupAPI gemischt) zurück auf das Gerät und damit auf seinen Port-Anker
 abgebildet.
 
 `IdentifyWindow` positioniert sich per `SetWindowPos` in **physischen Pixeln**. WPFs

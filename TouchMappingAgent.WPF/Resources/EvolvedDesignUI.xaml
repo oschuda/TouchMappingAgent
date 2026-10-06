@@ -5,7 +5,7 @@
         EvolvedDesignUI — the shared look for the agent's diagnostic windows.
 
         Derived from the product artwork rather than invented: the deep blue ground and the
-        cyan accent are the colours of the MultiTouch Agent mark, so a dialog reads as part of
+        cyan accent are the colours of the TouchMappingAgent mark, so a dialog reads as part of
         the same product without needing the logo on every surface.
 
         Kept deliberately small. This is a handful of brushes and four control styles, not a

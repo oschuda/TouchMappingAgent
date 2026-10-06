@@ -1,0 +1,1088 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    English satellite resources.
+
+    Every key in Strings.resx must appear here too; LocalizerTests asserts that, and also that
+    each translation's placeholders match the German original's. Adding a key without translating
+    it therefore fails the test run rather than showing "[Some_Key]" during commissioning.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- ===== Hardware status ===== -->
+  <data name="Status_NoMappingsStored" xml:space="preserve">
+    <value>No assignment stored. The touch assignment has to be learned once by touching each screen.</value>
+  </data>
+  <data name="Status_MappingsUnresolvable" xml:space="preserve">
+    <value>{0} stored assignment(s) do not match the hardware currently detected. Check the cabling or learn the assignment again.</value>
+  </data>
+  <data name="Status_AmbiguousDigitizers" xml:space="preserve">
+    <value>{0} digitizer(s) provide no unique hardware anchor. Automatic assignment is not possible for these devices.</value>
+  </data>
+  <data name="Status_MappingDegraded" xml:space="preserve">
+    <value>The assignment for {0} [{1}] now only matches via {2}. The connector has probably changed.</value>
+  </data>
+  <data name="Status_Unavailable" xml:space="preserve">
+    <value>Hardware status could not be determined.</value>
+  </data>
+
+  <!-- ===== Re-application ===== -->
+  <data name="Reapply_ReasonExact" xml:space="preserve">
+    <value>Stored assignment; monitor identified unambiguously by its PnP device path.</value>
+  </data>
+  <data name="Reapply_ReasonConnector" xml:space="preserve">
+    <value>Stored assignment; monitor identified by graphics connector (device path differs).</value>
+  </data>
+  <data name="Reapply_ReasonBoundsOnly" xml:space="preserve">
+    <value>Stored assignment; monitor identified by screen position only — has the connector been checked?</value>
+  </data>
+  <data name="Reapply_ReasonStored" xml:space="preserve">
+    <value>Stored assignment.</value>
+  </data>
+  <data name="Reapply_Succeeded" xml:space="preserve">
+    <value>Assignment for {0} [{1}] restored.</value>
+  </data>
+  <data name="Reapply_Failed" xml:space="preserve">
+    <value>The assignment for {0} could not be restored.</value>
+  </data>
+  <data name="Reapply_DigitizerAbsent" xml:space="preserve">
+    <value>The assigned digitizer is not attached. tabcal.exe would report success without calibrating anything.</value>
+  </data>
+  <data name="Reapply_NoDevicePath" xml:space="preserve">
+    <value>The assignment carries no device path.</value>
+  </data>
+  <data name="Reapply_EnumerationFailed" xml:space="preserve">
+    <value>Digitizers could not be enumerated: {0}</value>
+  </data>
+
+  <!-- ===== EDID: service-side ===== -->
+  <data name="Edid_TemplateApplyFailed" xml:space="preserve">
+    <value>The template could not be applied.</value>
+  </data>
+  <data name="Edid_DecollisionFailed" xml:space="preserve">
+    <value>EDID de-collision failed.</value>
+  </data>
+  <data name="Edid_RestoreFailed" xml:space="preserve">
+    <value>Restore failed.</value>
+  </data>
+  <data name="Edid_SynthesisFailed" xml:space="preserve">
+    <value>Synthesis failed.</value>
+  </data>
+  <data name="Edid_InvalidBase64" xml:space="preserve">
+    <value>The template data is not valid Base64.</value>
+  </data>
+  <data name="Edid_ModeNotRepresentable" xml:space="preserve">
+    <value>Mode {0}x{1}@{2} cannot be represented in an EDID.</value>
+  </data>
+
+  <!-- ===== EDID: from the Evolved.EdidManager module ===== -->
+  <data name="Edid_DryRun" xml:space="preserve">
+    <value>Dry run: {0} monitor(s) would be given a new serial number.</value>
+  </data>
+  <data name="Edid_NoCollisions" xml:space="preserve">
+    <value>No serial-number collisions found.</value>
+  </data>
+  <data name="Edid_CollisionsResolved" xml:space="preserve">
+    <value>{0} monitor(s) given a unique serial number.</value>
+  </data>
+  <data name="Edid_CollisionsResolvedWithFailures" xml:space="preserve">
+    <value>{0} monitor(s) given a unique serial number, {1} failed.</value>
+  </data>
+  <data name="Edid_ElevationRequired" xml:space="preserve">
+    <value>Administrative rights required: EDID overrides are stored under HKLM\SYSTEM\CurrentControlSet\Enum.</value>
+  </data>
+  <data name="Edid_InvalidPnpId" xml:space="preserve">
+    <value>“{0}” is not a valid PnP device instance id.</value>
+  </data>
+  <data name="Edid_TemplateWrongSize" xml:space="preserve">
+    <value>The template is {0} bytes — a multiple of {1} is required.</value>
+  </data>
+  <data name="Edid_TemplateBadHeader" xml:space="preserve">
+    <value>The template does not start with the EDID header.</value>
+  </data>
+  <data name="Edid_TemplateBadChecksum" xml:space="preserve">
+    <value>The template has an invalid checksum (stored 0x{0}, expected 0x{1}). A graphics driver discards such an EDID — the connector would stay dark.</value>
+  </data>
+  <data name="Edid_StampChecksumFailed" xml:space="preserve">
+    <value>Checksum verification failed after stamping.</value>
+  </data>
+  <data name="Edid_TemplateApplied" xml:space="preserve">
+    <value>Template applied to {0} (serial {1}).</value>
+  </data>
+  <data name="Edid_TemplateAppliedNoReenumerate" xml:space="preserve">
+    <value>Template applied to {0} (serial {1}). The device node could not be re-enumerated — it takes effect after a restart at the latest.</value>
+  </data>
+  <data name="Edid_OverrideWriteFailed" xml:space="preserve">
+    <value>The override for {0} could not be written.</value>
+  </data>
+  <data name="Edid_NoOverridePresent" xml:space="preserve">
+    <value>No override was stored for {0}.</value>
+  </data>
+  <data name="Edid_OverrideRemoved" xml:space="preserve">
+    <value>Override for {0} removed and the device node re-enumerated.</value>
+  </data>
+  <data name="Edid_OverrideRemovedNoReenumerate" xml:space="preserve">
+    <value>Override for {0} removed. The device node could not be re-enumerated — it takes effect after a restart at the latest.</value>
+  </data>
+  <data name="Edid_NoOverridesStored" xml:space="preserve">
+    <value>No EDID overrides are stored.</value>
+  </data>
+  <data name="Edid_OverridesRemoved" xml:space="preserve">
+    <value>{0} EDID override(s) removed.</value>
+  </data>
+
+  <!-- ===== Service availability ===== -->
+  <data name="Service_Unavailable" xml:space="preserve">
+    <value>The service is not available.</value>
+  </data>
+
+  <!-- ===== Shared value converters ===== -->
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Common_Administrator" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="Common_StandardUser" xml:space="preserve">
+    <value>Standard User</value>
+  </data>
+  <data name="Common_StepOk" xml:space="preserve">
+    <value>[OK]</value>
+  </data>
+  <data name="Common_StepCheck" xml:space="preserve">
+    <value>[CHECK]</value>
+  </data>
+
+  <!-- ===== Language picker ===== -->
+  <data name="Language_MenuHeader" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Language_German" xml:space="preserve">
+    <value>German</value>
+  </data>
+  <data name="Language_English" xml:space="preserve">
+    <value>English</value>
+  </data>
+
+  <!-- ===== Main window ===== -->
+  <data name="Main_Subtitle" xml:space="preserve">
+    <value>Mapping touch digitizers to physical monitors</value>
+  </data>
+  <data name="Main_NoticeLabel" xml:space="preserve">
+    <value>Note: </value>
+  </data>
+  <data name="Main_NoticeText" xml:space="preserve">
+    <value>With identical touch monitors, Windows prompts you during calibration to physically touch the target screen — exactly as in the native Tablet PC Setup wizard. Please touch the correct monitor the moment calibration starts.</value>
+  </data>
+  <data name="Main_MonitorLabel" xml:space="preserve">
+    <value>Monitor</value>
+  </data>
+  <data name="Main_LoadMonitors" xml:space="preserve">
+    <value>Load Monitors</value>
+  </data>
+  <data name="Main_LearnScreen" xml:space="preserve">
+    <value>Learn Screen (Touch)</value>
+  </data>
+  <data name="Main_CreateBackup" xml:space="preserve">
+    <value>Create Backup</value>
+  </data>
+  <data name="Main_AdvancedRepair" xml:space="preserve">
+    <value>Run Advanced Repair</value>
+  </data>
+  <data name="Main_CheckServiceStatus" xml:space="preserve">
+    <value>Check Service Status</value>
+  </data>
+  <data name="Main_ShowDiagnosticsLog" xml:space="preserve">
+    <value>View Diagnostics Log</value>
+  </data>
+  <data name="Main_StatusLabel" xml:space="preserve">
+    <value>Status: </value>
+  </data>
+  <data name="Main_SelectMonitorFirst" xml:space="preserve">
+    <value>Please select a monitor first.</value>
+  </data>
+  <data name="Main_TouchTargetScreen" xml:space="preserve">
+    <value>Now touch the screen {0} [{1}].</value>
+  </data>
+  <data name="Main_LearningInProgress" xml:space="preserve">
+    <value>Learning in progress – please touch the target screen …</value>
+  </data>
+  <data name="Main_LearnAborted" xml:space="preserve">
+    <value>Learning aborted – no touch detected.</value>
+  </data>
+  <data name="Main_TouchDeviceUnmatched" xml:space="preserve">
+    <value>The touched device could not be matched.</value>
+  </data>
+  <data name="Main_UnstableHardwareAnchor" xml:space="preserve">
+    <value>The touched device provides no stable hardware anchor. The mapping cannot be stored permanently.</value>
+  </data>
+  <data name="Main_LearnFailed" xml:space="preserve">
+    <value>Learning failed. See the diagnostics log for details.</value>
+  </data>
+  <data name="Main_MappingRejected" xml:space="preserve">
+    <value>The mapping could not be saved.</value>
+  </data>
+  <data name="Main_MappingSaved" xml:space="preserve">
+    <value>Mapping saved.</value>
+  </data>
+  <data name="Main_MappingSavedAndActivated" xml:space="preserve">
+    <value>Mapping for {0} [{1}] saved and activated.</value>
+  </data>
+  <data name="Main_CalibrationFailed" xml:space="preserve">
+    <value>Calibration failed. Please run TouchMappingAgent as Administrator and try again.</value>
+  </data>
+  <data name="Main_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Main_LoadingMonitors" xml:space="preserve">
+    <value>Loading monitors...</value>
+  </data>
+  <data name="Main_MonitorsLoaded" xml:space="preserve">
+    <value>Loaded {0} monitor(s).</value>
+  </data>
+  <data name="Main_LoadMonitorsFailed" xml:space="preserve">
+    <value>Failed to load monitors. Please try again.</value>
+  </data>
+  <data name="Main_CreatingBackup" xml:space="preserve">
+    <value>Creating secure backup...</value>
+  </data>
+  <data name="Main_BackupCreated" xml:space="preserve">
+    <value>Backup created successfully in secure storage!</value>
+  </data>
+  <data name="Main_BackupFailed" xml:space="preserve">
+    <value>Backup failed. Please check service logs.</value>
+  </data>
+  <data name="Main_BackupError" xml:space="preserve">
+    <value>An error occurred while creating the backup.</value>
+  </data>
+  <data name="Main_RunningAdvancedRepair" xml:space="preserve">
+    <value>Executing advanced touch and display repair...</value>
+  </data>
+  <data name="Main_AdvancedRepairSucceeded" xml:space="preserve">
+    <value>Advanced repair executed successfully! Hardware mappings restored.</value>
+  </data>
+  <data name="Main_AdvancedRepairIssues" xml:space="preserve">
+    <value>Repair sequence encountered issues. Check Windows Event Log.</value>
+  </data>
+  <data name="Main_AdvancedRepairIpcFailed" xml:space="preserve">
+    <value>Failed to execute repair sequence due to an IPC failure.</value>
+  </data>
+  <data name="Main_ServiceActive" xml:space="preserve">
+    <value>Service is active and responding.</value>
+  </data>
+  <data name="Main_ServiceNotResponding" xml:space="preserve">
+    <value>Service is not responding. Please check Windows Service status.</value>
+  </data>
+  <data name="Main_UnhandledExceptionReported" xml:space="preserve">
+    <value>An unexpected error occurred. See the diagnostics log for details.</value>
+  </data>
+
+  <!-- ===== Full-screen touch identification prompt ===== -->
+  <data name="Identify_TouchNow" xml:space="preserve">
+    <value>Please touch THIS screen NOW</value>
+  </data>
+  <data name="Identify_WaitingForTouch" xml:space="preserve">
+    <value>Waiting for touch …   (Esc cancels)</value>
+  </data>
+  <data name="Identify_RawInputUnavailableDetail" xml:space="preserve">
+    <value>Raw Input could not be registered — automatic device detection is not possible. Please assign the mapping manually. (Esc closes)</value>
+  </data>
+  <data name="Identify_RawInputUnavailable" xml:space="preserve">
+    <value>Raw Input is unavailable — please assign the mapping manually. (Esc closes)</value>
+  </data>
+  <data name="Identify_TouchDetected" xml:space="preserve">
+    <value>Touch detected – saving mapping …</value>
+  </data>
+
+  <!-- ===== Setup wizard: chrome ===== -->
+  <data name="Wizard_WindowTitle" xml:space="preserve">
+    <value>Setup Wizard</value>
+  </data>
+  <data name="Wizard_RightsLabel" xml:space="preserve">
+    <value>Rights:</value>
+  </data>
+  <data name="Wizard_Back" xml:space="preserve">
+    <value>◀ Back</value>
+  </data>
+  <data name="Wizard_Next" xml:space="preserve">
+    <value>Next ▶</value>
+  </data>
+  <data name="Wizard_Ready" xml:space="preserve">
+    <value>Ready.</value>
+  </data>
+  <data name="Wizard_StepCaption" xml:space="preserve">
+    <value>Step {0} of {1}</value>
+  </data>
+
+  <!-- ===== Setup wizard: step titles ===== -->
+  <data name="Wizard_StepTitle_PreFlight" xml:space="preserve">
+    <value>Rights &amp; System Pre-Flight Check</value>
+  </data>
+  <data name="Wizard_StepTitle_EdidStrategy" xml:space="preserve">
+    <value>Select EDID Strategy</value>
+  </data>
+  <data name="Wizard_StepTitle_PnpVerification" xml:space="preserve">
+    <value>PnP Verification &amp; Re-Enumeration</value>
+  </data>
+  <data name="Wizard_StepTitle_TouchAssignment" xml:space="preserve">
+    <value>Touch Alignment (Digitizer Assignment)</value>
+  </data>
+  <data name="Wizard_StepTitle_TabcalTest" xml:space="preserve">
+    <value>Function Test &amp; Visual Alignment</value>
+  </data>
+  <data name="Wizard_StepTitle_Summary" xml:space="preserve">
+    <value>Commissioning Report</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 1 ===== -->
+  <data name="Wizard_Step1_Intro" xml:space="preserve">
+    <value>The wizard first checks that every precondition is met: rights, a reachable background service, attached displays and digitizers, and the current EDID state.</value>
+  </data>
+  <data name="Wizard_Step1_ResultHeading" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="Wizard_Step1_AdminRights" xml:space="preserve">
+    <value>Administrative rights:</value>
+  </data>
+  <data name="Wizard_Step1_ServiceReachable" xml:space="preserve">
+    <value>Background service reachable:</value>
+  </data>
+  <data name="Wizard_Step1_MonitorsDetected" xml:space="preserve">
+    <value>Monitors detected:</value>
+  </data>
+  <data name="Wizard_Step1_DigitizersDetected" xml:space="preserve">
+    <value>Digitizers detected:</value>
+  </data>
+  <data name="Wizard_Step1_MonitorsHeading" xml:space="preserve">
+    <value>Detected Monitors</value>
+  </data>
+  <data name="Wizard_Step1_DigitizersHeading" xml:space="preserve">
+    <value>Detected Digitizers</value>
+  </data>
+  <data name="Wizard_Step1_Run" xml:space="preserve">
+    <value>Run System Check</value>
+  </data>
+  <data name="Wizard_Step1_Checking" xml:space="preserve">
+    <value>Checking rights, service and hardware …</value>
+  </data>
+  <data name="Wizard_Step1_NotYetChecked" xml:space="preserve">
+    <value>Not yet checked.</value>
+  </data>
+  <data name="Wizard_Step1_NoMonitors" xml:space="preserve">
+    <value>No monitors detected. Please check the cabling and the range extenders' power.</value>
+  </data>
+  <data name="Wizard_Step1_ServiceNotResponding" xml:space="preserve">
+    <value>The background service is not responding. Is TouchMappingAgent running?</value>
+  </data>
+  <data name="Wizard_Step1_Failed" xml:space="preserve">
+    <value>The system check failed. See the diagnostics log for details.</value>
+  </data>
+  <data name="Wizard_Step1_ServiceUnreachableStatus" xml:space="preserve">
+    <value>Service not reachable — EDID status unknown.</value>
+  </data>
+  <data name="Wizard_Step1_ExtenderDetected" xml:space="preserve">
+    <value>Extender/no EDID on {0} port(s).</value>
+  </data>
+  <data name="Wizard_Step1_CollisionDetected" xml:space="preserve">
+    <value>Identity collision detected: {0} monitor(s) report the same identity.</value>
+  </data>
+  <data name="Wizard_Step1_Clean" xml:space="preserve">
+    <value>System clean — no EDID collisions.</value>
+  </data>
+  <data name="Wizard_Step1_Summary" xml:space="preserve">
+    <value>{0} monitor(s), {1} digitizer(s). {2}</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 2 ===== -->
+  <data name="Wizard_Step2_Intro" xml:space="preserve">
+    <value>Identical monitors report the same EDID identity. So that Windows and other software can tell them apart, every port is given a unique serial number. The write happens in the background service (SYSTEM) — no UAC prompt appears.</value>
+  </data>
+  <data name="Wizard_Step2_OptionATitle" xml:space="preserve">
+    <value>a) Automatic Mutation</value>
+  </data>
+  <data name="Wizard_Step2_OptionADesc" xml:space="preserve">
+    <value>Uses the EDID reported by the monitor as a basis and injects unique serial numbers. Correct as long as the ports deliver an EDID.</value>
+  </data>
+  <data name="Wizard_Step2_OptionBTitle" xml:space="preserve">
+    <value>b) Template-Based Mutation (Extender Links)</value>
+  </data>
+  <data name="Wizard_Step2_OptionBDesc" xml:space="preserve">
+    <value>Installs a known EDID template. Needed when an extender passes no DDC signal, or a defective one. DM7000_Native.bin is used unless a file is supplied.</value>
+  </data>
+  <data name="Wizard_Step2_PickTemplate" xml:space="preserve">
+    <value>Choose custom template (.bin / .hex / .inf) …</value>
+  </data>
+  <data name="Wizard_Step2_SelectedFile" xml:space="preserve">
+    <value>Selected: {0}</value>
+  </data>
+  <data name="Wizard_Step2_Apply" xml:space="preserve">
+    <value>Write EDID Overrides and Run PnP Reset</value>
+  </data>
+  <data name="Wizard_Step2_Skipped" xml:space="preserve">
+    <value>Skipped — the identities are already unique.</value>
+  </data>
+  <data name="Wizard_Step2_WritingSerials" xml:space="preserve">
+    <value>Writing unique serial numbers …</value>
+  </data>
+  <data name="Wizard_Step2_ApplyingToPort" xml:space="preserve">
+    <value>Applying template to {0} ({1}) …</value>
+  </data>
+  <data name="Wizard_Step2_RecordTitle" xml:space="preserve">
+    <value>EDID Strategy</value>
+  </data>
+  <data name="Wizard_Step2_RecordTitleAutomatic" xml:space="preserve">
+    <value>EDID Strategy (Automatic Mutation)</value>
+  </data>
+  <data name="Wizard_Step2_RecordTitleTemplate" xml:space="preserve">
+    <value>EDID Strategy (Template)</value>
+  </data>
+  <data name="Wizard_Step2_NoPnpTarget" xml:space="preserve">
+    <value>No port with a resolvable PnP id was found.</value>
+  </data>
+  <data name="Wizard_Step2_OperationFailed" xml:space="preserve">
+    <value>The operation failed. See the diagnostics log for details.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateAppliedAll" xml:space="preserve">
+    <value>Template applied to {0} port(s).</value>
+  </data>
+  <data name="Wizard_Step2_TemplateAppliedPartial" xml:space="preserve">
+    <value>{0} succeeded, {1} failed: {2}</value>
+  </data>
+  <data name="Wizard_Step2_InfNoValidEdid" xml:space="preserve">
+    <value>The .inf file contains no EDID with a valid checksum.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateInvalid" xml:space="preserve">
+    <value>The template is invalid (header, block size or checksum). A graphics driver would discard it.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateReadFailed" xml:space="preserve">
+    <value>The template could not be read.</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 3 ===== -->
+  <data name="Wizard_Step3_Intro" xml:space="preserve">
+    <value>The system is measured again now. Success criterion: Windows reports a distinct PnP path for every monitor, and zero duplicate display identities remain.</value>
+  </data>
+  <data name="Wizard_Step3_RemainingCollisions" xml:space="preserve">
+    <value>Remaining collisions:</value>
+  </data>
+  <data name="Wizard_Step3_RequiredZero" xml:space="preserve">
+    <value>(required: 0)</value>
+  </data>
+  <data name="Wizard_Step3_Verify" xml:space="preserve">
+    <value>Re-Measure and Verify</value>
+  </data>
+  <data name="Wizard_Step3_NotYetChecked" xml:space="preserve">
+    <value>Not yet checked.</value>
+  </data>
+  <data name="Wizard_Step3_Measuring" xml:space="preserve">
+    <value>Measuring again …</value>
+  </data>
+  <data name="Wizard_Step3_Passed" xml:space="preserve">
+    <value>Success: {0} monitor(s) with unique PnP paths, 0 collisions.</value>
+  </data>
+  <data name="Wizard_Step3_StillColliding" xml:space="preserve">
+    <value>Still {0} colliding identit(y/ies). Repeat step 2.</value>
+  </data>
+  <data name="Wizard_Step3_PartialAnchors" xml:space="preserve">
+    <value>{0} monitor(s), but only {1} unique PnP path(s).</value>
+  </data>
+  <data name="Wizard_Step3_Failed" xml:space="preserve">
+    <value>Verification failed — is the service reachable?</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 4 ===== -->
+  <data name="Wizard_Step4_Intro" xml:space="preserve">
+    <value>A full-screen crosshair target appears on each screen in turn. Touch exactly the screen the window appears on. The wizard identifies which digitizer sent the touch from the raw input signal and permanently links it to that monitor's port.</value>
+  </data>
+  <data name="Wizard_Step4_LearnedHeading" xml:space="preserve">
+    <value>Learned Mappings</value>
+  </data>
+  <data name="Wizard_Step4_Run" xml:space="preserve">
+    <value>Learn Mapping (Touch Screens in Turn)</value>
+  </data>
+  <data name="Wizard_Step4_Failed" xml:space="preserve">
+    <value>Learning failed. See the diagnostics log for details.</value>
+  </data>
+  <data name="Wizard_Step4_TouchPrompt" xml:space="preserve">
+    <value>Please touch {0} …</value>
+  </data>
+  <data name="Wizard_Step4_Cancelled" xml:space="preserve">
+    <value>{0}: cancelled, no touch detected.</value>
+  </data>
+  <data name="Wizard_Step4_Unmatched" xml:space="preserve">
+    <value>{0}: the touched device could not be matched.</value>
+  </data>
+  <data name="Wizard_Step4_UnstableAnchor" xml:space="preserve">
+    <value>{0}: {1} provides no stable anchor.</value>
+  </data>
+  <data name="Wizard_Step4_DuplicateDigitizer" xml:space="preserve">
+    <value>{0}: same digitizer as before — please touch the correct screen.</value>
+  </data>
+  <data name="Wizard_Step4_SaveFailed" xml:space="preserve">
+    <value>{0}: saving failed.</value>
+  </data>
+  <data name="Wizard_Step4_LearnedEntry" xml:space="preserve">
+    <value>{0} ← {1}</value>
+  </data>
+  <data name="Wizard_Step4_AllLearned" xml:space="preserve">
+    <value>{0} mapping(s) learned.</value>
+  </data>
+  <data name="Wizard_Step4_PartialLearned" xml:space="preserve">
+    <value>{0} of {1} mapping(s) learned — please repeat.</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 5 ===== -->
+  <data name="Wizard_Step5_IntroBeforeBold" xml:space="preserve">
+    <value>The mapping is now activated in the Windows touch stack via tabcal.exe.</value>
+  </data>
+  <data name="Wizard_Step5_BoldPhrase" xml:space="preserve">
+    <value>This requires administrative rights.</value>
+  </data>
+  <data name="Wizard_Step5_IntroAfterBold" xml:space="preserve">
+    <value>tabcal writes to HKLM\SOFTWARE\Microsoft\Wisp\Touch, where normal users hold read access only. The background service cannot take this over: calibration needs the interactive session, which Session 0 is not.</value>
+  </data>
+  <data name="Wizard_Step5_Run" xml:space="preserve">
+    <value>Run Calibration and Start Visual Check</value>
+  </data>
+  <data name="Wizard_Step5_NotYetRun" xml:space="preserve">
+    <value>Not yet run.</value>
+  </data>
+  <data name="Wizard_Step5_ElevationRequired" xml:space="preserve">
+    <value>Administrative rights are required for calibration (tabcal.exe writes to HKLM\SOFTWARE\Microsoft\Wisp\Touch).</value>
+  </data>
+  <data name="Wizard_Step5_ElevationConfirmSuffix" xml:space="preserve">
+    <value>
+
+Restart the wizard now with elevated rights?</value>
+  </data>
+  <data name="Wizard_Step5_ElevationConfirmTitle" xml:space="preserve">
+    <value>Administrative Rights Required</value>
+  </data>
+  <data name="Wizard_Step5_NothingPending" xml:space="preserve">
+    <value>The service reports no mapping to apply.</value>
+  </data>
+  <data name="Wizard_Step5_CalibratingItem" xml:space="preserve">
+    <value>Calibrating {0} [{1}] …</value>
+  </data>
+  <data name="Wizard_Step5_ResultCount" xml:space="preserve">
+    <value>{0} of {1} calibration(s) succeeded.</value>
+  </data>
+  <data name="Wizard_Step5_VisualCheckIntro" xml:space="preserve">
+    <value>Please check both screens with your finger.</value>
+  </data>
+  <data name="Wizard_Step5_VisualCheckQuestion" xml:space="preserve">
+    <value>Does the pointer correctly follow your finger on every display?</value>
+  </data>
+  <data name="Wizard_Step5_VisualCheckTitle" xml:space="preserve">
+    <value>Visual Alignment Check</value>
+  </data>
+  <data name="Wizard_Step5_ConfirmedSuffix" xml:space="preserve">
+    <value> Visual check confirmed.</value>
+  </data>
+  <data name="Wizard_Step5_NotConfirmedSuffix" xml:space="preserve">
+    <value> Visual check NOT confirmed — check the mapping.</value>
+  </data>
+  <data name="Wizard_Step5_RecordTitle" xml:space="preserve">
+    <value>Calibration</value>
+  </data>
+  <data name="Wizard_Step5_Failed" xml:space="preserve">
+    <value>The calibration test failed. See the diagnostics log for details.</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 6 ===== -->
+  <data name="Wizard_Step6_VerdictSuccess" xml:space="preserve">
+    <value>Commissioning complete. All checks passed.</value>
+  </data>
+  <data name="Wizard_Step6_VerdictPartial" xml:space="preserve">
+    <value>Commissioning completed with limitations. Please review the flagged steps.</value>
+  </data>
+  <data name="Wizard_Step6_StepWord" xml:space="preserve">
+    <value>Step</value>
+  </data>
+  <data name="Wizard_Step6_ExportReport" xml:space="preserve">
+    <value>Export Commissioning Report (setup-report.json)</value>
+  </data>
+  <data name="Wizard_Step6_Close" xml:space="preserve">
+    <value>Close Wizard</value>
+  </data>
+  <data name="Wizard_Step6_SavedPath" xml:space="preserve">
+    <value>Saved: {0}</value>
+  </data>
+  <data name="Wizard_Step6_SavedToStatus" xml:space="preserve">
+    <value>Report saved: {0}</value>
+  </data>
+  <data name="Wizard_Step6_ExportFailed" xml:space="preserve">
+    <value>The report could not be written.</value>
+  </data>
+
+  <!-- ===== EDID & Display manager: chrome ===== -->
+  <data name="EdidUi_Title" xml:space="preserve">
+    <value>EDID &amp; Display Manager</value>
+  </data>
+  <data name="EdidUi_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="EdidUi_LegendHeading" xml:space="preserve">
+    <value>Status meaning:</value>
+  </data>
+  <data name="EdidUi_LegendValid" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="EdidUi_LegendValidDesc" xml:space="preserve">
+    <value> — the monitor provides an EDID with a correct checksum.</value>
+  </data>
+  <data name="EdidUi_LegendCollision" xml:space="preserve">
+    <value>EDID Collision</value>
+  </data>
+  <data name="EdidUi_LegendCollisionDesc" xml:space="preserve">
+    <value> — another monitor reports the same identity; indistinguishable via the EDID.</value>
+  </data>
+  <data name="EdidUi_StatusNoEdid" xml:space="preserve">
+    <value>No EDID</value>
+  </data>
+  <data name="EdidUi_LegendExtender" xml:space="preserve">
+    <value>Extender / No-EDID</value>
+  </data>
+  <data name="EdidUi_LegendExtenderDesc" xml:space="preserve">
+    <value> — the port shows a picture but delivers no EDID. Typical for KVM/HDBaseT links that do not pass DDC through. A template or a synthetic EDID helps here.</value>
+  </data>
+  <data name="EdidUi_LegendOverride" xml:space="preserve">
+    <value>Override Active</value>
+  </data>
+  <data name="EdidUi_LegendOverrideDesc" xml:space="preserve">
+    <value> — Windows reports an EDID this agent installed instead of the hardware EDID.</value>
+  </data>
+  <data name="EdidUi_ColConnector" xml:space="preserve">
+    <value>Connector</value>
+  </data>
+  <data name="EdidUi_ColMonitor" xml:space="preserve">
+    <value>Monitor</value>
+  </data>
+  <data name="EdidUi_ColMode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="EdidUi_ColSerial" xml:space="preserve">
+    <value>Serial Number</value>
+  </data>
+  <data name="EdidUi_ColStatus" xml:space="preserve">
+    <value>EDID Status</value>
+  </data>
+  <data name="EdidUi_ColPnpId" xml:space="preserve">
+    <value>PnP Id</value>
+  </data>
+  <data name="EdidUi_ApplyTemplateHeading" xml:space="preserve">
+    <value>Apply EDID Template</value>
+  </data>
+  <data name="EdidUi_TemplateLabel" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="EdidUi_DroppedFile" xml:space="preserve">
+    <value>Dropped file: {0}</value>
+  </data>
+  <data name="EdidUi_BrowseFile" xml:space="preserve">
+    <value>Choose File …</value>
+  </data>
+  <data name="EdidUi_SerialLabel" xml:space="preserve">
+    <value>Serial number (e.g. 880-A)</value>
+  </data>
+  <data name="EdidUi_ApplyTemplate" xml:space="preserve">
+    <value>Apply Template to Port</value>
+  </data>
+  <data name="EdidUi_Synthesize" xml:space="preserve">
+    <value>Generate Synthetic EDID from Current Signal</value>
+  </data>
+  <data name="EdidUi_ClearFile" xml:space="preserve">
+    <value>Clear File Selection</value>
+  </data>
+  <data name="EdidUi_ResolveCollisions" xml:space="preserve">
+    <value>Auto-Resolve Collisions</value>
+  </data>
+  <data name="EdidUi_PreviewDryRun" xml:space="preserve">
+    <value>Preview (Dry Run)</value>
+  </data>
+  <data name="EdidUi_RestoreSelected" xml:space="preserve">
+    <value>Remove Override for This Port</value>
+  </data>
+  <data name="EdidUi_RestoreAll" xml:space="preserve">
+    <value>Restore Defaults (All Overrides)</value>
+  </data>
+
+  <!-- ===== EDID & Display manager: view-model status text ===== -->
+  <data name="EdidUi_CollisionSummaryFull" xml:space="preserve">
+    <value>{0} monitor(s) are indistinguishable via their EDID.</value>
+  </data>
+  <data name="EdidUi_CollisionSummaryNumericOnly" xml:space="preserve">
+    <value>{0} group(s) share the numeric serial number, but are distinguishable via the text descriptor — no action needed.</value>
+  </data>
+  <data name="EdidUi_CollisionSummaryNone" xml:space="preserve">
+    <value>No serial number collisions.</value>
+  </data>
+  <data name="EdidUi_StatusSummary" xml:space="preserve">
+    <value>{0} port(s), {1} template(s).</value>
+  </data>
+  <data name="EdidUi_LoadingRunning" xml:space="preserve">
+    <value>Loading displays and templates …</value>
+  </data>
+  <data name="EdidUi_ServiceUnreachable" xml:space="preserve">
+    <value>Service not reachable. Is TouchMappingAgent running?</value>
+  </data>
+  <data name="EdidUi_ResolvingRunning" xml:space="preserve">
+    <value>Resolving collisions …</value>
+  </data>
+  <data name="EdidUi_PreviewRunning" xml:space="preserve">
+    <value>Dry run …</value>
+  </data>
+  <data name="EdidUi_RestoringAllRunning" xml:space="preserve">
+    <value>Removing overrides …</value>
+  </data>
+  <data name="EdidUi_SelectPortFirst" xml:space="preserve">
+    <value>Please select a port first.</value>
+  </data>
+  <data name="EdidUi_RestoringSelectedRunning" xml:space="preserve">
+    <value>Removing override for {0} …</value>
+  </data>
+  <data name="EdidUi_ApplyingTemplateRunning" xml:space="preserve">
+    <value>Applying template to {0} …</value>
+  </data>
+  <data name="EdidUi_NoActiveMode" xml:space="preserve">
+    <value>No active display mode is known for this port — an EDID cannot be synthesised without one.</value>
+  </data>
+  <data name="EdidUi_SynthesizingRunning" xml:space="preserve">
+    <value>Generating synthetic EDID for {0} …</value>
+  </data>
+  <data name="EdidUi_SelectTemplateOrFile" xml:space="preserve">
+    <value>Please select a template or drop a file.</value>
+  </data>
+  <data name="EdidUi_BuiltinTemplatePending" xml:space="preserve">
+    <value>The built-in template does not exist as a file yet. Please press 'Refresh' — the service will then create it.</value>
+  </data>
+  <data name="EdidUi_NoEdidInFile" xml:space="preserve">
+    <value>No EDID was found in {0}.</value>
+  </data>
+  <data name="EdidUi_InfAllChecksumsInvalid" xml:space="preserve">
+    <value>{0} contains only EDIDs with an invalid checksum. A driver would discard them.</value>
+  </data>
+  <data name="EdidUi_InfMultipleEntries" xml:space="preserve">
+    <value>{0} contains {1} EDIDs; using section [{2}].</value>
+  </data>
+  <data name="EdidUi_FileNotValidEdid" xml:space="preserve">
+    <value>{0} is not a valid EDID (header, block size or checksum). See the diagnostics log for details.</value>
+  </data>
+  <data name="EdidUi_FileReadFailed" xml:space="preserve">
+    <value>{0} could not be read.</value>
+  </data>
+  <data name="EdidUi_FileAccepted" xml:space="preserve">
+    <value>File accepted: {0}. Select a port and apply.</value>
+  </data>
+  <data name="EdidUi_FileSelectionCleared" xml:space="preserve">
+    <value>File selection cleared.</value>
+  </data>
+  <data name="EdidUi_PickTemplateTitle" xml:space="preserve">
+    <value>Choose EDID Template</value>
+  </data>
+  <data name="EdidUi_PickTemplateFilter" xml:space="preserve">
+    <value>EDID files (*.bin;*.hex;*.dat;*.edid;*.inf)|*.bin;*.hex;*.dat;*.edid;*.inf|Binary (*.bin;*.dat;*.edid)|*.bin;*.dat;*.edid|Hex text (*.hex)|*.hex|Monitor drivers (*.inf)|*.inf|All files (*.*)|*.*</value>
+  </data>
+  <data name="EdidUi_OperationFailed" xml:space="preserve">
+    <value>Service unreachable or the operation failed.</value>
+  </data>
+
+  <!-- ===== Help window ===== -->
+  <data name="Help_WindowTitle" xml:space="preserve">
+    <value>Help &amp; Manual</value>
+  </data>
+  <data name="Help_HeaderTitle" xml:space="preserve">
+    <value>MultiTouch Agent — Manual</value>
+  </data>
+  <data name="Help_HeaderSubtitle" xml:space="preserve">
+    <value>Touch Mapping, EDID Collisions and Range Extenders</value>
+  </data>
+  <data name="Help_S1_Heading" xml:space="preserve">
+    <value>1. Why This Agent Exists</value>
+  </data>
+  <data name="Help_S1_Body" xml:space="preserve">
+    <value>Windows cannot permanently assign a touch digitizer to a specific monitor when several identical monitors are attached. On this installation both DM7000 units report the same EDID, including the same serial number, and both PM1715 digitizers provide no physical location path. The operating system therefore has no criterion at all for telling left from right — after a restart or a DisplayPort event, the mappings can end up swapped.
+
+The agent supplies the missing criterion: a mapping learned once, anchored to the digitizer's USB port and the monitor's graphics connector — both physical properties that survive a restart.</value>
+  </data>
+  <data name="Help_S2_Heading" xml:space="preserve">
+    <value>2. Learning the Touch Mapping</value>
+  </data>
+  <data name="Help_S2_Step1Label" xml:space="preserve">
+    <value>Step 1:</value>
+  </data>
+  <data name="Help_S2_Step1Text" xml:space="preserve">
+    <value> Open the main window (double-click the tray icon).</value>
+  </data>
+  <data name="Help_S2_Step2Label" xml:space="preserve">
+    <value>Step 2:</value>
+  </data>
+  <data name="Help_S2_Step2Text" xml:space="preserve">
+    <value> In the monitor list, select the screen to be learned. The list shows connector and position, because both panels carry the same name.</value>
+  </data>
+  <data name="Help_S2_Step3Label" xml:space="preserve">
+    <value>Step 3:</value>
+  </data>
+  <data name="Help_S2_Step3Text" xml:space="preserve">
+    <value> Press "Learn Screen (Touch)". A full-screen window appears on the selected screen.</value>
+  </data>
+  <data name="Help_S2_Step4Label" xml:space="preserve">
+    <value>Step 4:</value>
+  </data>
+  <data name="Help_S2_Step4Text" xml:space="preserve">
+    <value> Touch that screen. The agent identifies which digitizer sent the touch from the raw input signal and permanently links it to that monitor's port.</value>
+  </data>
+  <data name="Help_S2_Closing" xml:space="preserve">
+    <value>One pass per screen is then enough. The agent restores the mapping by itself after every restart and every DisplayPort event.</value>
+  </data>
+  <data name="Help_S3_Heading" xml:space="preserve">
+    <value>3. EDID Collisions</value>
+  </data>
+  <data name="Help_S3_Body1" xml:space="preserve">
+    <value>The touch mapping itself does not need this — it uses the PnP device path, which is unique regardless. An EDID collision does, however, disrupt every</value>
+  </data>
+  <data name="Help_S3_BoldOther" xml:space="preserve">
+    <value> other</value>
+  </data>
+  <data name="Help_S3_Body2" xml:space="preserve">
+    <value> piece of software on the machine that identifies screens by their serial number.</value>
+  </data>
+  <data name="Help_S3_Body3" xml:space="preserve">
+    <value>In the EDID manager, the "EDID Status" column shows the finding. "EDID Collision" means: another monitor reports exactly the same identity. "Auto-Resolve Collisions" then assigns each device a unique serial number and installs it as a Windows EDID override.</value>
+  </data>
+  <data name="Help_S3_ImportantLabel" xml:space="preserve">
+    <value>Important:</value>
+  </data>
+  <data name="Help_S3_Body4" xml:space="preserve">
+    <value> When two monitors share only the numeric serial number but differ in their text descriptor, the agent deliberately does not intervene — they are distinguishable. The value 0x01010101 is a common placeholder for "serial number not programmed"; rewriting such panels would achieve nothing and would alter firmware data without need.</value>
+  </data>
+  <data name="Help_S4_Heading" xml:space="preserve">
+    <value>4. Range Extenders (KVM / HDBaseT)</value>
+  </data>
+  <data name="Help_S4_Body1" xml:space="preserve">
+    <value>Extenders frequently do not pass DDC through. Two symptoms:</value>
+  </data>
+  <data name="Help_S4_LabelA" xml:space="preserve">
+    <value>a) Generic EDID.</value>
+  </data>
+  <data name="Help_S4_TextA" xml:space="preserve">
+    <value> The transmitter unit responds with a block burned into the extender by its manufacturer, instead of the panel's EDID. If both extenders are identical, the graphics driver sees the same fingerprint twice — this is the cause of the collision on this installation.</value>
+  </data>
+  <data name="Help_S4_LabelB" xml:space="preserve">
+    <value>b) No EDID at all.</value>
+  </data>
+  <data name="Help_S4_TextB" xml:space="preserve">
+    <value> The port shows a picture but reports no EDID. The manager shows "Extender / No-EDID".</value>
+  </data>
+  <data name="Help_S4_SolutionOrderLabel" xml:space="preserve">
+    <value>Order of remedies:</value>
+  </data>
+  <data name="Help_S4_SolutionSteps" xml:space="preserve">
+    <value>1. Install an EDID template from the panel manufacturer (.bin, .hex or .inf). The supplied template DM7000_Native.bin contains the EDID actually measured from the DM7000.
+2. If no template is available: "Generate Synthetic EDID from Current Signal". The agent builds a standards-compliant block from it.</value>
+  </data>
+  <data name="Help_S4_SyntheticLabel" xml:space="preserve">
+    <value>On the synthetic EDID:</value>
+  </data>
+  <data name="Help_S4_SyntheticText" xml:space="preserve">
+    <value> It is a stopgap. It describes the mode Windows is currently driving, but contains no manufacturer-specific timings and no colour values measured at the panel. Colour reproduction and DPI scaling remain approximations, and further modes of the panel stay invisible to Windows. Where a genuine EDID or a manufacturer driver exists, either is the better source.</value>
+  </data>
+  <data name="Help_S4_HandshakeLabel" xml:space="preserve">
+    <value>On the handshake:</value>
+  </data>
+  <data name="Help_S4_HandshakeText" xml:space="preserve">
+    <value> If the screens stay black ("no signal") after a restart and only work after a power cycle at the extender, the hot-plug-detect chain is interrupted during boot. An EDID override only helps to a limited extent here — active DP-to-HDMI adapters, an EDID emulator right at the graphics output, or a power supply where the extenders come up before the server can remedy this.</value>
+  </data>
+  <data name="Help_S5_Heading" xml:space="preserve">
+    <value>5. Important: The Agent Must Keep Running</value>
+  </data>
+  <data name="Help_S5_Body1" xml:space="preserve">
+    <value>The service decides which mapping needs to be restored, but cannot carry that out itself: it runs in Session 0 and can neither see the desktop nor start tabcal.exe. Only the tray agent in the user session can do that.</value>
+  </data>
+  <data name="Help_S5_Body2" xml:space="preserve">
+    <value>If the agent is closed via "Exit", the mapping will not be restored after the next restart. Closing via the "X" does not exit it — it keeps running in the notification area.</value>
+  </data>
+  <data name="Help_S6_Heading" xml:space="preserve">
+    <value>6. If You Run Into Trouble</value>
+  </data>
+  <data name="Help_S6_Body1" xml:space="preserve">
+    <value>"Export Diagnostics Log" in the tray menu writes the service's and client's logs, plus a snapshot of the detected hardware, to a file.</value>
+  </data>
+  <data name="Help_S6_LogsLabel" xml:space="preserve">
+    <value>Logs live under:</value>
+  </data>
+  <data name="Help_S6_TemplatesLabel" xml:space="preserve">
+    <value>EDID templates live under:</value>
+  </data>
+  <data name="Help_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+
+  <!-- ===== Diagnostics log window ===== -->
+  <data name="Log_WindowTitle" xml:space="preserve">
+    <value>MultiTouch Agent - Diagnostics Log</value>
+  </data>
+  <data name="Log_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Log_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+
+  <!-- ===== Tray menu, dialogs, About ===== -->
+  <data name="Tray_OpenConfig" xml:space="preserve">
+    <value>Open Configuration</value>
+  </data>
+  <data name="Tray_CheckStatus" xml:space="preserve">
+    <value>Check Service Status</value>
+  </data>
+  <data name="Tray_Wizard" xml:space="preserve">
+    <value>Setup Wizard...</value>
+  </data>
+  <data name="Tray_EdidManager" xml:space="preserve">
+    <value>EDID &amp; Display Manager...</value>
+  </data>
+  <data name="Tray_Help" xml:space="preserve">
+    <value>Help &amp; Manual...</value>
+  </data>
+  <data name="Tray_ExportLog" xml:space="preserve">
+    <value>Export Diagnostics Log</value>
+  </data>
+  <data name="Tray_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Tray_ExitConfirmTitle" xml:space="preserve">
+    <value>Exit TouchMappingAgent?</value>
+  </data>
+  <data name="Tray_ExitWarning" xml:space="preserve">
+    <value>IMPORTANT NOTICE:
+Windows has no built-in way to permanently map touch digitizers to identical monitors.
+
+If you exit this agent, the system can no longer maintain the mapping across restarts or DisplayPort events (touch input will land on the wrong screen).
+
+Do you really want to exit the agent?</value>
+  </data>
+  <data name="Tray_CheckingStatus" xml:space="preserve">
+    <value>Checking status...</value>
+  </data>
+  <data name="Tray_EdidManagerOpenFailed" xml:space="preserve">
+    <value>The EDID manager could not be opened. See the diagnostics log for details.</value>
+  </data>
+  <data name="Tray_WizardOpenFailed" xml:space="preserve">
+    <value>The setup wizard could not be opened. See the diagnostics log for details.</value>
+  </data>
+  <data name="Tray_ExportDialogTitle" xml:space="preserve">
+    <value>Export Diagnostics Log</value>
+  </data>
+  <data name="Tray_ExportDialogFilter" xml:space="preserve">
+    <value>Log file (*.log)|*.log|Text file (*.txt)|*.txt|All files (*.*)|*.*</value>
+  </data>
+  <data name="Tray_ExportSucceeded" xml:space="preserve">
+    <value>Diagnostics report saved:
+{0}</value>
+  </data>
+  <data name="Tray_ExportFailed" xml:space="preserve">
+    <value>The diagnostics report could not be written. See the diagnostics log for details.</value>
+  </data>
+  <data name="Tray_Caption" xml:space="preserve">
+    <value>MultiTouch Agent</value>
+  </data>
+  <data name="Tray_AboutBody" xml:space="preserve">
+    <value>MultiTouch Agent
+Multimonitor · Local · Direct
+
+© 2026 PadaLuma Ink-Jet Solutions GmbH.
+All rights reserved.
+
+Developed by Erik Denzler</value>
+  </data>
+
+  <!-- ===== App-level dialogs ===== -->
+  <data name="App_UnhandledExceptionCaption" xml:space="preserve">
+    <value>TouchMappingAgent</value>
+  </data>
+  <data name="App_UnhandledExceptionBody" xml:space="preserve">
+    <value>An unexpected error occurred:
+
+{0}
+
+The application keeps running. See the diagnostics log for details.</value>
+  </data>
+
+  <!-- ===== Setup interaction service: dialogs and file pickers ===== -->
+  <data name="Interaction_PickTemplateTitle" xml:space="preserve">
+    <value>Choose EDID Template</value>
+  </data>
+  <data name="Interaction_PickTemplateFilter" xml:space="preserve">
+    <value>EDID files (*.bin;*.hex;*.dat;*.edid;*.inf)|*.bin;*.hex;*.dat;*.edid;*.inf|Monitor drivers (*.inf)|*.inf|All files (*.*)|*.*</value>
+  </data>
+  <data name="Interaction_SaveReportTitle" xml:space="preserve">
+    <value>Save Commissioning Report</value>
+  </data>
+  <data name="Interaction_SaveReportFilter" xml:space="preserve">
+    <value>JSON report (*.json)|*.json|All files (*.*)|*.*</value>
+  </data>
+</root>

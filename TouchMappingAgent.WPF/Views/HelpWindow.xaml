@@ -1,0 +1,146 @@
+<Window x:Class="TouchMappingAgent.WPF.Views.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:TouchMappingAgent.WPF.Localization"
+        Title="{loc:Loc Help_WindowTitle}" Height="700" Width="820"
+        MinHeight="480" MinWidth="620"
+        Icon="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/touchmappingagent.ico"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Evolved.Background}">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0" Source="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/logo.png"
+                   Height="64" Margin="0,0,14,0" VerticalAlignment="Center"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{loc:Loc Help_HeaderTitle}" Style="{StaticResource Evolved.Text.Title}"/>
+                <TextBlock Text="{loc:Loc Help_HeaderSubtitle}"
+                           Style="{StaticResource Evolved.Text.Muted}"/>
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S1_Heading}"
+                                   Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}" Text="{loc:Loc Help_S1_Body}"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S2_Heading}"
+                                   Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S2_Step1Label}"/>
+                            <Run Text="{loc:Loc Help_S2_Step1Text}"/>
+                            <LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S2_Step2Label}"/>
+                            <Run Text="{loc:Loc Help_S2_Step2Text}"/>
+                            <LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S2_Step3Label}"/>
+                            <Run Text="{loc:Loc Help_S2_Step3Text}"/>
+                            <LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S2_Step4Label}"/>
+                            <Run Text="{loc:Loc Help_S2_Step4Text}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="{loc:Loc Help_S2_Closing}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S3_Heading}" Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run Text="{loc:Loc Help_S3_Body1}"/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S3_BoldOther}"/>
+                            <Run Text="{loc:Loc Help_S3_Body2}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="{loc:Loc Help_S3_Body3}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S3_ImportantLabel}"/>
+                            <Run Text="{loc:Loc Help_S3_Body4}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S4_Heading}"
+                                   Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run Text="{loc:Loc Help_S4_Body1}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S4_LabelA}"/>
+                            <Run Text="{loc:Loc Help_S4_TextA}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S4_LabelB}"/>
+                            <Run Text="{loc:Loc Help_S4_TextB}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S4_SolutionOrderLabel}"/>
+                            <LineBreak/>
+                            <Run Text="{loc:Loc Help_S4_SolutionSteps}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S4_SyntheticLabel}"/>
+                            <Run Text="{loc:Loc Help_S4_SyntheticText}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Help_S4_HandshakeLabel}"/>
+                            <Run Text="{loc:Loc Help_S4_HandshakeText}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S5_Heading}"
+                                   Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run Text="{loc:Loc Help_S5_Body1}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="{loc:Loc Help_S5_Body2}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Evolved.Card}">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Help_S6_Heading}" Style="{StaticResource Evolved.Text.Heading}"/>
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run Text="{loc:Loc Help_S6_Body1}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="{loc:Loc Help_S6_LogsLabel}"/>
+                            <LineBreak/>
+                            <Run FontFamily="Consolas" Text="%ProgramData%\PadaLuma\TouchMappingAgent\logs"/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="{loc:Loc Help_S6_TemplatesLabel}"/>
+                            <LineBreak/>
+                            <Run FontFamily="Consolas" Text="%ProgramData%\Evolved\EdidTemplates"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Button Grid.Row="2" Content="{loc:Loc Help_Close}" Style="{StaticResource Evolved.Button}"
+                HorizontalAlignment="Right" Margin="0,14,0,0" Click="OnClose"/>
+    </Grid>
+</Window>
+

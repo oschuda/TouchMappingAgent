@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Neutral resources: GERMAN.
+
+    German is the neutral culture (see NeutralResourcesLanguage in AssemblyInfo), so these strings
+    are compiled into the main assembly and are what any culture without its own satellite falls
+    back to. English lives in Strings.en.resx.
+
+    Placeholders are positional ({0}, {1}) because the arguments arrive from the service as an
+    ordered list. Their meaning per key is documented on the key constants in
+    TouchMappingAgent.Shared/Localization/MessageKeys.cs and Evolved.EdidManager/EdidMessage.cs.
+    A translation whose placeholders do not match the sender's argument count is caught by
+    LocalizerTests rather than surfacing on the machine.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- ===== Hardware status ===== -->
+  <data name="Status_NoMappingsStored" xml:space="preserve">
+    <value>Keine Zuordnung hinterlegt. Die Touch-Zuordnung muss einmalig durch Berühren der Bildschirme angelernt werden.</value>
+  </data>
+  <data name="Status_MappingsUnresolvable" xml:space="preserve">
+    <value>{0} hinterlegte Zuordnung(en) passen nicht zur aktuell erkannten Hardware. Bitte Verkabelung prüfen oder neu anlernen.</value>
+  </data>
+  <data name="Status_AmbiguousDigitizers" xml:space="preserve">
+    <value>{0} Digitizer liefern keinen eindeutigen Hardware-Anker. Eine automatische Zuordnung ist für diese Geräte nicht möglich.</value>
+  </data>
+  <data name="Status_MappingDegraded" xml:space="preserve">
+    <value>Zuordnung für {0} [{1}] greift nur noch über {2}. Der Anschluss hat sich vermutlich geändert.</value>
+  </data>
+  <data name="Status_Unavailable" xml:space="preserve">
+    <value>Hardware-Status konnte nicht ermittelt werden.</value>
+  </data>
+
+  <!-- ===== Re-application ===== -->
+  <data name="Reapply_ReasonExact" xml:space="preserve">
+    <value>Gespeicherte Zuordnung, Monitor über PnP-Gerätepfad eindeutig wiedererkannt.</value>
+  </data>
+  <data name="Reapply_ReasonConnector" xml:space="preserve">
+    <value>Gespeicherte Zuordnung, Monitor über Grafik-Anschluss wiedererkannt (Gerätepfad abweichend).</value>
+  </data>
+  <data name="Reapply_ReasonBoundsOnly" xml:space="preserve">
+    <value>Gespeicherte Zuordnung, Monitor nur über Bildschirmposition wiedererkannt — Anschluss geprüft?</value>
+  </data>
+  <data name="Reapply_ReasonStored" xml:space="preserve">
+    <value>Gespeicherte Zuordnung.</value>
+  </data>
+  <data name="Reapply_Succeeded" xml:space="preserve">
+    <value>Zuordnung für {0} [{1}] wiederhergestellt.</value>
+  </data>
+  <data name="Reapply_Failed" xml:space="preserve">
+    <value>Zuordnung für {0} konnte nicht wiederhergestellt werden.</value>
+  </data>
+  <data name="Reapply_DigitizerAbsent" xml:space="preserve">
+    <value>Der zugeordnete Digitizer ist nicht angeschlossen. tabcal.exe würde Erfolg melden, ohne etwas zu kalibrieren.</value>
+  </data>
+  <data name="Reapply_NoDevicePath" xml:space="preserve">
+    <value>Die Zuordnung enthält keinen Gerätepfad.</value>
+  </data>
+  <data name="Reapply_EnumerationFailed" xml:space="preserve">
+    <value>Digitizer konnten nicht ermittelt werden: {0}</value>
+  </data>
+
+  <!-- ===== EDID: service-side ===== -->
+  <data name="Edid_TemplateApplyFailed" xml:space="preserve">
+    <value>Template konnte nicht angewendet werden.</value>
+  </data>
+  <data name="Edid_DecollisionFailed" xml:space="preserve">
+    <value>EDID-Bereinigung fehlgeschlagen.</value>
+  </data>
+  <data name="Edid_RestoreFailed" xml:space="preserve">
+    <value>Wiederherstellung fehlgeschlagen.</value>
+  </data>
+  <data name="Edid_SynthesisFailed" xml:space="preserve">
+    <value>Synthese fehlgeschlagen.</value>
+  </data>
+  <data name="Edid_InvalidBase64" xml:space="preserve">
+    <value>Template-Daten sind kein gültiges Base64.</value>
+  </data>
+  <data name="Edid_ModeNotRepresentable" xml:space="preserve">
+    <value>Modus {0}x{1}@{2} lässt sich nicht in einer EDID abbilden.</value>
+  </data>
+
+  <!-- ===== EDID: from the Evolved.EdidManager module ===== -->
+  <data name="Edid_DryRun" xml:space="preserve">
+    <value>Trockenlauf: {0} Monitor(e) würden eine neue Seriennummer erhalten.</value>
+  </data>
+  <data name="Edid_NoCollisions" xml:space="preserve">
+    <value>Keine Seriennummern-Kollisionen gefunden.</value>
+  </data>
+  <data name="Edid_CollisionsResolved" xml:space="preserve">
+    <value>{0} Monitor(e) mit eindeutiger Seriennummer versehen.</value>
+  </data>
+  <data name="Edid_CollisionsResolvedWithFailures" xml:space="preserve">
+    <value>{0} Monitor(e) mit eindeutiger Seriennummer versehen, {1} fehlgeschlagen.</value>
+  </data>
+  <data name="Edid_ElevationRequired" xml:space="preserve">
+    <value>Administratorrechte erforderlich: EDID-Overrides werden unter HKLM\SYSTEM\CurrentControlSet\Enum abgelegt.</value>
+  </data>
+  <data name="Edid_InvalidPnpId" xml:space="preserve">
+    <value>„{0}“ ist keine gültige PnP-Kennung.</value>
+  </data>
+  <data name="Edid_TemplateWrongSize" xml:space="preserve">
+    <value>Template hat {0} Byte — erforderlich ist ein Vielfaches von {1}.</value>
+  </data>
+  <data name="Edid_TemplateBadHeader" xml:space="preserve">
+    <value>Template beginnt nicht mit dem EDID-Header.</value>
+  </data>
+  <data name="Edid_TemplateBadChecksum" xml:space="preserve">
+    <value>Template hat eine ungültige Prüfsumme (gespeichert 0x{0}, erwartet 0x{1}). Ein Grafiktreiber verwirft eine solche EDID — der Anschluss bliebe dunkel.</value>
+  </data>
+  <data name="Edid_StampChecksumFailed" xml:space="preserve">
+    <value>Prüfsummenprüfung nach dem Stempeln fehlgeschlagen.</value>
+  </data>
+  <data name="Edid_TemplateApplied" xml:space="preserve">
+    <value>Template auf {0} angewendet (Serial {1}).</value>
+  </data>
+  <data name="Edid_TemplateAppliedNoReenumerate" xml:space="preserve">
+    <value>Template auf {0} angewendet (Serial {1}). Der Geräteknoten konnte nicht neu eingelesen werden — wirksam spätestens nach einem Neustart.</value>
+  </data>
+  <data name="Edid_OverrideWriteFailed" xml:space="preserve">
+    <value>Override für {0} konnte nicht geschrieben werden.</value>
+  </data>
+  <data name="Edid_NoOverridePresent" xml:space="preserve">
+    <value>Für {0} war kein Override hinterlegt.</value>
+  </data>
+  <data name="Edid_OverrideRemoved" xml:space="preserve">
+    <value>Override für {0} entfernt und Geräteknoten neu eingelesen.</value>
+  </data>
+  <data name="Edid_OverrideRemovedNoReenumerate" xml:space="preserve">
+    <value>Override für {0} entfernt. Der Geräteknoten konnte nicht neu eingelesen werden — wirksam spätestens nach einem Neustart.</value>
+  </data>
+  <data name="Edid_NoOverridesStored" xml:space="preserve">
+    <value>Keine EDID-Overrides hinterlegt.</value>
+  </data>
+  <data name="Edid_OverridesRemoved" xml:space="preserve">
+    <value>{0} EDID-Override(s) entfernt.</value>
+  </data>
+
+  <!-- ===== Service availability ===== -->
+  <data name="Service_Unavailable" xml:space="preserve">
+    <value>Dienst nicht verfügbar.</value>
+  </data>
+
+  <!-- ===== Shared value converters ===== -->
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="Common_Administrator" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="Common_StandardUser" xml:space="preserve">
+    <value>Standardbenutzer</value>
+  </data>
+  <data name="Common_StepOk" xml:space="preserve">
+    <value>[OK]</value>
+  </data>
+  <data name="Common_StepCheck" xml:space="preserve">
+    <value>[PRÜFEN]</value>
+  </data>
+
+  <!-- ===== Language picker ===== -->
+  <data name="Language_MenuHeader" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="Language_German" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
+  <data name="Language_English" xml:space="preserve">
+    <value>Englisch</value>
+  </data>
+
+  <!-- ===== Main window ===== -->
+  <data name="Main_Subtitle" xml:space="preserve">
+    <value>Zuordnung von Touch-Digitizern zu physischen Monitoren</value>
+  </data>
+  <data name="Main_NoticeLabel" xml:space="preserve">
+    <value>Hinweis: </value>
+  </data>
+  <data name="Main_NoticeText" xml:space="preserve">
+    <value>Bei baugleichen Touch-Monitoren fordert Windows während der Kalibrierung dazu auf, den Ziel-Bildschirm physisch zu berühren – genau wie im nativen Tablet-PC-Einrichtungsassistenten. Bitte berühren Sie in diesem Moment den korrekten Monitor, sobald die Kalibrierung startet.</value>
+  </data>
+  <data name="Main_MonitorLabel" xml:space="preserve">
+    <value>Monitor</value>
+  </data>
+  <data name="Main_LoadMonitors" xml:space="preserve">
+    <value>Monitore laden</value>
+  </data>
+  <data name="Main_LearnScreen" xml:space="preserve">
+    <value>Bildschirm anlernen (Berührung)</value>
+  </data>
+  <data name="Main_CreateBackup" xml:space="preserve">
+    <value>Backup erstellen</value>
+  </data>
+  <data name="Main_AdvancedRepair" xml:space="preserve">
+    <value>Erweiterte Reparatur ausführen</value>
+  </data>
+  <data name="Main_CheckServiceStatus" xml:space="preserve">
+    <value>Dienst-Status prüfen</value>
+  </data>
+  <data name="Main_ShowDiagnosticsLog" xml:space="preserve">
+    <value>Diagnose-Log anzeigen</value>
+  </data>
+  <data name="Main_StatusLabel" xml:space="preserve">
+    <value>Status: </value>
+  </data>
+  <data name="Main_SelectMonitorFirst" xml:space="preserve">
+    <value>Bitte zuerst einen Monitor auswählen.</value>
+  </data>
+  <data name="Main_TouchTargetScreen" xml:space="preserve">
+    <value>Berühren Sie jetzt den Bildschirm {0} [{1}].</value>
+  </data>
+  <data name="Main_LearningInProgress" xml:space="preserve">
+    <value>Anlernen läuft – bitte Ziel-Bildschirm berühren …</value>
+  </data>
+  <data name="Main_LearnAborted" xml:space="preserve">
+    <value>Anlernen abgebrochen – keine Berührung erkannt.</value>
+  </data>
+  <data name="Main_TouchDeviceUnmatched" xml:space="preserve">
+    <value>Berührtes Gerät konnte nicht zugeordnet werden.</value>
+  </data>
+  <data name="Main_UnstableHardwareAnchor" xml:space="preserve">
+    <value>Das berührte Touch-Gerät liefert keinen stabilen Hardware-Anker. Die Zuordnung kann nicht dauerhaft gespeichert werden.</value>
+  </data>
+  <data name="Main_LearnFailed" xml:space="preserve">
+    <value>Anlernen fehlgeschlagen. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Main_MappingRejected" xml:space="preserve">
+    <value>Zuordnung konnte nicht gespeichert werden.</value>
+  </data>
+  <data name="Main_MappingSaved" xml:space="preserve">
+    <value>Zuordnung gespeichert.</value>
+  </data>
+  <data name="Main_MappingSavedAndActivated" xml:space="preserve">
+    <value>Zuordnung für {0} [{1}] gespeichert und aktiviert.</value>
+  </data>
+  <data name="Main_CalibrationFailed" xml:space="preserve">
+    <value>Kalibrierung fehlgeschlagen. Bitte TouchMappingAgent als Administrator ausführen und erneut versuchen.</value>
+  </data>
+  <data name="Main_Ready" xml:space="preserve">
+    <value>Bereit</value>
+  </data>
+  <data name="Main_LoadingMonitors" xml:space="preserve">
+    <value>Monitore werden geladen...</value>
+  </data>
+  <data name="Main_MonitorsLoaded" xml:space="preserve">
+    <value>{0} Monitor(e) geladen.</value>
+  </data>
+  <data name="Main_LoadMonitorsFailed" xml:space="preserve">
+    <value>Monitore konnten nicht geladen werden. Bitte erneut versuchen.</value>
+  </data>
+  <data name="Main_CreatingBackup" xml:space="preserve">
+    <value>Sicheres Backup wird erstellt...</value>
+  </data>
+  <data name="Main_BackupCreated" xml:space="preserve">
+    <value>Backup erfolgreich im sicheren Speicher erstellt!</value>
+  </data>
+  <data name="Main_BackupFailed" xml:space="preserve">
+    <value>Backup fehlgeschlagen. Bitte Dienst-Protokolle prüfen.</value>
+  </data>
+  <data name="Main_BackupError" xml:space="preserve">
+    <value>Beim Erstellen des Backups ist ein Fehler aufgetreten.</value>
+  </data>
+  <data name="Main_RunningAdvancedRepair" xml:space="preserve">
+    <value>Erweiterte Touch- und Display-Reparatur wird ausgeführt...</value>
+  </data>
+  <data name="Main_AdvancedRepairSucceeded" xml:space="preserve">
+    <value>Erweiterte Reparatur erfolgreich ausgeführt! Hardware-Zuordnungen wiederhergestellt.</value>
+  </data>
+  <data name="Main_AdvancedRepairIssues" xml:space="preserve">
+    <value>Bei der Reparatur sind Probleme aufgetreten. Windows-Ereignisanzeige prüfen.</value>
+  </data>
+  <data name="Main_AdvancedRepairIpcFailed" xml:space="preserve">
+    <value>Die Reparatursequenz konnte wegen eines IPC-Fehlers nicht ausgeführt werden.</value>
+  </data>
+  <data name="Main_ServiceActive" xml:space="preserve">
+    <value>Dienst ist aktiv und antwortet.</value>
+  </data>
+  <data name="Main_ServiceNotResponding" xml:space="preserve">
+    <value>Dienst antwortet nicht. Bitte den Windows-Dienststatus prüfen.</value>
+  </data>
+  <data name="Main_UnhandledExceptionReported" xml:space="preserve">
+    <value>Ein unerwarteter Fehler ist aufgetreten. Details im Diagnose-Log.</value>
+  </data>
+
+  <!-- ===== Full-screen touch identification prompt ===== -->
+  <data name="Identify_TouchNow" xml:space="preserve">
+    <value>Bitte berühren Sie JETZT diesen Bildschirm</value>
+  </data>
+  <data name="Identify_WaitingForTouch" xml:space="preserve">
+    <value>Warte auf Berührung …   (Esc bricht ab)</value>
+  </data>
+  <data name="Identify_RawInputUnavailableDetail" xml:space="preserve">
+    <value>Raw-Input konnte nicht registriert werden – eine automatische Geräte-Erkennung ist nicht möglich. Bitte manuell zuordnen. (Esc schließt)</value>
+  </data>
+  <data name="Identify_RawInputUnavailable" xml:space="preserve">
+    <value>Raw-Input nicht verfügbar – bitte manuell zuordnen. (Esc schließt)</value>
+  </data>
+  <data name="Identify_TouchDetected" xml:space="preserve">
+    <value>Berührung erkannt – Zuordnung wird gespeichert …</value>
+  </data>
+
+  <!-- ===== Setup wizard: chrome ===== -->
+  <data name="Wizard_WindowTitle" xml:space="preserve">
+    <value>Einrichtungs-Assistent</value>
+  </data>
+  <data name="Wizard_RightsLabel" xml:space="preserve">
+    <value>Rechte:</value>
+  </data>
+  <data name="Wizard_Back" xml:space="preserve">
+    <value>◀ Zurück</value>
+  </data>
+  <data name="Wizard_Next" xml:space="preserve">
+    <value>Weiter ▶</value>
+  </data>
+  <data name="Wizard_Ready" xml:space="preserve">
+    <value>Bereit.</value>
+  </data>
+  <data name="Wizard_StepCaption" xml:space="preserve">
+    <value>Schritt {0} von {1}</value>
+  </data>
+
+  <!-- ===== Setup wizard: step titles ===== -->
+  <data name="Wizard_StepTitle_PreFlight" xml:space="preserve">
+    <value>Rechte- und System-Prüfung</value>
+  </data>
+  <data name="Wizard_StepTitle_EdidStrategy" xml:space="preserve">
+    <value>EDID-Strategie wählen</value>
+  </data>
+  <data name="Wizard_StepTitle_PnpVerification" xml:space="preserve">
+    <value>PnP-Verifizierung</value>
+  </data>
+  <data name="Wizard_StepTitle_TouchAssignment" xml:space="preserve">
+    <value>Touch-Zuordnung</value>
+  </data>
+  <data name="Wizard_StepTitle_TabcalTest" xml:space="preserve">
+    <value>Kalibrierung und Sichtprüfung</value>
+  </data>
+  <data name="Wizard_StepTitle_Summary" xml:space="preserve">
+    <value>Abschluss</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 1 ===== -->
+  <data name="Wizard_Step1_Intro" xml:space="preserve">
+    <value>Der Assistent prüft zuerst, ob alle Voraussetzungen erfüllt sind: Rechte, erreichbarer Hintergrunddienst, angeschlossene Displays und Digitizer sowie der aktuelle EDID-Zustand.</value>
+  </data>
+  <data name="Wizard_Step1_ResultHeading" xml:space="preserve">
+    <value>Ergebnis</value>
+  </data>
+  <data name="Wizard_Step1_AdminRights" xml:space="preserve">
+    <value>Administratorrechte:</value>
+  </data>
+  <data name="Wizard_Step1_ServiceReachable" xml:space="preserve">
+    <value>Hintergrunddienst erreichbar:</value>
+  </data>
+  <data name="Wizard_Step1_MonitorsDetected" xml:space="preserve">
+    <value>Erkannte Monitore:</value>
+  </data>
+  <data name="Wizard_Step1_DigitizersDetected" xml:space="preserve">
+    <value>Erkannte Digitizer:</value>
+  </data>
+  <data name="Wizard_Step1_MonitorsHeading" xml:space="preserve">
+    <value>Erkannte Monitore</value>
+  </data>
+  <data name="Wizard_Step1_DigitizersHeading" xml:space="preserve">
+    <value>Erkannte Digitizer</value>
+  </data>
+  <data name="Wizard_Step1_Run" xml:space="preserve">
+    <value>Systemprüfung ausführen</value>
+  </data>
+  <data name="Wizard_Step1_Checking" xml:space="preserve">
+    <value>Prüfe Rechte, Dienst und Hardware …</value>
+  </data>
+  <data name="Wizard_Step1_NotYetChecked" xml:space="preserve">
+    <value>Noch nicht geprüft.</value>
+  </data>
+  <data name="Wizard_Step1_NoMonitors" xml:space="preserve">
+    <value>Keine Monitore erkannt. Bitte Verkabelung und Extender-Stromversorgung prüfen.</value>
+  </data>
+  <data name="Wizard_Step1_ServiceNotResponding" xml:space="preserve">
+    <value>Der Hintergrunddienst antwortet nicht. Läuft TouchMappingAgent?</value>
+  </data>
+  <data name="Wizard_Step1_Failed" xml:space="preserve">
+    <value>Die Systemprüfung ist fehlgeschlagen. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Wizard_Step1_ServiceUnreachableStatus" xml:space="preserve">
+    <value>Dienst nicht erreichbar — EDID-Status unbekannt.</value>
+  </data>
+  <data name="Wizard_Step1_ExtenderDetected" xml:space="preserve">
+    <value>Extender/keine EDID an {0} Anschluss/Anschlüssen.</value>
+  </data>
+  <data name="Wizard_Step1_CollisionDetected" xml:space="preserve">
+    <value>Kollision erkannt: {0} Monitor(e) melden dieselbe Identität.</value>
+  </data>
+  <data name="Wizard_Step1_Clean" xml:space="preserve">
+    <value>System sauber — keine EDID-Kollisionen.</value>
+  </data>
+  <data name="Wizard_Step1_Summary" xml:space="preserve">
+    <value>{0} Monitor(e), {1} Digitizer. {2}</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 2 ===== -->
+  <data name="Wizard_Step2_Intro" xml:space="preserve">
+    <value>Baugleiche Monitore melden dieselbe EDID-Identität. Damit Windows und alle weitere Software sie unterscheiden können, erhält jeder Anschluss eine eindeutige Seriennummer. Der Schreibvorgang läuft im Hintergrunddienst (SYSTEM) — es erscheint keine UAC-Abfrage.</value>
+  </data>
+  <data name="Wizard_Step2_OptionATitle" xml:space="preserve">
+    <value>a) Automatische Behebung</value>
+  </data>
+  <data name="Wizard_Step2_OptionADesc" xml:space="preserve">
+    <value>Nutzt die vom Monitor gemeldete EDID als Basis und injiziert eindeutige Seriennummern. Richtig, solange die Anschlüsse eine EDID liefern.</value>
+  </data>
+  <data name="Wizard_Step2_OptionBTitle" xml:space="preserve">
+    <value>b) Vorlagen-Behebung (Extender-Strecken)</value>
+  </data>
+  <data name="Wizard_Step2_OptionBDesc" xml:space="preserve">
+    <value>Spielt ein bekanntes EDID-Template ein. Nötig, wenn ein Extender kein oder nur ein defektes DDC-Signal durchreicht. Ohne eigene Datei wird DM7000_Native.bin verwendet.</value>
+  </data>
+  <data name="Wizard_Step2_PickTemplate" xml:space="preserve">
+    <value>Eigene Vorlage wählen (.bin / .hex / .inf) …</value>
+  </data>
+  <data name="Wizard_Step2_SelectedFile" xml:space="preserve">
+    <value>Gewählt: {0}</value>
+  </data>
+  <data name="Wizard_Step2_Apply" xml:space="preserve">
+    <value>EDID-Overrides schreiben und PnP-Reset ausführen</value>
+  </data>
+  <data name="Wizard_Step2_Skipped" xml:space="preserve">
+    <value>Übersprungen — die Identitäten sind bereits eindeutig.</value>
+  </data>
+  <data name="Wizard_Step2_WritingSerials" xml:space="preserve">
+    <value>Schreibe eindeutige Seriennummern …</value>
+  </data>
+  <data name="Wizard_Step2_ApplyingToPort" xml:space="preserve">
+    <value>Wende Vorlage auf {0} an ({1}) …</value>
+  </data>
+  <data name="Wizard_Step2_RecordTitle" xml:space="preserve">
+    <value>EDID-Strategie</value>
+  </data>
+  <data name="Wizard_Step2_RecordTitleAutomatic" xml:space="preserve">
+    <value>EDID-Strategie (automatisch)</value>
+  </data>
+  <data name="Wizard_Step2_RecordTitleTemplate" xml:space="preserve">
+    <value>EDID-Strategie (Vorlage)</value>
+  </data>
+  <data name="Wizard_Step2_NoPnpTarget" xml:space="preserve">
+    <value>Kein Anschluss mit auswertbarer PnP-Kennung gefunden.</value>
+  </data>
+  <data name="Wizard_Step2_OperationFailed" xml:space="preserve">
+    <value>Der Vorgang ist fehlgeschlagen. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateAppliedAll" xml:space="preserve">
+    <value>Vorlage auf {0} Anschluss/Anschlüsse angewendet.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateAppliedPartial" xml:space="preserve">
+    <value>{0} erfolgreich, {1} fehlgeschlagen: {2}</value>
+  </data>
+  <data name="Wizard_Step2_InfNoValidEdid" xml:space="preserve">
+    <value>Die INF enthält keine EDID mit gültiger Prüfsumme.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateInvalid" xml:space="preserve">
+    <value>Die Vorlage ist ungültig (Header, Blockgröße oder Prüfsumme). Ein Grafiktreiber würde sie verwerfen.</value>
+  </data>
+  <data name="Wizard_Step2_TemplateReadFailed" xml:space="preserve">
+    <value>Die Vorlage konnte nicht gelesen werden.</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 3 ===== -->
+  <data name="Wizard_Step3_Intro" xml:space="preserve">
+    <value>Jetzt wird erneut gemessen. Erfolgskriterium: Windows meldet für jeden Monitor einen eigenen PnP-Pfad, und es bleiben null doppelte Display-Identitäten.</value>
+  </data>
+  <data name="Wizard_Step3_RemainingCollisions" xml:space="preserve">
+    <value>Verbleibende Kollisionen:</value>
+  </data>
+  <data name="Wizard_Step3_RequiredZero" xml:space="preserve">
+    <value>(erforderlich: 0)</value>
+  </data>
+  <data name="Wizard_Step3_Verify" xml:space="preserve">
+    <value>Erneut messen und verifizieren</value>
+  </data>
+  <data name="Wizard_Step3_NotYetChecked" xml:space="preserve">
+    <value>Noch nicht geprüft.</value>
+  </data>
+  <data name="Wizard_Step3_Measuring" xml:space="preserve">
+    <value>Messe erneut …</value>
+  </data>
+  <data name="Wizard_Step3_Passed" xml:space="preserve">
+    <value>Erfolg: {0} Monitor(e) mit eindeutigen PnP-Pfaden, 0 Kollisionen.</value>
+  </data>
+  <data name="Wizard_Step3_StillColliding" xml:space="preserve">
+    <value>Noch {0} kollidierende Identität(en). Schritt 2 wiederholen.</value>
+  </data>
+  <data name="Wizard_Step3_PartialAnchors" xml:space="preserve">
+    <value>{0} Monitor(e), aber nur {1} eindeutige PnP-Pfade.</value>
+  </data>
+  <data name="Wizard_Step3_Failed" xml:space="preserve">
+    <value>Die Verifizierung ist fehlgeschlagen — Dienst erreichbar?</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 4 ===== -->
+  <data name="Wizard_Step4_Intro" xml:space="preserve">
+    <value>Auf jedem Bildschirm erscheint nacheinander ein Vollbild-Zielfenster. Berühren Sie jeweils genau den Bildschirm, auf dem das Fenster erscheint. Der Assistent erkennt am Roh-Eingabesignal, welcher Digitizer die Berührung gesendet hat, und verknüpft ihn dauerhaft mit dem Anschluss dieses Monitors.</value>
+  </data>
+  <data name="Wizard_Step4_LearnedHeading" xml:space="preserve">
+    <value>Angelernte Zuordnungen</value>
+  </data>
+  <data name="Wizard_Step4_Run" xml:space="preserve">
+    <value>Zuordnung anlernen (Bildschirme nacheinander berühren)</value>
+  </data>
+  <data name="Wizard_Step4_Failed" xml:space="preserve">
+    <value>Das Anlernen ist fehlgeschlagen. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Wizard_Step4_TouchPrompt" xml:space="preserve">
+    <value>Bitte {0} berühren …</value>
+  </data>
+  <data name="Wizard_Step4_Cancelled" xml:space="preserve">
+    <value>{0}: abgebrochen, keine Berührung.</value>
+  </data>
+  <data name="Wizard_Step4_Unmatched" xml:space="preserve">
+    <value>{0}: berührtes Gerät nicht zuzuordnen.</value>
+  </data>
+  <data name="Wizard_Step4_UnstableAnchor" xml:space="preserve">
+    <value>{0}: {1} liefert keinen stabilen Anker.</value>
+  </data>
+  <data name="Wizard_Step4_DuplicateDigitizer" xml:space="preserve">
+    <value>{0}: derselbe Digitizer wie zuvor — bitte den richtigen Bildschirm berühren.</value>
+  </data>
+  <data name="Wizard_Step4_SaveFailed" xml:space="preserve">
+    <value>{0}: Speichern fehlgeschlagen.</value>
+  </data>
+  <data name="Wizard_Step4_LearnedEntry" xml:space="preserve">
+    <value>{0} ← {1}</value>
+  </data>
+  <data name="Wizard_Step4_AllLearned" xml:space="preserve">
+    <value>{0} Zuordnung(en) angelernt.</value>
+  </data>
+  <data name="Wizard_Step4_PartialLearned" xml:space="preserve">
+    <value>{0} von {1} Zuordnung(en) angelernt — bitte wiederholen.</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 5 ===== -->
+  <data name="Wizard_Step5_IntroBeforeBold" xml:space="preserve">
+    <value>Die Zuordnung wird jetzt über tabcal.exe im Windows-Touch-Stack aktiviert.</value>
+  </data>
+  <data name="Wizard_Step5_BoldPhrase" xml:space="preserve">
+    <value>Hierfür sind Administratorrechte erforderlich.</value>
+  </data>
+  <data name="Wizard_Step5_IntroAfterBold" xml:space="preserve">
+    <value>tabcal schreibt nach HKLM\SOFTWARE\Microsoft\Wisp\Touch, wofür normale Benutzer nur Lesezugriff haben. Der Hintergrunddienst kann es nicht übernehmen: die Kalibrierung braucht die interaktive Sitzung, die Session 0 nicht ist.</value>
+  </data>
+  <data name="Wizard_Step5_Run" xml:space="preserve">
+    <value>Kalibrierung ausführen und Sichtprüfung starten</value>
+  </data>
+  <data name="Wizard_Step5_NotYetRun" xml:space="preserve">
+    <value>Noch nicht ausgeführt.</value>
+  </data>
+  <data name="Wizard_Step5_ElevationRequired" xml:space="preserve">
+    <value>Für die Kalibrierung sind Administratorrechte erforderlich (tabcal.exe schreibt nach HKLM\SOFTWARE\Microsoft\Wisp\Touch).</value>
+  </data>
+  <data name="Wizard_Step5_ElevationConfirmSuffix" xml:space="preserve">
+    <value>
+
+Assistenten jetzt mit erhöhten Rechten neu starten?</value>
+  </data>
+  <data name="Wizard_Step5_ElevationConfirmTitle" xml:space="preserve">
+    <value>Administratorrechte erforderlich</value>
+  </data>
+  <data name="Wizard_Step5_NothingPending" xml:space="preserve">
+    <value>Der Dienst meldet keine anzuwendende Zuordnung.</value>
+  </data>
+  <data name="Wizard_Step5_CalibratingItem" xml:space="preserve">
+    <value>Kalibriere {0} [{1}] …</value>
+  </data>
+  <data name="Wizard_Step5_ResultCount" xml:space="preserve">
+    <value>{0} von {1} Kalibrierung(en) erfolgreich.</value>
+  </data>
+  <data name="Wizard_Step5_VisualCheckIntro" xml:space="preserve">
+    <value>Bitte auf beiden Bildschirmen mit dem Finger prüfen.</value>
+  </data>
+  <data name="Wizard_Step5_VisualCheckQuestion" xml:space="preserve">
+    <value>Folgt der Zeiger auf allen Displays korrekt dem Finger?</value>
+  </data>
+  <data name="Wizard_Step5_VisualCheckTitle" xml:space="preserve">
+    <value>Sichtprüfung</value>
+  </data>
+  <data name="Wizard_Step5_ConfirmedSuffix" xml:space="preserve">
+    <value> Sichtprüfung bestätigt.</value>
+  </data>
+  <data name="Wizard_Step5_NotConfirmedSuffix" xml:space="preserve">
+    <value> Sichtprüfung NICHT bestätigt — Zuordnung prüfen.</value>
+  </data>
+  <data name="Wizard_Step5_RecordTitle" xml:space="preserve">
+    <value>Kalibrierung</value>
+  </data>
+  <data name="Wizard_Step5_Failed" xml:space="preserve">
+    <value>Der Kalibrierungstest ist fehlgeschlagen. Details im Diagnose-Log.</value>
+  </data>
+
+  <!-- ===== Setup wizard: step 6 ===== -->
+  <data name="Wizard_Step6_VerdictSuccess" xml:space="preserve">
+    <value>Inbetriebnahme abgeschlossen. Alle Prüfungen bestanden.</value>
+  </data>
+  <data name="Wizard_Step6_VerdictPartial" xml:space="preserve">
+    <value>Inbetriebnahme mit Einschränkungen. Bitte die markierten Schritte prüfen.</value>
+  </data>
+  <data name="Wizard_Step6_StepWord" xml:space="preserve">
+    <value>Schritt</value>
+  </data>
+  <data name="Wizard_Step6_ExportReport" xml:space="preserve">
+    <value>Inbetriebnahmeprotokoll exportieren (setup-report.json)</value>
+  </data>
+  <data name="Wizard_Step6_Close" xml:space="preserve">
+    <value>Assistent schließen</value>
+  </data>
+  <data name="Wizard_Step6_SavedPath" xml:space="preserve">
+    <value>Gespeichert: {0}</value>
+  </data>
+  <data name="Wizard_Step6_SavedToStatus" xml:space="preserve">
+    <value>Protokoll gespeichert: {0}</value>
+  </data>
+  <data name="Wizard_Step6_ExportFailed" xml:space="preserve">
+    <value>Das Protokoll konnte nicht geschrieben werden.</value>
+  </data>
+
+  <!-- ===== EDID & Display manager: chrome ===== -->
+  <data name="EdidUi_Title" xml:space="preserve">
+    <value>EDID &amp; Display-Manager</value>
+  </data>
+  <data name="EdidUi_Refresh" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="EdidUi_LegendHeading" xml:space="preserve">
+    <value>Status-Bedeutung:</value>
+  </data>
+  <data name="EdidUi_LegendValid" xml:space="preserve">
+    <value>Gültig</value>
+  </data>
+  <data name="EdidUi_LegendValidDesc" xml:space="preserve">
+    <value> — der Monitor liefert eine EDID mit korrekter Prüfsumme.</value>
+  </data>
+  <data name="EdidUi_LegendCollision" xml:space="preserve">
+    <value>Kollision</value>
+  </data>
+  <data name="EdidUi_LegendCollisionDesc" xml:space="preserve">
+    <value> — ein anderer Monitor meldet dieselbe Identität; über die EDID nicht unterscheidbar.</value>
+  </data>
+  <data name="EdidUi_StatusNoEdid" xml:space="preserve">
+    <value>Keine EDID</value>
+  </data>
+  <data name="EdidUi_LegendExtender" xml:space="preserve">
+    <value>Extender (keine EDID)</value>
+  </data>
+  <data name="EdidUi_LegendExtenderDesc" xml:space="preserve">
+    <value> — der Anschluss zeigt ein Bild, liefert aber keine EDID. Typisch für KVM-/HDBaseT-Strecken, die DDC nicht durchreichen. Hier hilft eine Vorlage oder eine synthetische EDID.</value>
+  </data>
+  <data name="EdidUi_LegendOverride" xml:space="preserve">
+    <value>Override aktiv</value>
+  </data>
+  <data name="EdidUi_LegendOverrideDesc" xml:space="preserve">
+    <value> — Windows meldet eine von diesem Agenten hinterlegte EDID statt der Hardware-EDID.</value>
+  </data>
+  <data name="EdidUi_ColConnector" xml:space="preserve">
+    <value>Anschluss</value>
+  </data>
+  <data name="EdidUi_ColMonitor" xml:space="preserve">
+    <value>Monitor</value>
+  </data>
+  <data name="EdidUi_ColMode" xml:space="preserve">
+    <value>Modus</value>
+  </data>
+  <data name="EdidUi_ColSerial" xml:space="preserve">
+    <value>Seriennummer</value>
+  </data>
+  <data name="EdidUi_ColStatus" xml:space="preserve">
+    <value>EDID-Status</value>
+  </data>
+  <data name="EdidUi_ColPnpId" xml:space="preserve">
+    <value>PnP-ID</value>
+  </data>
+  <data name="EdidUi_ApplyTemplateHeading" xml:space="preserve">
+    <value>EDID-Vorlage anwenden</value>
+  </data>
+  <data name="EdidUi_TemplateLabel" xml:space="preserve">
+    <value>Vorlage</value>
+  </data>
+  <data name="EdidUi_DroppedFile" xml:space="preserve">
+    <value>Abgelegte Datei: {0}</value>
+  </data>
+  <data name="EdidUi_BrowseFile" xml:space="preserve">
+    <value>Datei wählen …</value>
+  </data>
+  <data name="EdidUi_SerialLabel" xml:space="preserve">
+    <value>Seriennummer (z. B. 880-A)</value>
+  </data>
+  <data name="EdidUi_ApplyTemplate" xml:space="preserve">
+    <value>Vorlage auf Anschluss anwenden</value>
+  </data>
+  <data name="EdidUi_Synthesize" xml:space="preserve">
+    <value>Synthetisches EDID aus aktuellem Signal erzeugen</value>
+  </data>
+  <data name="EdidUi_ClearFile" xml:space="preserve">
+    <value>Dateiauswahl zurücksetzen</value>
+  </data>
+  <data name="EdidUi_ResolveCollisions" xml:space="preserve">
+    <value>Kollisionen automatisch beheben</value>
+  </data>
+  <data name="EdidUi_PreviewDryRun" xml:space="preserve">
+    <value>Vorschau (Trockenlauf)</value>
+  </data>
+  <data name="EdidUi_RestoreSelected" xml:space="preserve">
+    <value>Override des Anschlusses entfernen</value>
+  </data>
+  <data name="EdidUi_RestoreAll" xml:space="preserve">
+    <value>Alle Overrides zurücksetzen</value>
+  </data>
+
+  <!-- ===== EDID & Display manager: view-model status text ===== -->
+  <data name="EdidUi_CollisionSummaryFull" xml:space="preserve">
+    <value>{0} Monitor(e) sind über die EDID nicht unterscheidbar.</value>
+  </data>
+  <data name="EdidUi_CollisionSummaryNumericOnly" xml:space="preserve">
+    <value>{0} Gruppe(n) teilen die numerische Seriennummer, sind aber über den Text-Descriptor unterscheidbar — kein Eingriff nötig.</value>
+  </data>
+  <data name="EdidUi_CollisionSummaryNone" xml:space="preserve">
+    <value>Keine Seriennummern-Kollisionen.</value>
+  </data>
+  <data name="EdidUi_StatusSummary" xml:space="preserve">
+    <value>{0} Anschluss/Anschlüsse, {1} Vorlage(n).</value>
+  </data>
+  <data name="EdidUi_LoadingRunning" xml:space="preserve">
+    <value>Lade Displays und Vorlagen …</value>
+  </data>
+  <data name="EdidUi_ServiceUnreachable" xml:space="preserve">
+    <value>Dienst nicht erreichbar. Läuft TouchMappingAgent?</value>
+  </data>
+  <data name="EdidUi_ResolvingRunning" xml:space="preserve">
+    <value>Kollisionen werden behoben …</value>
+  </data>
+  <data name="EdidUi_PreviewRunning" xml:space="preserve">
+    <value>Trockenlauf …</value>
+  </data>
+  <data name="EdidUi_RestoringAllRunning" xml:space="preserve">
+    <value>Overrides werden entfernt …</value>
+  </data>
+  <data name="EdidUi_SelectPortFirst" xml:space="preserve">
+    <value>Bitte zuerst einen Anschluss auswählen.</value>
+  </data>
+  <data name="EdidUi_RestoringSelectedRunning" xml:space="preserve">
+    <value>Override für {0} wird entfernt …</value>
+  </data>
+  <data name="EdidUi_ApplyingTemplateRunning" xml:space="preserve">
+    <value>Vorlage wird auf {0} angewendet …</value>
+  </data>
+  <data name="EdidUi_NoActiveMode" xml:space="preserve">
+    <value>Für diesen Anschluss ist kein aktiver Displaymodus bekannt — ohne ihn lässt sich keine EDID synthetisieren.</value>
+  </data>
+  <data name="EdidUi_SynthesizingRunning" xml:space="preserve">
+    <value>Synthetische EDID für {0} wird erzeugt …</value>
+  </data>
+  <data name="EdidUi_SelectTemplateOrFile" xml:space="preserve">
+    <value>Bitte eine Vorlage auswählen oder eine Datei ablegen.</value>
+  </data>
+  <data name="EdidUi_BuiltinTemplatePending" xml:space="preserve">
+    <value>Die eingebaute Vorlage liegt noch nicht als Datei vor. Bitte 'Aktualisieren' drücken — der Dienst legt sie dann an.</value>
+  </data>
+  <data name="EdidUi_NoEdidInFile" xml:space="preserve">
+    <value>In {0} wurde keine EDID gefunden.</value>
+  </data>
+  <data name="EdidUi_InfAllChecksumsInvalid" xml:space="preserve">
+    <value>{0} enthält nur EDIDs mit ungültiger Prüfsumme. Ein Treiber würde sie verwerfen.</value>
+  </data>
+  <data name="EdidUi_InfMultipleEntries" xml:space="preserve">
+    <value>{0} enthält {1} EDIDs; verwende Sektion [{2}].</value>
+  </data>
+  <data name="EdidUi_FileNotValidEdid" xml:space="preserve">
+    <value>{0} ist keine gültige EDID (Header, Blockgröße oder Prüfsumme). Details im Diagnose-Log.</value>
+  </data>
+  <data name="EdidUi_FileReadFailed" xml:space="preserve">
+    <value>{0} konnte nicht gelesen werden.</value>
+  </data>
+  <data name="EdidUi_FileAccepted" xml:space="preserve">
+    <value>Datei übernommen: {0}. Anschluss wählen und anwenden.</value>
+  </data>
+  <data name="EdidUi_FileSelectionCleared" xml:space="preserve">
+    <value>Dateiauswahl zurückgesetzt.</value>
+  </data>
+  <data name="EdidUi_PickTemplateTitle" xml:space="preserve">
+    <value>EDID-Vorlage wählen</value>
+  </data>
+  <data name="EdidUi_PickTemplateFilter" xml:space="preserve">
+    <value>EDID-Dateien (*.bin;*.hex;*.dat;*.edid;*.inf)|*.bin;*.hex;*.dat;*.edid;*.inf|Binär (*.bin;*.dat;*.edid)|*.bin;*.dat;*.edid|Hex-Text (*.hex)|*.hex|Monitortreiber (*.inf)|*.inf|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="EdidUi_OperationFailed" xml:space="preserve">
+    <value>Dienst nicht erreichbar oder Vorgang fehlgeschlagen.</value>
+  </data>
+
+  <!-- ===== Help window ===== -->
+  <data name="Help_WindowTitle" xml:space="preserve">
+    <value>Hilfe &amp; Handbuch</value>
+  </data>
+  <data name="Help_HeaderTitle" xml:space="preserve">
+    <value>MultiTouch Agent — Handbuch</value>
+  </data>
+  <data name="Help_HeaderSubtitle" xml:space="preserve">
+    <value>Touch-Zuordnung, EDID-Kollisionen und Range-Extender</value>
+  </data>
+  <data name="Help_S1_Heading" xml:space="preserve">
+    <value>1. Warum es diesen Agenten gibt</value>
+  </data>
+  <data name="Help_S1_Body" xml:space="preserve">
+    <value>Windows kann einen Touch-Digitizer nicht dauerhaft einem bestimmten Monitor zuordnen, wenn mehrere baugleiche Monitore angeschlossen sind. Auf dieser Anlage melden beide DM7000 dieselbe EDID inklusive derselben Seriennummer, und beide PM1715-Digitizer liefern keinen physischen Ortspfad. Dem Betriebssystem fehlt damit jedes Kriterium, links von rechts zu unterscheiden — nach einem Neustart oder einem DisplayPort-Ereignis können die Zuordnungen vertauscht sein.
+
+Der Agent liefert das fehlende Kriterium: eine einmal angelernte Zuordnung, verankert am USB-Port des Digitizers und am Grafik-Anschluss des Monitors — beides physische Merkmale, die einen Neustart überstehen.</value>
+  </data>
+  <data name="Help_S2_Heading" xml:space="preserve">
+    <value>2. Touch-Zuordnung anlernen</value>
+  </data>
+  <data name="Help_S2_Step1Label" xml:space="preserve">
+    <value>Schritt 1:</value>
+  </data>
+  <data name="Help_S2_Step1Text" xml:space="preserve">
+    <value> Hauptfenster öffnen (Doppelklick auf das Tray-Symbol).</value>
+  </data>
+  <data name="Help_S2_Step2Label" xml:space="preserve">
+    <value>Schritt 2:</value>
+  </data>
+  <data name="Help_S2_Step2Text" xml:space="preserve">
+    <value> In der Monitor-Liste den Bildschirm auswählen, der angelernt werden soll. Die Liste zeigt Anschluss und Position, weil beide Panels denselben Namen tragen.</value>
+  </data>
+  <data name="Help_S2_Step3Label" xml:space="preserve">
+    <value>Schritt 3:</value>
+  </data>
+  <data name="Help_S2_Step3Text" xml:space="preserve">
+    <value> „Bildschirm anlernen (Berührung)" drücken. Auf dem gewählten Bildschirm erscheint ein Vollbildfenster.</value>
+  </data>
+  <data name="Help_S2_Step4Label" xml:space="preserve">
+    <value>Schritt 4:</value>
+  </data>
+  <data name="Help_S2_Step4Text" xml:space="preserve">
+    <value> Diesen Bildschirm berühren. Der Agent erkennt anhand des Roh-Eingabesignals, welcher Digitizer die Berührung gesendet hat, und verknüpft ihn dauerhaft mit dem Anschluss dieses Monitors.</value>
+  </data>
+  <data name="Help_S2_Closing" xml:space="preserve">
+    <value>Danach genügt ein Durchgang pro Bildschirm. Der Agent stellt die Zuordnung nach jedem Neustart und jedem DisplayPort-Ereignis selbsttätig wieder her.</value>
+  </data>
+  <data name="Help_S3_Heading" xml:space="preserve">
+    <value>3. EDID-Kollisionen</value>
+  </data>
+  <data name="Help_S3_Body1" xml:space="preserve">
+    <value>Die Touch-Zuordnung selbst braucht das nicht — sie verwendet den PnP-Gerätepfad, der ohnehin eindeutig ist. Eine EDID-Kollision stört aber jede</value>
+  </data>
+  <data name="Help_S3_BoldOther" xml:space="preserve">
+    <value> andere</value>
+  </data>
+  <data name="Help_S3_Body2" xml:space="preserve">
+    <value> Software auf der Maschine, die Bildschirme über die Seriennummer identifiziert.</value>
+  </data>
+  <data name="Help_S3_Body3" xml:space="preserve">
+    <value>Im EDID-Manager zeigt die Spalte „EDID-Status" den Befund. „Kollision" bedeutet: ein anderer Monitor meldet exakt dieselbe Identität. „Kollisionen automatisch beheben" vergibt dann pro Gerät eine eindeutige Seriennummer und hinterlegt sie als Windows-EDID-Override.</value>
+  </data>
+  <data name="Help_S3_ImportantLabel" xml:space="preserve">
+    <value>Wichtig:</value>
+  </data>
+  <data name="Help_S3_Body4" xml:space="preserve">
+    <value> Teilen sich zwei Monitore nur die numerische Seriennummer, unterscheiden sich aber im Text-Descriptor, greift der Agent bewusst nicht ein — sie sind unterscheidbar. Der Wert 0x01010101 ist ein verbreiteter Platzhalter für „Seriennummer nicht programmiert"; solche Panels umzuschreiben brächte nichts und veränderte Firmware-Daten ohne Not.</value>
+  </data>
+  <data name="Help_S4_Heading" xml:space="preserve">
+    <value>4. Range-Extender (KVM / HDBaseT)</value>
+  </data>
+  <data name="Help_S4_Body1" xml:space="preserve">
+    <value>Extender reichen DDC häufig nicht durch. Zwei Symptome:</value>
+  </data>
+  <data name="Help_S4_LabelA" xml:space="preserve">
+    <value>a) Generische EDID.</value>
+  </data>
+  <data name="Help_S4_TextA" xml:space="preserve">
+    <value> Die Sendeeinheit antwortet mit einem fest eingebrannten Block des Extender-Herstellers statt mit der EDID des Panels. Sind beide Extender baugleich, sieht der Grafiktreiber zweimal denselben Fingerabdruck — das ist die Ursache der Kollision auf dieser Anlage.</value>
+  </data>
+  <data name="Help_S4_LabelB" xml:space="preserve">
+    <value>b) Gar keine EDID.</value>
+  </data>
+  <data name="Help_S4_TextB" xml:space="preserve">
+    <value> Der Anschluss zeigt ein Bild, meldet aber keine EDID. Im Manager erscheint „Extender (keine EDID)".</value>
+  </data>
+  <data name="Help_S4_SolutionOrderLabel" xml:space="preserve">
+    <value>Lösungsreihenfolge:</value>
+  </data>
+  <data name="Help_S4_SolutionSteps" xml:space="preserve">
+    <value>1. Eine EDID-Vorlage des Panelherstellers einspielen (.bin, .hex oder .inf). Die mitgelieferte Vorlage DM7000_Native.bin enthält die real ausgelesene EDID des DM7000.
+2. Liegt keine Vorlage vor: „Synthetisches EDID aus aktuellem Signal erzeugen". Der Agent baut daraus einen normgerechten Block.</value>
+  </data>
+  <data name="Help_S4_SyntheticLabel" xml:space="preserve">
+    <value>Zur synthetischen EDID:</value>
+  </data>
+  <data name="Help_S4_SyntheticText" xml:space="preserve">
+    <value> Sie ist ein Notbehelf. Sie beschreibt den Modus, den Windows gerade fährt, enthält aber keine herstellerspezifischen Timings und keine am Panel gemessenen Farbwerte. Farbwiedergabe und DPI-Skalierung bleiben Näherungen, und weitere Modi des Panels sind für Windows unsichtbar. Wo eine echte EDID oder ein Herstellertreiber existiert, ist beides die bessere Quelle.</value>
+  </data>
+  <data name="Help_S4_HandshakeLabel" xml:space="preserve">
+    <value>Hinweis zum Handshake:</value>
+  </data>
+  <data name="Help_S4_HandshakeText" xml:space="preserve">
+    <value> Bleiben die Bildschirme nach einem Neustart schwarz („kein Signal") und funktionieren erst nach einem Strom-Aus/Ein am Extender, ist die Hot-Plug-Detect-Kette beim Booten unterbrochen. Ein EDID-Override hilft hier nur bedingt — abhelfen können aktive DP-auf-HDMI-Adapter, ein EDID-Emulator direkt am Grafikausgang oder eine Stromversorgung, bei der die Extender vor dem Server hochlaufen.</value>
+  </data>
+  <data name="Help_S5_Heading" xml:space="preserve">
+    <value>5. Wichtig: Agent muss laufen</value>
+  </data>
+  <data name="Help_S5_Body1" xml:space="preserve">
+    <value>Der Dienst entscheidet, welche Zuordnung wiederhergestellt werden muss, kann das aber nicht selbst ausführen: er läuft in Session 0 und sieht weder den Desktop noch kann er tabcal.exe starten. Nur der Tray-Agent in der Benutzersitzung kann das.</value>
+  </data>
+  <data name="Help_S5_Body2" xml:space="preserve">
+    <value>Wird der Agent über „Beenden" geschlossen, bleibt die Zuordnung nach dem nächsten Neustart aus. Das Schließen über das „X" beendet ihn nicht — er läuft im Infobereich weiter.</value>
+  </data>
+  <data name="Help_S6_Heading" xml:space="preserve">
+    <value>6. Bei Problemen</value>
+  </data>
+  <data name="Help_S6_Body1" xml:space="preserve">
+    <value>„Diagnose-Log exportieren" im Tray-Menü schreibt die Protokolle von Dienst und Client sowie eine Momentaufnahme der erkannten Hardware in eine Datei.</value>
+  </data>
+  <data name="Help_S6_LogsLabel" xml:space="preserve">
+    <value>Protokolle liegen unter:</value>
+  </data>
+  <data name="Help_S6_TemplatesLabel" xml:space="preserve">
+    <value>EDID-Vorlagen liegen unter:</value>
+  </data>
+  <data name="Help_Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+
+  <!-- ===== Diagnostics log window ===== -->
+  <data name="Log_WindowTitle" xml:space="preserve">
+    <value>MultiTouch Agent - Diagnose-Log</value>
+  </data>
+  <data name="Log_Clear" xml:space="preserve">
+    <value>Leeren</value>
+  </data>
+  <data name="Log_Copy" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+
+  <!-- ===== Tray menu, dialogs, About ===== -->
+  <data name="Tray_OpenConfig" xml:space="preserve">
+    <value>Konfiguration öffnen</value>
+  </data>
+  <data name="Tray_CheckStatus" xml:space="preserve">
+    <value>Dienst-Status prüfen</value>
+  </data>
+  <data name="Tray_Wizard" xml:space="preserve">
+    <value>Einrichtungs-Assistent...</value>
+  </data>
+  <data name="Tray_EdidManager" xml:space="preserve">
+    <value>EDID &amp; Display-Manager...</value>
+  </data>
+  <data name="Tray_Help" xml:space="preserve">
+    <value>Hilfe &amp; Handbuch...</value>
+  </data>
+  <data name="Tray_ExportLog" xml:space="preserve">
+    <value>Diagnose-Log exportieren</value>
+  </data>
+  <data name="Tray_About" xml:space="preserve">
+    <value>Über / Info</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Beenden</value>
+  </data>
+  <data name="Tray_ExitConfirmTitle" xml:space="preserve">
+    <value>TouchMappingAgent beenden?</value>
+  </data>
+  <data name="Tray_ExitWarning" xml:space="preserve">
+    <value>WICHTIGER HINWEIS:
+Windows unterstützt systembedingt keine dauerhafte Zuordnung von Touch-Digitizern zu baugleichen Monitoren.
+
+Wenn Sie diesen Agenten beenden, kann das System die Zuordnung bei Neustarts oder DisplayPort-Events nicht mehr aufrechterhalten (Touch-Eingaben landen auf dem falschen Bildschirm).
+
+Möchten Sie den Agenten wirklich beenden?</value>
+  </data>
+  <data name="Tray_CheckingStatus" xml:space="preserve">
+    <value>Status wird geprüft...</value>
+  </data>
+  <data name="Tray_EdidManagerOpenFailed" xml:space="preserve">
+    <value>Der EDID-Manager konnte nicht geöffnet werden. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Tray_WizardOpenFailed" xml:space="preserve">
+    <value>Der Einrichtungs-Assistent konnte nicht geöffnet werden. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Tray_ExportDialogTitle" xml:space="preserve">
+    <value>Diagnose-Log exportieren</value>
+  </data>
+  <data name="Tray_ExportDialogFilter" xml:space="preserve">
+    <value>Protokolldatei (*.log)|*.log|Textdatei (*.txt)|*.txt|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="Tray_ExportSucceeded" xml:space="preserve">
+    <value>Diagnosebericht gespeichert:
+{0}</value>
+  </data>
+  <data name="Tray_ExportFailed" xml:space="preserve">
+    <value>Der Diagnosebericht konnte nicht geschrieben werden. Details im Diagnose-Log.</value>
+  </data>
+  <data name="Tray_Caption" xml:space="preserve">
+    <value>MultiTouch Agent</value>
+  </data>
+  <data name="Tray_AboutBody" xml:space="preserve">
+    <value>MultiTouch Agent
+Multimonitor · Local · Direct
+
+© 2026 PadaLuma Ink-Jet Solutions GmbH.
+Alle Rechte vorbehalten.
+
+Entwickelt von Erik Denzler</value>
+  </data>
+
+  <!-- ===== App-level dialogs ===== -->
+  <data name="App_UnhandledExceptionCaption" xml:space="preserve">
+    <value>TouchMappingAgent</value>
+  </data>
+  <data name="App_UnhandledExceptionBody" xml:space="preserve">
+    <value>Ein unerwarteter Fehler ist aufgetreten:
+
+{0}
+
+Die Anwendung läuft weiter. Details stehen im Diagnose-Log.</value>
+  </data>
+
+  <!-- ===== Setup interaction service: dialogs and file pickers ===== -->
+  <data name="Interaction_PickTemplateTitle" xml:space="preserve">
+    <value>EDID-Vorlage wählen</value>
+  </data>
+  <data name="Interaction_PickTemplateFilter" xml:space="preserve">
+    <value>EDID-Dateien (*.bin;*.hex;*.dat;*.edid;*.inf)|*.bin;*.hex;*.dat;*.edid;*.inf|Monitortreiber (*.inf)|*.inf|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="Interaction_SaveReportTitle" xml:space="preserve">
+    <value>Inbetriebnahmeprotokoll speichern</value>
+  </data>
+  <data name="Interaction_SaveReportFilter" xml:space="preserve">
+    <value>JSON-Protokoll (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
+  </data>
+</root>

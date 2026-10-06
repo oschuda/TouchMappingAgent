@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net9.0-windows (not plain net9.0): DisplayEnumerator uses Win32 P/Invoke (user32.dll)
+         and needs to be callable directly from the WPF client (see Hardware/DisplayEnumerator.cs
+         doc comment for why monitor enumeration must run client-side, not in the service). Both
+         consumers (Service, WPF) already require net9.0-windows, so this has no real downside. -->
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssemblyName>TouchMappingAgent.Shared</AssemblyName>
+    <RootNamespace>TouchMappingAgent.Shared</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- No external dependencies for shared models layer -->
+  </ItemGroup>
+
+</Project>

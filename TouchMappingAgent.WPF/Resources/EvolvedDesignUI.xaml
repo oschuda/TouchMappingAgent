@@ -1,0 +1,140 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        EvolvedDesignUI — the shared look for the agent's diagnostic windows.
+
+        Derived from the product artwork rather than invented: the deep blue ground and the
+        cyan accent are the colours of the MultiTouch Agent mark, so a dialog reads as part of
+        the same product without needing the logo on every surface.
+
+        Kept deliberately small. This is a handful of brushes and four control styles, not a
+        design system — an industrial diagnostic tool benefits far more from legible contrast
+        and generous hit targets (the operator may well be using a touch screen to fix a touch
+        problem) than from visual sophistication.
+    -->
+
+    <!-- Ground and surfaces -->
+    <SolidColorBrush x:Key="Evolved.Background" Color="#0E1B2A"/>
+    <SolidColorBrush x:Key="Evolved.Surface" Color="#152539"/>
+    <SolidColorBrush x:Key="Evolved.SurfaceAlt" Color="#1B2E46"/>
+    <SolidColorBrush x:Key="Evolved.Border" Color="#274563"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="Evolved.Foreground" Color="#EAF2FA"/>
+    <SolidColorBrush x:Key="Evolved.ForegroundMuted" Color="#9FBAD3"/>
+
+    <!-- Accent and status. The status colours match the tray badge, so "green" means the same
+         thing in the window as it does in the notification area. -->
+    <SolidColorBrush x:Key="Evolved.Accent" Color="#1E9BE8"/>
+    <SolidColorBrush x:Key="Evolved.AccentHover" Color="#3FB0F5"/>
+    <SolidColorBrush x:Key="Evolved.Ok" Color="#2EB050"/>
+    <SolidColorBrush x:Key="Evolved.Warn" Color="#E89818"/>
+    <SolidColorBrush x:Key="Evolved.Danger" Color="#D9534F"/>
+
+    <!-- Base text -->
+    <Style x:Key="Evolved.Text" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Evolved.Foreground}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <Style x:Key="Evolved.Text.Muted" TargetType="TextBlock" BasedOn="{StaticResource Evolved.Text}">
+        <Setter Property="Foreground" Value="{StaticResource Evolved.ForegroundMuted}"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style x:Key="Evolved.Text.Heading" TargetType="TextBlock" BasedOn="{StaticResource Evolved.Text}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
+
+    <Style x:Key="Evolved.Text.Title" TargetType="TextBlock" BasedOn="{StaticResource Evolved.Text}">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <!-- Buttons. Padding is generous on purpose: this tool gets used on the touch screens it
+         diagnoses, and a 24px-tall button is unusable with a finger. -->
+    <Style x:Key="Evolved.Button" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource Evolved.Foreground}"/>
+        <Setter Property="Background" Value="{StaticResource Evolved.SurfaceAlt}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="14,9"/>
+        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource Evolved.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Evolved.Button.Primary" TargetType="Button" BasedOn="{StaticResource Evolved.Button}">
+        <Setter Property="Background" Value="{StaticResource Evolved.Accent}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.AccentHover}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <!-- Destructive actions get the danger colour so "Overrides zurücksetzen" cannot be
+         mistaken for a neutral action. -->
+    <Style x:Key="Evolved.Button.Danger" TargetType="Button" BasedOn="{StaticResource Evolved.Button}">
+        <Setter Property="Background" Value="#3A2226"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.Danger}"/>
+    </Style>
+
+    <Style x:Key="Evolved.Card" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Evolved.Surface}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="14"/>
+    </Style>
+
+    <Style x:Key="Evolved.TextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource Evolved.SurfaceAlt}"/>
+        <Setter Property="Foreground" Value="{StaticResource Evolved.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,7"/>
+        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="CaretBrush" Value="{StaticResource Evolved.Foreground}"/>
+    </Style>
+
+    <Style x:Key="Evolved.ListView" TargetType="ListView">
+        <Setter Property="Background" Value="{StaticResource Evolved.SurfaceAlt}"/>
+        <Setter Property="Foreground" Value="{StaticResource Evolved.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="Evolved.GridViewColumnHeader" TargetType="GridViewColumnHeader">
+        <Setter Property="Background" Value="{StaticResource Evolved.Surface}"/>
+        <Setter Property="Foreground" Value="{StaticResource Evolved.ForegroundMuted}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Evolved.Border}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+</ResourceDictionary>

@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssemblyName>TouchMappingAgent.Service</AssemblyName>
+    <RootNamespace>TouchMappingAgent.Service</RootNamespace>
+    <!-- Windows Service: Exe output, no UI framework needed -->
+    <OutputType>Exe</OutputType>
+    <!-- The service has no UI, but its executable still shows up in Task Manager, the Services
+         console and the installer's file list — it should carry the product icon there too. -->
+    <ApplicationIcon>..\assets\touchmappingagent.ico</ApplicationIcon>
+    <!--
+      Pinned to win-x64 (framework-dependent, not self-contained) so publish produces a
+      single, unambiguous flat output directory. Without a RuntimeIdentifier, "dotnet publish"
+      produces a portable/RID-agnostic layout where Windows-specific packages like
+      System.ServiceProcess.ServiceController (needed by UseWindowsService()) ship BOTH a
+      generic lib/net9.0 stub AND the real implementation under runtimes/win/lib/net9.0 —
+      with no RID baked into runtimeconfig.json to disambiguate. installer.nsi only copies
+      publish\*.dll (flat, no subfolders), which grabs the generic stub, not the real
+      implementation nested under runtimes\ — causing a FileNotFoundException at service
+      startup. Pinning the RID makes the SDK place the correct win-x64 assets directly in
+      the flat output root, matching what the installer actually deploys.
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Self-contained for the same reason as TouchMappingAgent.WPF.csproj: the target machine
+         (BIGHYPERV and beyond) is not guaranteed to have .NET 9 installed, and this service must
+         not depend on someone having installed it first. -->
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Serilog" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TouchMappingAgent.Shared\TouchMappingAgent.Shared.csproj" />
+    <ProjectReference Include="..\Evolved.EdidManager\Evolved.EdidManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lets the test project cover MappingStore's registry key escaping and the coordinator's
+         hardware-generation hash directly. Both are internal details with non-obvious
+         correctness conditions (backslashes are registry subkey separators; the generation
+         hash must be order-independent) that deserve their own tests. -->
+    <InternalsVisibleTo Include="TouchMappingAgent.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+<Window x:Class="TouchMappingAgent.WPF.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:TouchMappingAgent.WPF.Localization"
+        Title="{loc:Loc Tray_Caption}" Height="420" Width="420"
+        ResizeMode="NoResize"
+        Icon="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/touchmappingagent.ico"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Evolved.Background}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- The full banner (icon art + wordmark): this window is the one place in the app with
+             enough room for it to stay legible — every other window uses the plain icon mark
+             instead (see the csproj comment on assets\logo.png for why). -->
+        <Image Grid.Row="0" Source="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/logo.png"
+               Width="180" Height="180" Margin="0,0,0,16"
+               RenderOptions.BitmapScalingMode="HighQuality"/>
+
+        <TextBlock Grid.Row="1" Text="{loc:Loc Tray_AboutBody}" Style="{StaticResource Evolved.Text}"
+                   TextAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
+        <Button Grid.Row="2" Content="{loc:Loc Help_Close}" Style="{StaticResource Evolved.Button}"
+                HorizontalAlignment="Center" Margin="0,16,0,0" Width="100" Click="OnClose"/>
+    </Grid>
+</Window>

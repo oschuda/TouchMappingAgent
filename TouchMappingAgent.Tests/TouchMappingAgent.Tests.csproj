@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssemblyName>TouchMappingAgent.Tests</AssemblyName>
+    <RootNamespace>TouchMappingAgent.Tests</RootNamespace>
+    <IsTestProject>true</IsTestProject>
+    <!-- Suppress missing XML doc warnings in test code (CS1591) -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TouchMappingAgent.Shared\TouchMappingAgent.Shared.csproj" />
+    <ProjectReference Include="..\TouchMappingAgent.WPF\TouchMappingAgent.WPF.csproj" />
+    <ProjectReference Include="..\TouchMappingAgent.Service\TouchMappingAgent.Service.csproj" />
+    <ProjectReference Include="..\Evolved.EdidManager\Evolved.EdidManager.csproj" />
+  </ItemGroup>
+
+</Project>

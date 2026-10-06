@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net9.0-windows: registry and CfgMgr32 interop. The Registry APIs ship in the
+         Windows targeting pack, so no extra package reference is needed. -->
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssemblyName>Evolved.EdidManager</AssemblyName>
+    <RootNamespace>Evolved.EdidManager</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The pure layers (parsing, mutation, collision detection, id conversion) carry the
+         correctness-critical logic and are covered directly by the test project. -->
+    <InternalsVisibleTo Include="TouchMappingAgent.Tests" />
+  </ItemGroup>
+
+</Project>

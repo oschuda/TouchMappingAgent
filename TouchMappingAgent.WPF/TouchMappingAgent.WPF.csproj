@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssemblyName>TouchMappingAgent.WPF</AssemblyName>
+    <RootNamespace>TouchMappingAgent.WPF</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <OutputType>WinExe</OutputType>
+    <ApplicationIcon>..\assets\touchmappingagent.ico</ApplicationIcon>
+    <!-- Pinned for the same reason as TouchMappingAgent.Service.csproj: a fixed RID gives a
+         single, unambiguous flat publish output that matches what installer.nsi deploys. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Self-contained: BIGHYPERV and every other target machine ships without a pre-installed
+         .NET 9 runtime, and this product cannot assume an administrator will install one first.
+         The publish output carries its own CLR, so `dotnet publish` alone (as the build script
+         invokes it) already produces a machine that needs nothing pre-installed — the installer
+         does not have to detect or bootstrap a runtime. -->
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Copied next to the .exe because TrayIconManager loads it at runtime: NotifyIcon needs
+         a System.Drawing.Icon, and the shell picks the right frame per DPI from the file. -->
+    <None Include="..\assets\touchmappingagent.ico" Link="touchmappingagent.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <!-- Also embedded so Window.Icon and the header Image can reference it by pack URI. WPF
+         then picks the frame matching the target DPI instead of downscaling the 256px one. -->
+    <Resource Include="..\assets\touchmappingagent.ico" Link="Assets\touchmappingagent.ico" />
+    <!-- The full banner (icon art + wordmark), shown where there is actually room for it to stay
+         legible: the setup wizard's header and the About window. Too big to read at the ~44-64px
+         a compact window header allows, which is why every other window keeps the plain icon
+         above instead. -->
+    <Resource Include="..\assets\logo.png" Link="Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- UI text. Strings.resx is German and is the NEUTRAL culture (see AssemblyInfo.cs), so it
+         compiles into the main assembly and is what any unshipped language falls back to.
+         Strings.en.resx becomes an en\TouchMappingAgent.WPF.resources.dll satellite, which is
+         also how Localizer.DiscoverAvailableCultures finds which languages this build ships.
+
+         No <Generator>: the designer's per-key properties are useless here, because the keys that
+         matter arrive from the service at runtime and can only be looked up by string. See
+         Localization\Strings.cs. -->
+    <EmbeddedResource Update="Localization\Strings.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Strings.en.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <!-- Same logging stack as the service, so client and service produce comparable logs
+         side by side under %ProgramData%\PadaLuma\TouchMappingAgent\logs. -->
+    <PackageReference Include="Serilog" Version="4.1.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TouchMappingAgent.Shared\TouchMappingAgent.Shared.csproj" />
+    <ProjectReference Include="..\Evolved.EdidManager\Evolved.EdidManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lets the test project cover MonitorMappingViewModel.RenderTemplate directly. That
+         helper replaces a string.Format call which threw FormatException on structured-logging
+         placeholders inside catch blocks, so it needs its own tests rather than only indirect
+         coverage. -->
+    <InternalsVisibleTo Include="TouchMappingAgent.Tests" />
+  </ItemGroup>
+
+</Project>

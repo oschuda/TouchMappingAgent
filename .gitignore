@@ -1,0 +1,26 @@
+# Build output
+bin/
+obj/
+
+# IDE
+.vs/
+.vscode/
+*.sln.DotSettings.user
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test coverage
+coverage/
+*.trx
+
+# Logs
+logs/
+*.log
+
+# Publish output and installer build artifacts
+publish/
+TouchMappingAgent-Setup.exe

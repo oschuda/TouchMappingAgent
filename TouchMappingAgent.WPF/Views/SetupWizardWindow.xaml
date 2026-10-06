@@ -1,0 +1,306 @@
+<Window x:Class="TouchMappingAgent.WPF.Views.SetupWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:TouchMappingAgent.WPF.ViewModels"
+        xmlns:loc="clr-namespace:TouchMappingAgent.WPF.Localization"
+        Title="{loc:Loc Wizard_WindowTitle}" Height="760" Width="980"
+        MinHeight="620" MinWidth="860"
+        Icon="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/touchmappingagent.ico"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Evolved.Background}"
+        Loaded="OnLoaded">
+
+    <Window.Resources>
+        <Style x:Key="StepPanel" TargetType="Border" BasedOn="{StaticResource Evolved.Card}">
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Banner: the full logo, at a size where its wordmark actually stays readable
+             (unlike the ~44px icon slots every other window is limited to). -->
+        <Image Grid.Row="0" Source="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/logo.png"
+               Height="72" HorizontalAlignment="Left" Margin="0,0,0,14"
+               RenderOptions.BitmapScalingMode="HighQuality"/>
+
+        <!-- Header -->
+        <Grid Grid.Row="1" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0" Source="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/touchmappingagent.ico"
+                   Width="44" Height="44" Margin="0,0,14,0" VerticalAlignment="Center"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding StepTitle}" Style="{StaticResource Evolved.Text.Title}"/>
+                <TextBlock Text="{Binding StepCaption}" Style="{StaticResource Evolved.Text.Muted}"/>
+            </StackPanel>
+
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
+                       Style="{StaticResource Evolved.Text.Muted}">
+                <Run Text="{loc:Loc Wizard_RightsLabel}"/>
+                <Run Text="{Binding IsElevated, Converter={StaticResource BoolToElevation}, Mode=OneWay}"/>
+            </TextBlock>
+        </Grid>
+
+        <!-- Steps -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <Grid>
+
+                <!-- ===================== 1 Pre-Flight ===================== -->
+                <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource StepVisibility}, ConverterParameter=PreFlight}">
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Style="{StaticResource Evolved.Text}" Text="{loc:Loc Wizard_Step1_Intro}"/>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Wizard_Step1_ResultHeading}" Style="{StaticResource Evolved.Text.Heading}"/>
+                            <TextBlock Style="{StaticResource Evolved.Text}">
+                                <Run Text="{loc:Loc Wizard_Step1_AdminRights}"/>
+                                <Run Text="{Binding IsElevated, Converter={StaticResource BoolToYesNo}, Mode=OneWay}"/>
+                                <LineBreak/>
+                                <Run Text="{loc:Loc Wizard_Step1_ServiceReachable}"/>
+                                <Run Text="{Binding ServiceReachable, Converter={StaticResource BoolToYesNo}, Mode=OneWay}"/>
+                                <LineBreak/>
+                                <Run Text="{loc:Loc Wizard_Step1_MonitorsDetected}"/>
+                                <Run Text="{Binding Monitors.Count, Mode=OneWay}"/>
+                                <LineBreak/>
+                                <Run Text="{loc:Loc Wizard_Step1_DigitizersDetected}"/>
+                                <Run Text="{Binding Digitizers.Count, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Text="{Binding CollisionStatus}" Style="{StaticResource Evolved.Text}"
+                                       FontWeight="SemiBold" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Wizard_Step1_MonitorsHeading}" Style="{StaticResource Evolved.Text.Heading}"/>
+                            <ItemsControl ItemsSource="{Binding Monitors}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayLabel}" Style="{StaticResource Evolved.Text.Muted}"
+                                                   Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock Text="{loc:Loc Wizard_Step1_DigitizersHeading}" Style="{StaticResource Evolved.Text.Heading}"
+                                       Margin="0,12,0,6"/>
+                            <ItemsControl ItemsSource="{Binding Digitizers}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayLabel}" Style="{StaticResource Evolved.Text.Muted}"
+                                                   Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Content="{loc:Loc Wizard_Step1_Run}" Style="{StaticResource Evolved.Button.Primary}"
+                            Command="{Binding RunPreFlightCommand}" HorizontalAlignment="Left"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                </StackPanel>
+
+                <!-- ===================== 2 EDID strategy ===================== -->
+                <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource StepVisibility}, ConverterParameter=EdidStrategy}">
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Style="{StaticResource Evolved.Text}" Text="{loc:Loc Wizard_Step2_Intro}"/>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <StackPanel>
+                            <RadioButton GroupName="Strategy" Margin="0,0,0,10"
+                                         Foreground="{StaticResource Evolved.Foreground}"
+                                         IsChecked="{Binding SelectedStrategy, Converter={StaticResource EnumToBool}, ConverterParameter=Automatic}">
+                                <StackPanel>
+                                    <TextBlock Text="{loc:Loc Wizard_Step2_OptionATitle}" Style="{StaticResource Evolved.Text}" FontWeight="SemiBold"/>
+                                    <TextBlock Style="{StaticResource Evolved.Text.Muted}"
+                                               Text="{loc:Loc Wizard_Step2_OptionADesc}"/>
+                                </StackPanel>
+                            </RadioButton>
+
+                            <RadioButton GroupName="Strategy"
+                                         Foreground="{StaticResource Evolved.Foreground}"
+                                         IsChecked="{Binding SelectedStrategy, Converter={StaticResource EnumToBool}, ConverterParameter=Template}">
+                                <StackPanel>
+                                    <TextBlock Text="{loc:Loc Wizard_Step2_OptionBTitle}" Style="{StaticResource Evolved.Text}" FontWeight="SemiBold"/>
+                                    <TextBlock Style="{StaticResource Evolved.Text.Muted}"
+                                               Text="{loc:Loc Wizard_Step2_OptionBDesc}"/>
+                                </StackPanel>
+                            </RadioButton>
+
+                            <StackPanel Orientation="Horizontal" Margin="24,10,0,0">
+                                <Button Content="{loc:Loc Wizard_Step2_PickTemplate}"
+                                        Style="{StaticResource Evolved.Button}"
+                                        Command="{Binding PickTemplateCommand}"/>
+                            </StackPanel>
+                            <TextBlock Margin="24,6,0,0" Style="{StaticResource Evolved.Text.Muted}"
+                                       Text="{Binding TemplateFileDisplay}"
+                                       Visibility="{Binding TemplateFilePath, Converter={StaticResource NullToCollapsed}}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}"
+                            Visibility="{Binding EdidActionResult, Converter={StaticResource NullToCollapsed}}">
+                        <TextBlock Text="{Binding EdidActionResult}" Style="{StaticResource Evolved.Text}"/>
+                    </Border>
+
+                    <Button Content="{loc:Loc Wizard_Step2_Apply}"
+                            Style="{StaticResource Evolved.Button.Primary}"
+                            Command="{Binding ApplyEdidStrategyCommand}" HorizontalAlignment="Left"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                </StackPanel>
+
+                <!-- ===================== 3 PnP verification ===================== -->
+                <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource StepVisibility}, ConverterParameter=PnpVerification}">
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Style="{StaticResource Evolved.Text}" Text="{loc:Loc Wizard_Step3_Intro}"/>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding PnpVerificationResult}" Style="{StaticResource Evolved.Text}"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Style="{StaticResource Evolved.Text.Muted}" Margin="0,8,0,0">
+                                <Run Text="{loc:Loc Wizard_Step3_RemainingCollisions}"/>
+                                <Run Text="{Binding RemainingCollisions, Mode=OneWay}"/>
+                                <Run Text="{loc:Loc Wizard_Step3_RequiredZero}"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Content="{loc:Loc Wizard_Step3_Verify}" Style="{StaticResource Evolved.Button.Primary}"
+                            Command="{Binding VerifyPnpCommand}" HorizontalAlignment="Left"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                </StackPanel>
+
+                <!-- ===================== 4 Touch assignment ===================== -->
+                <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource StepVisibility}, ConverterParameter=TouchAssignment}">
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Style="{StaticResource Evolved.Text}" Text="{loc:Loc Wizard_Step4_Intro}"/>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Wizard_Step4_LearnedHeading}" Style="{StaticResource Evolved.Text.Heading}"/>
+                            <ItemsControl ItemsSource="{Binding LearnedAssignments}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource Evolved.Text.Muted}" Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Content="{loc:Loc Wizard_Step4_Run}"
+                            Style="{StaticResource Evolved.Button.Primary}"
+                            Command="{Binding RunTouchAssignmentCommand}" HorizontalAlignment="Left"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                </StackPanel>
+
+                <!-- ===================== 5 tabcal ===================== -->
+                <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource StepVisibility}, ConverterParameter=TabcalTest}">
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Style="{StaticResource Evolved.Text}">
+                            <Run Text="{loc:Loc Wizard_Step5_IntroBeforeBold}"/>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="SemiBold" Text="{loc:Loc Wizard_Step5_BoldPhrase}"/>
+                            <Run Text="{loc:Loc Wizard_Step5_IntroAfterBold}"/>
+                        </TextBlock>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Text="{Binding TabcalResult}" Style="{StaticResource Evolved.Text}" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <Button Content="{loc:Loc Wizard_Step5_Run}"
+                            Style="{StaticResource Evolved.Button.Primary}"
+                            Command="{Binding RunTabcalTestCommand}" HorizontalAlignment="Left"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                </StackPanel>
+
+                <!-- ===================== 6 Summary ===================== -->
+                <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource StepVisibility}, ConverterParameter=Summary}">
+                    <Border Style="{StaticResource StepPanel}">
+                        <TextBlock Text="{Binding FinalVerdict}" Style="{StaticResource Evolved.Text.Heading}"/>
+                    </Border>
+
+                    <Border Style="{StaticResource StepPanel}">
+                        <ItemsControl ItemsSource="{Binding StepResults}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,4">
+                                        <TextBlock Style="{StaticResource Evolved.Text}">
+                                            <Run Text="{loc:Loc Wizard_Step6_StepWord}"/>
+                                            <Run Text="{Binding Step, Mode=OneWay}"/>
+                                            <Run Text="—"/>
+                                            <Run Text="{Binding Title, Mode=OneWay}"/>
+                                            <Run Text="{Binding Succeeded, Converter={StaticResource BoolToOkFail}, Mode=OneWay}"
+                                                 FontWeight="Bold"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Detail}" Style="{StaticResource Evolved.Text.Muted}"
+                                                   Margin="16,2,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+
+                    <WrapPanel>
+                        <Button Content="{loc:Loc Wizard_Step6_ExportReport}"
+                                Style="{StaticResource Evolved.Button.Primary}"
+                                Command="{Binding ExportReportCommand}" Margin="0,0,10,0"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                        <Button Content="{loc:Loc Wizard_Step6_Close}" Style="{StaticResource Evolved.Button}"
+                                Click="OnClose"/>
+                    </WrapPanel>
+
+                    <TextBlock Margin="0,10,0,0" Style="{StaticResource Evolved.Text.Muted}"
+                               Text="{Binding ReportPathDisplay}"
+                               Visibility="{Binding ReportPath, Converter={StaticResource NullToCollapsed}}"/>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Navigation -->
+        <Grid Grid.Row="3" Margin="0,14,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="{loc:Loc Wizard_Back}" Style="{StaticResource Evolved.Button}"
+                    Command="{Binding GoBackCommand}"
+                    IsEnabled="{Binding CanGoBack}"/>
+
+            <Button Grid.Column="2" Content="{loc:Loc Wizard_Next}" Style="{StaticResource Evolved.Button.Primary}"
+                    Command="{Binding GoNextCommand}"
+                    IsEnabled="{Binding CanGoNext}"/>
+        </Grid>
+
+        <!-- Status -->
+        <Border Grid.Row="4" Background="{StaticResource Evolved.Surface}"
+                BorderBrush="{StaticResource Evolved.Border}" BorderThickness="1"
+                CornerRadius="4" Padding="10,8">
+            <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource Evolved.Text}"/>
+        </Border>
+    </Grid>
+</Window>

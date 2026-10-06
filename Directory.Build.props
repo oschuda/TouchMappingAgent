@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>
+    
+    <!-- Versioning -->
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <Description>Touch Mapping Agent for HID Device Management</Description>
+    <PackageProjectUrl>https://github.com/YourOrg/TouchMappingAgent</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- Applies to every project via this single Directory.Build.props: the SDK turns these into
+         the compiled AssemblyCompany / AssemblyCopyright / AssemblyProduct attributes (see
+         GenerateAssemblyInfo, on by default), which is what a hand-edited AssemblyInfo.cs would
+         otherwise declare — one point of truth instead of four separate copies to keep in sync. -->
+    <Company>PadaLuma Inkjet Solutions</Company>
+    <Authors>Erik Denzler</Authors>
+    <Copyright>© 2026 PadaLuma Inkjet Solutions, Erik Denzler</Copyright>
+    <Product>TouchMappingAgent</Product>
+  </PropertyGroup>
+
+  <!-- Analyzer Configuration -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

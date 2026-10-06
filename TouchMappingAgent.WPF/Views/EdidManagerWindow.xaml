@@ -1,0 +1,164 @@
+<Window x:Class="TouchMappingAgent.WPF.Views.EdidManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:TouchMappingAgent.WPF.Localization"
+        Title="{loc:Loc EdidUi_Title}" Height="720" Width="1040"
+        MinHeight="560" MinWidth="900"
+        Icon="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/touchmappingagent.ico"
+        WindowStartupLocation="CenterScreen"
+        AllowDrop="True"
+        Background="{StaticResource Evolved.Background}"
+        Drop="OnFileDrop" DragOver="OnDragOver"
+        Loaded="OnLoaded">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0" Source="pack://application:,,,/TouchMappingAgent.WPF;component/Assets/touchmappingagent.ico"
+                   Width="44" Height="44" Margin="0,0,14,0" VerticalAlignment="Center"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{loc:Loc EdidUi_Title}" Style="{StaticResource Evolved.Text.Title}"/>
+                <TextBlock Text="{Binding CollisionSummary}" Style="{StaticResource Evolved.Text.Muted}"/>
+            </StackPanel>
+
+            <Button Grid.Column="2" Content="{loc:Loc EdidUi_Refresh}" Style="{StaticResource Evolved.Button}"
+                    Command="{Binding RefreshCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"
+                    VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Explanation -->
+        <Border Grid.Row="1" Style="{StaticResource Evolved.Card}" Margin="0,0,0,12">
+            <TextBlock Style="{StaticResource Evolved.Text.Muted}">
+                <Run Text="{loc:Loc EdidUi_LegendHeading}" FontWeight="SemiBold"/>
+                <LineBreak/>
+                <Run Text="{loc:Loc EdidUi_LegendValid}"/><Run Text="{loc:Loc EdidUi_LegendValidDesc}"/>
+                <LineBreak/>
+                <Run Text="{loc:Loc EdidUi_LegendCollision}"/><Run Text="{loc:Loc EdidUi_LegendCollisionDesc}"/>
+                <LineBreak/>
+                <Run Text="{loc:Loc EdidUi_LegendExtender}"/><Run Text="{loc:Loc EdidUi_LegendExtenderDesc}"/>
+                <LineBreak/>
+                <Run Text="{loc:Loc EdidUi_LegendOverride}"/><Run Text="{loc:Loc EdidUi_LegendOverrideDesc}"/>
+            </TextBlock>
+        </Border>
+
+        <!-- Port list -->
+        <Border Grid.Row="2" Style="{StaticResource Evolved.Card}" Padding="0">
+            <ListView ItemsSource="{Binding Ports}" SelectedItem="{Binding SelectedPort}"
+                      Style="{StaticResource Evolved.ListView}" BorderThickness="0">
+                <ListView.View>
+                    <GridView ColumnHeaderContainerStyle="{StaticResource Evolved.GridViewColumnHeader}">
+                        <GridViewColumn Header="{loc:Loc EdidUi_ColConnector}" DisplayMemberBinding="{Binding Connector}" Width="90"/>
+                        <GridViewColumn Header="{loc:Loc EdidUi_ColMonitor}" DisplayMemberBinding="{Binding MonitorName}" Width="150"/>
+                        <GridViewColumn Header="{loc:Loc EdidUi_ColMode}" DisplayMemberBinding="{Binding ModeDisplay}" Width="130"/>
+                        <GridViewColumn Header="{loc:Loc EdidUi_ColSerial}" DisplayMemberBinding="{Binding SerialDisplay}" Width="180"/>
+                        <GridViewColumn Header="{loc:Loc EdidUi_ColStatus}" DisplayMemberBinding="{Binding EdidStatus}" Width="150"/>
+                        <GridViewColumn Header="{loc:Loc EdidUi_ColPnpId}" DisplayMemberBinding="{Binding PnpInstanceId}" Width="290"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Border>
+
+        <!-- Template / action panel -->
+        <Border Grid.Row="3" Style="{StaticResource Evolved.Card}" Margin="0,12,0,12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="{loc:Loc EdidUi_ApplyTemplateHeading}"
+                           Style="{StaticResource Evolved.Text.Heading}"/>
+
+                <Grid Grid.Row="1" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{loc:Loc EdidUi_TemplateLabel}" Style="{StaticResource Evolved.Text.Muted}" Margin="0,0,0,4"/>
+                        <ComboBox ItemsSource="{Binding Templates}" SelectedItem="{Binding SelectedTemplate}"
+                                  DisplayMemberPath="Name" MinHeight="34"/>
+                        <TextBlock Style="{StaticResource Evolved.Text.Muted}" Margin="0,6,0,0"
+                                   Text="{Binding DroppedFileDisplay}"
+                                   Visibility="{Binding DroppedFilePath, Converter={StaticResource NullToCollapsed}}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                        <Button Content="{loc:Loc EdidUi_BrowseFile}" Style="{StaticResource Evolved.Button}"
+                                Click="OnBrowseTemplate"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="4">
+                        <TextBlock Text="{loc:Loc EdidUi_SerialLabel}" Style="{StaticResource Evolved.Text.Muted}"
+                                   Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding CustomSerial, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource Evolved.TextBox}"/>
+                    </StackPanel>
+                </Grid>
+
+                <WrapPanel Grid.Row="2">
+                    <Button Content="{loc:Loc EdidUi_ApplyTemplate}" Style="{StaticResource Evolved.Button.Primary}"
+                            Command="{Binding ApplyTemplateCommand}" Margin="0,0,10,0"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                    <Button Content="{loc:Loc EdidUi_Synthesize}"
+                            Style="{StaticResource Evolved.Button}"
+                            Command="{Binding SynthesizeCommand}" Margin="0,0,10,0"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                    <Button Content="{loc:Loc EdidUi_ClearFile}" Style="{StaticResource Evolved.Button}"
+                            Command="{Binding ClearDroppedFileCommand}"/>
+                </WrapPanel>
+            </Grid>
+        </Border>
+
+        <!-- Global actions + status -->
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <WrapPanel Grid.Row="0" Margin="0,0,0,10">
+                <Button Content="{loc:Loc EdidUi_ResolveCollisions}" Style="{StaticResource Evolved.Button.Primary}"
+                        Command="{Binding ResolveCollisionsCommand}" Margin="0,0,10,0"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                <Button Content="{loc:Loc EdidUi_PreviewDryRun}" Style="{StaticResource Evolved.Button}"
+                        Command="{Binding PreviewCollisionsCommand}" Margin="0,0,10,0"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                <Button Content="{loc:Loc EdidUi_RestoreSelected}" Style="{StaticResource Evolved.Button}"
+                        Command="{Binding RestoreSelectedCommand}" Margin="0,0,10,0"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+                <Button Content="{loc:Loc EdidUi_RestoreAll}" Style="{StaticResource Evolved.Button.Danger}"
+                        Command="{Binding RestoreDefaultsCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"/>
+            </WrapPanel>
+
+            <Border Grid.Row="1" Background="{StaticResource Evolved.Surface}"
+                    BorderBrush="{StaticResource Evolved.Border}" BorderThickness="1"
+                    CornerRadius="4" Padding="10,8">
+                <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource Evolved.Text}"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
+
